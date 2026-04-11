@@ -27,8 +27,8 @@ class TokenResponse(BaseModel):
     token_type: str
 
 class BookUpdate(BaseModel):
-    title: str
-    author_id: int | None = None
+    title: str | None = None
+    price: int | None = None
     amount: int | None = None
 
 class BookCreate(BaseModel):

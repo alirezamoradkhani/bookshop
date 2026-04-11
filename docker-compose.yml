@@ -21,3 +21,15 @@ services:
 
 volumes:
   pgdata:
+
+app:
+  build: .
+  container_name: fastapi-app
+  restart: always
+  ports:
+    - "8000:8000"
+  depends_on:
+    - postgres
+    - redis
+  volumes:
+    - .:/app

@@ -62,25 +62,25 @@ def remove_book(book_id: int, token_data: dict = Depends(get_current_user), db=D
 
 @app.patch("/books", response_model=schemas.BookResponse)
 def update_book(book_id: int, book: schemas.BookUpdate, token_data: dict = Depends(get_current_user), db=Depends(get_db)):
-    return crud.update_book(db=db, token_data=token_data, book_id=book_id, book=book)
+    return crud.update_book(db=db, token_data=token_data, book_id=book_id, book_update=book)
 #orders crud
 @app.post("/orders", response_model= schemas.OrderResponse)
-def buy_book(book_id : int,token_data = Depends(get_current_user), db = Depends(get_db)):
-    return crud.buy(db=db, book_id=book_id, token_data=token_data)
+def buy_book(book_id : list[int],token_data = Depends(get_current_user), db = Depends(get_db)):
+    return crud.buy(db=db, book_ids=book_id, token_data=token_data)
 
-
+    
 @app.patch("/orders", response_model=schemas.OrderResponse)
 def update_order_state(order_id: int, new_state: schemas.OrderState, token_data = Depends(get_current_user), db = Depends(get_db)):
-    return crud.update_order_state(db=db, order_id=order_id, new_state=new_state.value, token_data=token_data)
+    return crud.update_order_state(db=db, order_id=order_id, new_state=new_state, token_data=token_data)
 
 
 @app.get("/orders")
 def get_order(order_id: int, token_data = Depends(get_current_user), db = Depends(get_db)):
-    return crud.get_order(db=db, order_id=order_id, token_data=token_data)
+    return crud.get_order(db=db, token_data=token_data)
 
 @app.get("/wallet/info")
 def get_wallet_info(token_data: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-    return crud.get_wallet_info(token_data=token_data, db=db)
+    return crud.wallet_info(token_data=token_data, db=db)
 
 @app.post("/wallet/recharge")
 def recharge_wallet(amount: int, token_data: dict = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -88,7 +88,7 @@ def recharge_wallet(amount: int, token_data: dict = Depends(get_current_user), d
 
 @app.post("/wallet/withdraw")
 def withdraw_wallet(amount: int, token_data: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-    return crud.withdraw(token_data=token_data, amount=amount, db=db)
+    return crud.withdraw_wallet_amount(token_data=token_data, amount=amount, db=db)
 @app.post("/wallet/transfer")
 def transfer_funds(recipient_email: str, amount: int, token_data: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-    return crud.transfer_funds(token_data=token_data, recipient_email=recipient_email, amount=amount, db=db)
+    return crud.transfer_wallet_amount(token_data=token_data, recipient_email=recipient_email, amount=amount, db=db)

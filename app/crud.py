@@ -4,11 +4,11 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 import models
 import schemas
-import datetime
+from datetime import datetime
     
 
 def singin(email: str,db: Session):
-    db_user = db.query(models.BaseUser).filter(models.BaseUser.email == email).first()
+    db_user = db.query(models.BaseUser).filter(models.BaseUser.email == email, models.BaseUser.delete_time.is_(None)).first()
     if db_user is not None:
         raise HTTPException(status_code=400, detail="email already registered")
     send_otp(email)
@@ -35,11 +35,11 @@ def remove_user(db: Session, token_data: dict, user_id: int):
     user_to_remove = db.query(models.BaseUser).filter(models.BaseUser.id == user_id).first()
     if user_to_remove is None:
         raise HTTPException(status_code=404, detail="User not found.")
-    db.delete(user_to_remove)
+    user_to_remove.delete_time = str(datetime.utcnow())
     db.commit()
 
 def login_step_one(db: Session, user: schemas.UserLogin):
-    user_in_db = db.query(models.BaseUser).filter(models.BaseUser.username == user.username).first()
+    user_in_db = db.query(models.BaseUser).filter(models.BaseUser.username == user.username, models.BaseUser.delete_time.is_(None)).first()
     if user_in_db is None or not verify_password(user.password, user_in_db.password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
     send_otp(user_in_db.email)
@@ -48,7 +48,7 @@ def login_step_one(db: Session, user: schemas.UserLogin):
 def login_step_two(db: Session, email: str, otp: str):
     if not verify_otp(email, otp):
         raise Exception("Invalid OTP")
-    user = db.query(models.BaseUser).filter(models.BaseUser.email == email).first()
+    user = db.query(models.BaseUser).filter(models.BaseUser.email == email, models.BaseUser.delete_time.is_(None)).first()
     if user is None:
         raise Exception("Invalid email or password")
     token_data = {
@@ -63,13 +63,13 @@ def get_all_users(db: Session, token_data: dict):
         raise HTTPException(status_code=400, detail="Invalid token user")
     if db_user.role != models.Role.ADMIN.value:
         raise HTTPException(status_code=400, detail="Only admin users can access this resource.")
-    return db.query(models.BaseUser).all()
+    return db.query(models.BaseUser).filter(models.BaseUser.delete_time.is_(None)).all()
 
 def get_authors(db: Session):
-    return db.query(models.Author).all()
+    return db.query(models.Author).filter(models.Author.delete_time.is_(None)).all()
 
 def add_book(db: Session, token_data: dict, book: schemas.BookCreate):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
 
@@ -86,27 +86,27 @@ def add_book(db: Session, token_data: dict, book: schemas.BookCreate):
         return db_book
         
 def remove_book(db: Session, token_data: dict, book_id: int):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
 
     if current_user.role == models.Role.USER:
         raise HTTPException(status_code=400, detail="User does not have permission to remove books.")
     if current_user.role == models.Role.AUTHOR:
-        book = db.query(models.Book).filter(models.Book.id == book_id, models.Book.author_id == current_user.id).first()
+        book = db.query(models.Book).filter(models.Book.id == book_id, models.Book.author_id == current_user.id, models.Book.delete_time.is_(None)).first()
         if book is None:
             raise HTTPException(status_code=404, detail="Book not found or you do not have permission to remove this book.")
-        db.delete(book)
+        book.delete_time = str(datetime.utcnow())
         db.commit()
     elif current_user.role == models.Role.ADMIN:
         book = db.query(models.Book).filter(models.Book.id == book_id).first()
         if book is None:
             raise HTTPException(status_code=404, detail="Book not found.")
-        db.delete(book)
+        book.delete_time = str(datetime.utcnow())
         db.commit()
 
 def update_book(db: Session, token_data: dict, book_id: int, book_update: schemas.BookUpdate):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
 
@@ -114,23 +114,30 @@ def update_book(db: Session, token_data: dict, book_id: int, book_update: schema
         raise HTTPException(status_code=400, detail="User does not have permission to update books.")
 
     if current_user.role == models.Role.AUTHOR:
-        book = db.query(models.Book).filter(models.Book.id == book_id, models.Book.author_id == current_user.id).first()
-        if book is None:
+        book = db.query(models.Book).filter(models.Book.id == book_id, models.Book.delete_time.is_(None)).first()
+        book_author = db.query(models.BookAuthor).filter(models.BookAuthor.book_id == book_id, models.BookAuthor.authors_id == current_user.id).first()
+        if book_author is None or book is None:
             raise HTTPException(status_code=404, detail="Book not found or you do not have permission to update this book.")
-        book.title = book_update.title
-        book.amount = book_update.amount
-        book.price = book_update.price
+        if book_update.title is not None:
+            book.title = book_update.title
+        if book_update.amount is not None:
+            book.amount = book_update.amount
+        if book_update.price is not None:
+            book.price = book_update.price
         db.commit()
         db.refresh(book)
         return book
 
     if current_user.role == models.Role.ADMIN:
-        book = db.query(models.Book).filter(models.Book.id == book_id).first()
+        book = db.query(models.Book).filter(models.Book.id == book_id, models.Book.delete_time.is_(None)).first()
         if book is None:
             raise HTTPException(status_code=404, detail="Book not found.")
-        book.title = book_update.title
-        book.amount = book_update.amount
-        book.price = book_update.price
+        if book_update.title is not None:
+            book.title = book_update.title
+        if book_update.amount is not None:
+            book.amount = book_update.amount
+        if book_update.price is not None:
+            book.price = book_update.price
         db.commit()
         db.refresh(book)
         return book
@@ -138,24 +145,26 @@ def update_book(db: Session, token_data: dict, book_id: int, book_update: schema
 def search_books(db: Session, title: str | None = None, author: str | None = None, id: int | None = None, limit: int = 10, offset: int = 0):
     query = db.query(models.Book)
     if title:
-        query = query.filter(models.Book.title.ilike(f"%{title}%"))
+        query = query.filter(models.Book.title.ilike(f"%{title}%"), models.Book.delete_time.is_(None))
     if author:
-        authors = db.query(models.Author).filter(models.Author.username.ilike(f"%{author}%")).all()
+        authors = db.query(models.Author).filter(models.Author.username.ilike(f"%{author}%"), models.Author.delete_time.is_(None)).all()
         author_ids = [author.id for author in authors]
-        query = query.join(models.BookAuthor).filter(models.BookAuthor.author_id.in_(author_ids))
+        book_ids = db.query(models.BookAuthor.book_id).filter(models.BookAuthor.author_id.in_(author_ids)).all()
+        book_ids = [book_id for (book_id,) in book_ids]
+        query = query.filter(models.Book.id.in_(book_ids), models.Book.delete_time.is_(None))
     if id is not None:
         query = query.filter(models.Book.id == id)
     return query.offset(offset).limit(limit).all()
 
-def buy(db: Session, book_ids: list, token_data: dict):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+def buy(db: Session, book_ids: list[int], token_data: dict):
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     if current_user.role != models.Role.USER:
         raise HTTPException(status_code=400, detail="Only users can buy books.")
     final_price = 0
     for book_id in book_ids:
-        book = db.query(models.Book).filter(models.Book.id == book_id).first()
+        book = db.query(models.Book).filter(models.Book.id == book_id, models.Book.delete_time.is_(None)).first()
         if book is None:
             raise HTTPException(status_code=404, detail="Book not found.")
         if book.amount <= 0:
@@ -165,19 +174,21 @@ def buy(db: Session, book_ids: list, token_data: dict):
         raise HTTPException(status_code=400, detail="Insufficient funds in wallet.")
     current_user.wallet_amount -= final_price
     for book_id in book_ids:
-        book = db.query(models.Book).filter(models.Book.id == book_id).first()
-        book.amount -= 1
+        book = db.query(models.Book).filter(models.Book.id == book_id, models.Book.delete_time.is_(None)).first()
+        if book is not None:
+            book.amount -= 1
     new_order = models.Order(customer_id=current_user.id, state=schemas.OrderState.WAITFORSELLER.value, final_price=final_price, date=str(datetime.utcnow()))
     db.add(new_order)
     db.commit()
     db.refresh(new_order)
-    order_book = models.ordersbooks(order_id=new_order.id, book_id=book.id)
-    db.add(order_book)
+    for book_id in book_ids:
+        order_book = models.ordersbooks(order_id=new_order.id, book_ids=book_id)
+        db.add(order_book)
     db.commit()
     return new_order
 
 def get_order(db: Session,token_data: dict):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     if current_user.role == models.Role.USER:
@@ -194,7 +205,7 @@ def update_order_state(db: Session, token_data: dict, order_id: int, new_state: 
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
     if order is None:
         raise HTTPException(status_code=404, detail="Order not found.")
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     if order.state == schemas.OrderState.CANCELED.value or order.state == schemas.OrderState.DONE.value:
@@ -206,9 +217,6 @@ def update_order_state(db: Session, token_data: dict, order_id: int, new_state: 
             if new_state == schemas.OrderState.CANCELED:
                 order.state = new_state.value
                 current_user.wallet_amount += order.final_price
-                for book_id in book_ids:
-                    book = db.query(models.Book).filter(models.Book.id == book_id).first()
-                    book.amount += 1
                 db.commit()
                 return order
             else:
@@ -221,18 +229,14 @@ def update_order_state(db: Session, token_data: dict, order_id: int, new_state: 
                 raise HTTPException(status_code=403, detail="You do not have permission to update this order.")
             if new_state == schemas.OrderState.INPROCCES:
                 order.state = new_state.value
-                current_user.wallet_amount += order.final_price * 0.95
+                current_user.wallet_amount += order.final_price
                 db.commit()
                 return order
             else:
                 raise HTTPException(status_code=400, detail="Authors can only mark orders as in process or done.")
-    if current_user.role == models.Role.ADMIN:
-        order.state = new_state.value
-        db.commit()
-        return order
     
 def increase_wallet_amount(db: Session, token_data: dict, amount: int):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     if current_user.role != models.Role.USER:
@@ -246,12 +250,12 @@ def increase_wallet_amount(db: Session, token_data: dict, amount: int):
     return current_user.wallet_amount
 
 def transfer_wallet_amount(db: Session, token_data: dict, recipient_email: str, amount: int):
-    sender = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    sender = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if sender is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     if sender.role != models.Role.USER:
         raise HTTPException(status_code=400, detail="Only users can transfer wallet amount.")
-    recipient = db.query(models.BaseUser).filter(models.BaseUser.email == recipient_email).first()
+    recipient = db.query(models.BaseUser).filter(models.BaseUser.email == recipient_email, models.BaseUser.delete_time.is_(None)).first()
     if recipient is None:
         raise HTTPException(status_code=404, detail="Recipient not found.")
     if recipient.role != models.Role.USER:
@@ -270,7 +274,7 @@ def transfer_wallet_amount(db: Session, token_data: dict, recipient_email: str, 
     return {"sender_wallet_amount": sender.wallet_amount, "recipient_wallet_amount": recipient.wallet_amount}
 
 def deposit(token_data: dict, amount: int, db: Session):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     if current_user.role != models.Role.USER:
@@ -288,7 +292,7 @@ def confirm_deposit(token_data: dict, amount: int, db: Session):
     ...
     
 def withdraw_wallet_amount(db: Session, token_data: dict, amount: int):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     if current_user.role != models.Role.AUTHOR:
@@ -304,7 +308,7 @@ def withdraw_wallet_amount(db: Session, token_data: dict, amount: int):
     return current_user.wallet_amount
 
 def wallet_info(db: Session, token_data: dict):
-    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"]).first()
+    current_user = db.query(models.BaseUser).filter(models.BaseUser.id == token_data["user_id"], models.BaseUser.delete_time.is_(None)).first()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     transactions = db.query(models.transaction).filter(models.transaction.user_id == current_user.id).all()
