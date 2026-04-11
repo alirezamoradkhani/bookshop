@@ -1,6 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, BOOLEAN
+from sqlalchemy import ForeignKey, Integer, String, Boolean, BOOLEAN
 from sqlalchemy.orm import Mapped, mapped_column
-from database import Base
+from app.database import Base
 from enum import Enum as pyEnum
 from sqlalchemy.types import Enum as sqlEnum
 
@@ -10,10 +10,16 @@ class Role(str, pyEnum):
     AUTHOR = "author"
     USER = "user"
 
-class catagory(str, pyEnum):
+class Category(str, pyEnum):
     SCIENCE = "science"
     ART = "art"
     HISTORY = "history"
+    TECHNOLOGY = "technology"
+    PROGRAMMING = "programming"
+    BUSINESS = "business"
+    LITERATURE = "literature"
+    PSYCHOLOGY = "psychology"
+    PHILOSOPHY = "philosophy"
 
 class OrderState(str, pyEnum):
     WAITFORSELLER = "waitforseller"
@@ -89,8 +95,8 @@ class Book(Base):
     price: Mapped[int] = mapped_column(Integer, nullable=False)
     amount: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
-    category: Mapped[catagory] = mapped_column(
-        sqlEnum(catagory, name="catagory_enum"),
+    category: Mapped[Category] = mapped_column(
+        sqlEnum(Category, name="category_enum"),
         nullable=False
     )
     delete_time: Mapped[str] = mapped_column(String, nullable=True, default=None)

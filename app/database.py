@@ -1,21 +1,19 @@
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker, declarative_base
-from core.setting import settings
+from app.core.setting import settings
 POSTGRES_DATABASE_URL = settings.database_url
-engine = create_engine(POSTGRES_DATABASE_URL)
+engine = create_async_engine(POSTGRES_DATABASE_URL)
 
-SessionLocal = sessionmaker(
+SessionLocal = async_sessionmaker(
     autocommit=False,
     autoflush=False,
     bind=engine
 )
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
 
 
 Base = declarative_base()

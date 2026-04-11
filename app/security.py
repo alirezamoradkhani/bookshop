@@ -2,10 +2,10 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException, status
-import redis
+import redis.asyncio as redis
 import random
 from passlib.context import CryptContext
-from core.setting import settings
+from app.core.setting import settings
 
 bearer_scheme = HTTPBearer()
 
@@ -14,26 +14,26 @@ ALGORITHM = settings.jwt_algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 redis_client = redis.Redis(
-    host="localhost",
+    host="redis",
     port=6379,
     decode_responses=True
 )
 
-def send_otp(email: str):
+async def send_otp(email: str):
     otp = str(random.randint(100000, 999999))
 
-    redis_client.set(f"otp:{email}", otp, ex=120)
+    await redis_client.set(f"otp:{email}", otp, ex=120)
 
     print("OTP:", otp)
 
     return otp
 
-def verify_otp(email: str, otp: str):
-    saved_otp = redis_client.get(f"otp:{email}")
+async def verify_otp(email: str, otp: str):
+    saved_otp = await redis_client.get(f"otp:{email}")
     if saved_otp is None:
         return False
     if saved_otp == otp:
-        redis_client.delete(f"otp:{email}")
+        await redis_client.delete(f"otp:{email}")
         return True
     return False
 
@@ -67,3 +67,5 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
+
+#its turned async

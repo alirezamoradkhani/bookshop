@@ -58,7 +58,7 @@ class BookSearch(BaseModel):
         orm_mode = True
 
 class OrderResponse(BaseModel):
-    book_id: int
+    book_ids: list[int]
     customer_id: int
     id: int
     state: str
