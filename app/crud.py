@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from app.security import create_access_token, hash_password, verify_password, redis_client
-from app.otp import send_otp, verify_otp
+from app.otp import send_otp, verify_otp, create_otp
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from app import models
@@ -12,7 +12,7 @@ async def singin(email: str,db: AsyncSession):
     result = await db.execute(select(models.BaseUser).where(models.BaseUser.email == email, models.BaseUser.delete_time.is_(None)))
     if result.scalar_one_or_none() is not None:
         raise HTTPException(status_code=400, detail="email already registered")
-    await send_otp(email)
+    await create_otp(email)
     return "OTP sent to email"
 
 async def create_user(db: AsyncSession, otp: str, user: schemas.UserCreate):
@@ -46,7 +46,7 @@ async def login_step_one(db: AsyncSession, user: schemas.UserLogin):
     user_in_db = result.scalar_one_or_none()
     if user_in_db is None or not verify_password(user.password, user_in_db.password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    await send_otp(user_in_db.email)
+    await create_otp(user_in_db.email)
     return "OTP sent to email"
 
 async def login_step_two(db: AsyncSession, email: str, otp: str):
