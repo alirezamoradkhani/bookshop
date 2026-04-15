@@ -35,6 +35,11 @@ async def get_all_users(db: AsyncSession = Depends(get_db), token_data: dict = D
 @app.get("/users/authors", response_model=list[schemas.UserResponse])
 async def get_authors(db: AsyncSession = Depends(get_db)):
     return await crud.get_authors(db=db)
+
+@app.patch("/user/plan")
+async def upgrade_plan(new_plan: models.UserPlan,token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    return await crud.upgrade_plan(db=db,token_data=token_data,new_plan=new_plan)
+
 @app.delete("/users")
 async def remove_user(user_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     return await crud.remove_user(db=db, token_data=token_data, user_id=user_id)
@@ -63,16 +68,25 @@ async def remove_book(book_id: int, token_data: dict = Depends(get_current_user)
 @app.patch("/books", response_model=schemas.BookResponse)
 async def update_book(book_id: int, book: schemas.BookUpdate, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     return await crud.update_book(db=db, token_data=token_data, book_id=book_id, book_update=book)
+
+#edition crud
+@app.post("/editions")
+async def add_edition(edition: schemas.EditionCreate,token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    return await crud.add_edition(db=db,token_data=token_data,edition=edition)
+
 #orders crud
 @app.post("/orders", response_model= schemas.OrderResponse)
-async def buy_book(book_id : list[int],token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.buy(db=db, book_ids=book_id, token_data=token_data)
+async def buy_edition(edition_ids : list[int],token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    return await crud.buy(db=db, edition_ids=edition_ids, token_data=token_data)
 
     
 @app.patch("/orders", response_model=schemas.OrderResponse)
 async def update_order_state(order_id: int, new_state: schemas.OrderState, token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     return await crud.update_order_state(db=db, order_id=order_id, new_state=new_state, token_data=token_data)
 
+@app.patch("/order/author")
+async def update_order_edition_state(order_id: int,edition_id: int,new_state: schemas.OrderItemState, token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    return await crud.update_order_edition_state(db=db,token_data=token_data,edition_id=edition_id,order_id=order_id,new_state=new_state)
 
 @app.get("/orders")
 async def get_order(order_id: int, token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
@@ -92,3 +106,17 @@ async def withdraw_wallet(amount: int, token_data: dict = Depends(get_current_us
 @app.post("/wallet/transfer")
 async def transfer_funds(recipient_email: str, amount: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     return await crud.transfer_wallet_amount(token_data=token_data, recipient_email=recipient_email, amount=amount, db=db)
+
+#borrows
+
+@app.post("/borrows/take")
+async def borrow_edition(edition_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    return await crud.borrow_edition(db=db,token_data=token_data,edition_id=edition_id)
+
+@app.post("/borrow/return")
+async def return_borrow(borrow_id:int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    return await crud.return_borrow(db=db,token_data=token_data,borrow_id=borrow_id)
+
+@app.post("/borrow/waitlist")
+async def add_to_waitlist(edition_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    return await crud.add_to_waitlist(db=db,token_data=token_data,edition_id=edition_id)

@@ -1,14 +1,22 @@
-from sqlalchemy import ForeignKey, Integer, String, Boolean, BOOLEAN
+from sqlalchemy import ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 from enum import Enum as pyEnum
 from sqlalchemy.types import Enum as sqlEnum
+from sqlalchemy import DateTime
+from datetime import datetime
 
 
 class Role(str, pyEnum):
     ADMIN = "admin"
     AUTHOR = "author"
     USER = "user"
+
+class UserPlan(str, pyEnum):
+    BRONZE = "bronze"
+    SILVER = "silver"
+    GOLD = "gold"
+    PLATINUM = "platinum"
 
 class Category(str, pyEnum):
     SCIENCE = "science"
@@ -18,16 +26,35 @@ class Category(str, pyEnum):
     PROGRAMMING = "programming"
     BUSINESS = "business"
     LITERATURE = "literature"
-    PSYCHOLOGY = "psychology"
-    PHILOSOPHY = "philosophy"
+
+class Language(str,pyEnum):
+    FA = "fa"
+    EN = "en"
+    ARB = "arb"
+    
 
 class OrderState(str, pyEnum):
-    WAITFORSELLER = "waitforseller"
-    INPROCCES = "inprocces"
+    WAITING = "waiting"
+    IN_PROCCESE = "in_proccese"
     DONE = "done"
     CANCELED = "canceled"
 
-class transactionType(str, pyEnum):
+class OrderItemState(str, pyEnum):
+    WAITING = "waiting"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    PREPARING = "preparing"
+    DONE = "done"
+
+class BorrowStatus(str, pyEnum):
+    # WAITING = "waiting"
+    ACTIVE = "active"
+    OVERDUE = "overdue"
+    RETURNED = "returned"
+    # CANCELLED = "cancelled"
+
+
+class TransactionType(str, pyEnum):
     DEPOSIT = "deposit"
     WITHDRAWAL = "withdrawal"
     SEND = "send"
@@ -42,88 +69,52 @@ class BaseUser(Base):
     email: Mapped[str] = mapped_column(String, unique=True)
     password: Mapped[str] = mapped_column(String)
 
-    role: Mapped[Role] = mapped_column(
-        sqlEnum(Role, name="role_enum"),
-        nullable=False,
-        default=Role.USER
-    )
+    role: Mapped[Role] = mapped_column(sqlEnum(Role))
+    wallet_amount: Mapped[int] = mapped_column(Integer, default=0)
 
-    wallet_amount: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    delete_time: Mapped[str] = mapped_column(String, nullable=True,default=None)
-
-    __mapper_args__ = {
-        "polymorphic_on": role,
-        "polymorphic_identity": "base_user",
-    }
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class User(BaseUser):
     __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True, index=True)
-
-    __mapper_args__ = {
-        'polymorphic_identity': Role.USER.value,
-    }
+    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
+    plan: Mapped[UserPlan] = mapped_column(
+        sqlEnum(UserPlan, name="plan_enum"),
+        default=UserPlan.BRONZE,
+        nullable=False
+    )
 
 
 class Author(BaseUser):
     __tablename__ = "authors"
-
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True, index=True)
-
-    __mapper_args__ = {
-        'polymorphic_identity': Role.AUTHOR.value,
-    }
+    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
 
 
 class Admin(BaseUser):
     __tablename__ = "admins"
+    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
 
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True, index=True)
-
-    __mapper_args__ = {
-        'polymorphic_identity': Role.ADMIN.value,
-    }
 
 
 class Book(Base):
     __tablename__ = "books"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    title: Mapped[str] = mapped_column(String, index=True)
-    price: Mapped[int] = mapped_column(Integer, nullable=False)
-    amount: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-
-    category: Mapped[Category] = mapped_column(
-        sqlEnum(Category, name="category_enum"),
-        nullable=False
-    )
-    delete_time: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String)
+    category: Mapped[Category] = mapped_column(sqlEnum(Category))
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
-class Order(Base):
-    __tablename__ = "orders"
+class Edition(Base):
+    __tablename__ = "editions"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    customer_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), index=True)
-
-    state: Mapped[OrderState] = mapped_column(
-        sqlEnum(OrderState, name="state_enum"),
-        nullable=False,
-        default=OrderState.WAITFORSELLER
-    )
-
-    final_price: Mapped[int] = mapped_column(Integer, nullable=False)
-    date: Mapped[str] = mapped_column(String, nullable=False)
-
-
-class ordersbooks(Base):
-    __tablename__ = "orders_books"
-
-    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), primary_key=True)
-    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), primary_key=True)
-
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"))
+    price: Mapped[int] = mapped_column(Integer)
+    amount: Mapped[int] = mapped_column(Integer, default=0)
+    language : Mapped[Language] = mapped_column(sqlEnum(Language, name = "language_enm"))
+    specefic_edition_title : Mapped[str] = mapped_column(String, default= None)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
 class BookAuthor(Base):
     __tablename__ = "book_authors"
@@ -132,16 +123,56 @@ class BookAuthor(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), primary_key=True)
 
 
-class transaction(Base):
+class Borrow(Base):
+    __tablename__ = "borrows"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"))
+
+    status: Mapped[BorrowStatus] = mapped_column(sqlEnum(BorrowStatus),default= BorrowStatus.ACTIVE)
+
+    borrowed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    returned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class Waitlist(Base):
+    __tablename__ = "waitlist"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"))
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    state: Mapped[OrderState] = mapped_column(sqlEnum(OrderState), default= OrderState.WAITING)
+    final_price: Mapped[int] = mapped_column(Integer)
+    date: Mapped[str] = mapped_column(String)
+
+
+class OrderEdition(Base):
+    __tablename__ = "orders_editions"
+
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), primary_key=True)
+    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"), primary_key=True)
+    state: Mapped[OrderItemState] = mapped_column(sqlEnum(OrderItemState), default=OrderItemState.WAITING)
+
+class Transaction(Base):
     __tablename__ = "transactions"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("base_users.id"), index=True)
-    amount: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    type: Mapped[transactionType] = mapped_column(
-        sqlEnum(transactionType, name="transaction_type_enum"),
-        nullable=False
-    )
-
-    date: Mapped[str] = mapped_column(String, nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("base_users.id"))
+    amount: Mapped[int] = mapped_column(Integer)
+    type: Mapped[TransactionType] = mapped_column(sqlEnum(TransactionType))
+    date: Mapped[str] = mapped_column(String)
