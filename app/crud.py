@@ -1,4 +1,4 @@
-from sqlalchemy import select, func, update, case
+from sqlalchemy import select, func, update, case, desc
 from app.security import create_access_token, hash_password, verify_password, redis_client
 from app.otp import send_otp, verify_otp, create_otp
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -743,3 +743,129 @@ async def add_to_waitlist(db: AsyncSession, token_data: dict, edition_id: int):
     await db.refresh(wait)
 
     return wait
+
+async def best_author_in_sell(db: AsyncSession):
+    result = await db.execute(
+    select(
+        models.Author.id,
+        models.BaseUser.username,
+        func.count(models.OrderEdition.edition_id).label("total_sales")
+    )
+    .join(models.BaseUser, models.BaseUser.id == models.Author.id)
+    .join(models.BookAuthor, models.BookAuthor.author_id == models.Author.id)
+    .join(models.Book, models.Book.id == models.BookAuthor.book_id)
+    .join(models.Edition, models.Edition.book_id == models.Book.id)
+    .join(models.OrderEdition, models.OrderEdition.edition_id == models.Edition.id)
+    .join(models.Order, models.Order.id == models.OrderEdition.order_id)
+    .where(
+        models.Order.state == models.OrderState.DONE,
+        models.OrderEdition.state == models.OrderItemState.DONE
+    )
+    .group_by(models.Author.id, models.BaseUser.username)
+    .order_by(desc("total_sales")).limit(20)
+)
+    return result.all()
+
+async def best_author_in_income(db:AsyncSession):
+    result = await db.execute(
+        select(
+            models.Author.id,
+            models.BaseUser.username,
+            func.sum(models.Edition.price).label("total_income"))
+            .join(models.BaseUser,models.BaseUser.id == models.Author.id)
+            .join(models.BookAuthor,models.BookAuthor.author_id == models.Author.id)
+            .join(models.Book,models.Book.id == models.BookAuthor.book_id)
+            .join(models.Edition,models.Edition.book_id == models.Book.id)
+            .join(models.OrderEdition,models.OrderEdition.edition_id == models.Edition.id)
+            .join(models.Order,models.Order.id == models.OrderEdition.order_id)
+            .where(models.Order.state == models.OrderState.DONE,
+                   models.OrderEdition.state == models.OrderItemState.DONE)
+                   .group_by(models.Author.id, models.BaseUser.username)
+                   .order_by(desc("total_income")).limit(20)
+                   )
+    return result.all()
+
+async def best_edition_in_sell(db: AsyncSession):
+    result = await db.execute(
+        select(models.Book.id,
+               models.Book.title,
+               models.Edition.id,
+               models.Edition.specefic_edition_title,
+               func.count(models.OrderEdition.id).label("total_sales"))
+               .join(models.Edition,models.Book.id == models.Edition.book_id)
+               .join(models.OrderEdition,models.OrderEdition.edition_id == models.Edition.id)
+               .join(models.Order,models.Order.id == models.OrderEdition.order_id)
+               .where(models.Order.state == models.OrderState.DONE,
+                      models.OrderEdition.state == models.OrderItemState.DONE)
+                      .group_by(models.Edition.id, models.Book.id,models.Book.title,models.Edition.specefic_edition_title)
+                      .order_by(desc("total_sales")).limit(20)
+    )
+    return result.all()
+
+async def best_category_in_sell(db: AsyncSession):
+    result = await db.execute(
+        select(models.Book.category,
+               func.count(models.Book.category).label("total_sales"))
+               .join(models.Edition,models.Edition.book_id == models.Book.id)
+               .join(models.OrderEdition,models.OrderEdition.edition_id == models.Edition.id)
+               .join(models.Order,models.Order.id == models.OrderEdition.order_id)
+               .where(models.OrderEdition.state == models.OrderItemState.DONE,
+                      models.Order.state == models.OrderState.DONE)
+                      .group_by(models.Book.category)
+                      .order_by(desc("total_sales")).limit(20)
+    )
+    return result.all()
+
+async def monthly_income(db:AsyncSession, token_data: dict):
+    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
+    current_user = result.scalar_one_or_none()
+    if current_user is None:
+        raise HTTPException(status_code=400, detail="Invalid token user")
+    if current_user.role != models.Role.AUTHOR:
+        raise HTTPException(status_code=403, detail="Only authors have income")
+    result = await db.execute(
+        select(models.BaseUser.id,
+               models.BaseUser.username,
+               func.sum(models.Edition.price).label("monthly_income"))
+               .join(models.BookAuthor,models.BookAuthor.author_id == models.BaseUser.id)
+               .join(models.Edition, models.Edition.book_id == models.BookAuthor.book_id)
+               .join(models.OrderEdition, models.OrderEdition.edition_id == models.Edition.id)
+               .join(models.Order,models.Order.id == models.OrderEdition.order_id)
+               .where(models.OrderEdition.state == models.OrderItemState.DONE,
+                      models.Order.state == models.OrderState.DONE)
+                      .group_by(models.BaseUser.id, models.BaseUser.username)
+    )
+    return result.scalar_one_or_none()
+
+async def best_user_in_buy(db: AsyncSession):
+    result = await db.execute(
+        select(models.BaseUser.id,
+               models.BaseUser.username,
+               models.User.plan,
+               func.count(models.OrderEdition).label("total_buys"))
+               .join(models.User,models.User.id == models.BaseUser.id)
+               .join(models.Order,models.Order.user_id == models.User.id)
+               .join(models.OrderEdition, models.OrderEdition.order_id == models.Order.id)
+               .where(models.Order.state == models.OrderState.DONE, models.OrderEdition.state == models.OrderItemState.DONE)
+               .group_by(models.BaseUser.id, models.BaseUser.username, models.User.plan)
+               .order_by(desc("total_buys")).limit(20)
+    )
+    return result.all()
+
+async def best_edition_in_borrow(db: AsyncSession):
+    result = await db.execute(
+        select(models.Book.id,
+               models.Book.title,
+               models.Book.category,
+               models.Edition.id,
+               models.Edition.specefic_edition_title,
+               func.count(models.Borrow.id).label("total_borrow"))
+               .join(models.Edition, models.Edition.book_id == models.Book.id)
+               .join(models.Borrow, models.Borrow.edition_id == models.Edition.id)
+               .group_by(models.Edition.id,models.Book.id,models.Book.category,models.Book.title,models.Edition.specefic_edition_title)
+               .order_by(desc("total_borrow"))
+               .limit(20)
+    )
+    return result.all()
+
+# کاربران دارای تأخیر (overdue)
