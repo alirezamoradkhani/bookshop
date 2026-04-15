@@ -1,11 +1,11 @@
-from sqlalchemy import select, func, update, case, desc
+from sqlalchemy import select, func, update, case, desc, and_
 from app.security import create_access_token, hash_password, verify_password, redis_client
 from app.otp import send_otp, verify_otp, create_otp
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from app import models
 from app import schemas
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
     
 
 async def singin(email: str,db: AsyncSession):
@@ -38,7 +38,7 @@ async def remove_user(db: AsyncSession, token_data: dict, user_id: int):
     user_to_remove = result.scalar_one_or_none()
     if user_to_remove is None:
         raise HTTPException(status_code=404, detail="User not found.")
-    user_to_remove.is_deleted == False
+    user_to_remove.is_deleted = True
     await db.commit()
 
 async def login_step_one(db: AsyncSession, user: schemas.UserLogin):
@@ -177,7 +177,7 @@ async def search_books(db: AsyncSession,title: str | None = None,author: str | N
     if title:
         query = query.where(
             models.Book.title.ilike(f"%{title}%"),
-            models.Book.is_deleted == None
+            models.Book.is_deleted == False
         )
 
     if id is not None:
@@ -240,7 +240,7 @@ async def buy(db: AsyncSession, edition_ids: list[int], token_data: dict):
         edition = result.scalar_one_or_none()
         if edition is not None:
             edition.amount -= 1
-    new_order = models.Order(customer_id=current_user.id, state=models.OrderState.WAITING.value, final_price=final_price, date=str(datetime.utcnow()))
+    new_order = models.Order(user_id=current_user.id, state=models.OrderState.WAITING.value, final_price=final_price, date=str(datetime.utcnow()))
     db.add(new_order)
     await db.commit()
     await db.refresh(new_order)
@@ -489,7 +489,7 @@ async def transfer_wallet_amount(db: AsyncSession, token_data: dict, recipient_e
     return {"sender_wallet_amount": sender.wallet_amount, "recipient_wallet_amount": recipient.wallet_amount}
 
 async def deposit(token_data: dict, amount: int, db: AsyncSession):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted))
+    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
     current_user = result.scalar_one_or_none()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
@@ -868,4 +868,28 @@ async def best_edition_in_borrow(db: AsyncSession):
     )
     return result.all()
 
-# کاربران دارای تأخیر (overdue)
+async def user_with_over_due(db: AsyncSession):
+    result = await db.execute(
+        select(models.BaseUser.id,
+               models.BaseUser.username,
+               models.Borrow.id,
+               models.Borrow.borrowed_at,
+               models.Borrow.due_at)
+               .join(models.Borrow,models.Borrow.user_id == models.BaseUser.id)
+               .where(models.Borrow.status == models.BorrowStatus.OVERDUE)
+    )
+    return result.all()
+
+async def mark_overdue_borrows(db: AsyncSession):
+    await db.execute(
+        update(models.Borrow)
+        .where(
+            and_(
+                models.Borrow.status == models.BorrowStatus.ACTIVE,
+                models.Borrow.due_at < datetime.now(timezone.utc)
+            )
+        )
+        .values(status=models.BorrowStatus.OVERDUE)
+    )
+
+    await db.commit()

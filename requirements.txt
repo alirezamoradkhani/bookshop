@@ -30,3 +30,4 @@ passlib[bcrypt]
 passlib[argon2]
 argon2-cffi
 types-passlib
+apscheduler

@@ -1,11 +1,17 @@
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db, engine
-from app import models, schemas, crud
+from app import models, schemas, crud, scheduler
 from app.security import  get_current_user
 # models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+async def startup():
+    scheduler.scheduler.start()
+
 
 @app.get("/")
 async def test():
@@ -120,6 +126,10 @@ async def return_borrow(borrow_id:int, token_data: dict = Depends(get_current_us
 @app.post("/borrow/waitlist")
 async def add_to_waitlist(edition_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     return await crud.add_to_waitlist(db=db,token_data=token_data,edition_id=edition_id)
+
+@app.get("/borrow/overdue")
+async def user_with_over_due(db = Depends(get_db)):
+    return await crud.user_with_over_due(db=db)
 
 #records
 
