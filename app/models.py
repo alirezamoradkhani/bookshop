@@ -75,7 +75,7 @@ class BaseUser(Base):
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
-class User(BaseUser):
+class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
     plan: Mapped[UserPlan] = mapped_column(
@@ -85,12 +85,12 @@ class User(BaseUser):
     )
 
 
-class Author(BaseUser):
+class Author(Base):
     __tablename__ = "authors"
     id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
 
 
-class Admin(BaseUser):
+class Admin(Base):
     __tablename__ = "admins"
     id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
 

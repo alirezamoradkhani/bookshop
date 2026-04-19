@@ -38,9 +38,6 @@ class BookCreate(BaseModel):
 class BookResponse(BaseModel):
     id : int
     title: str
-    author_id: list[int]
-    amount: int
-    price: int
     category: str
     class Config:
         orm_mode = True
@@ -55,11 +52,10 @@ class BookSearch(BaseModel):
         orm_mode = True
 
 class OrderResponse(BaseModel):
-    book_ids: list[int]
-    customer_id: int
     id: int
+    user_id: int
     state: str
-    price: int
+    final_price: int
     date: str
     class Config:
         orm_mode = True

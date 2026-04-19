@@ -8,6 +8,11 @@ from app import schemas
 from datetime import datetime, timedelta, timezone
     
 
+
+async def test(db:AsyncSession):
+    result = await db.execute(select(models.BaseUser))
+    return result.scalars().all()
+
 async def singin(email: str,db: AsyncSession):
     result = await db.execute(select(models.BaseUser).where(models.BaseUser.email == email, models.BaseUser.is_deleted == False))
     if result.scalar_one_or_none() is not None:
@@ -23,9 +28,19 @@ async def create_user(db: AsyncSession, otp: str, user: schemas.UserCreate):
     hashed_password = hash_password(user.password)
     new_user = models.BaseUser(username=user.username, email=user.email, password=hashed_password, role=user.role)
     db.add(new_user)
+    await db.flush()
+    if user.role == models.Role.AUTHOR:
+        author = models.Author(id=new_user.id)
+        db.add(author)
+    if user.role == models.Role.USER:
+        user = models.User(id=new_user.id)
+        db.add(user)
     await db.commit()
     await db.refresh(new_user)
     return new_user
+
+async def create_author(db: AsyncSession, otp: str):
+    ...
 
 async def remove_user(db: AsyncSession, token_data: dict, user_id: int):
     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == user_id, models.BaseUser.is_deleted == False))
@@ -63,11 +78,15 @@ async def login_step_two(db: AsyncSession, email: str, otp: str):
     return {"access_token": access_token, "token_type": "bearer"}
 
 async def upgrade_plan(db: AsyncSession, token_data: dict,new_plan: models.UserPlan):
-    result = await db.execute(select(models.User).where(models.User.id == token_data["user_id"], models.User.is_deleted == False))
+    result = await db.execute(select(models.User)
+                              .join(models.BaseUser,models.BaseUser.id == models.User.id)
+                              .where(models.User.id == token_data["user_id"], models.BaseUser.is_deleted == False))
     current_user = result.scalar_one_or_none()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
     current_user.plan = new_plan
+    await db.commit()
+    return "ok"
 
 async def get_all_users(db: AsyncSession, token_data: dict):
     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
@@ -80,7 +99,7 @@ async def get_all_users(db: AsyncSession, token_data: dict):
     return result.scalars().all()
 
 async def get_authors(db: AsyncSession):
-    result = await db.execute(select(models.Author).where(models.Author.is_deleted == False))
+    result = await db.execute(select(models.Author))
     return result.scalars().all()
 
 async def add_book(db: AsyncSession, token_data: dict, book: schemas.BookCreate):
@@ -100,7 +119,7 @@ async def add_book(db: AsyncSession, token_data: dict, book: schemas.BookCreate)
             book_author = models.BookAuthor(book_id=db_book.id, author_id = author_id)
             db.add(book_author)
         await db.commit()
-        return db_book
+        return f"id: {db_book.id}"
 
 async def remove_book(db: AsyncSession, token_data: dict, book_id: int):
     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
@@ -525,7 +544,7 @@ async def withdraw_wallet_amount(db: AsyncSession, token_data: dict, amount: int
     return current_user.wallet_amount
 
 async def wallet_info(db: AsyncSession, token_data: dict):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted))
+    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
     current_user = result.scalar_one_or_none()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")
@@ -541,7 +560,10 @@ async def wallet_info(db: AsyncSession, token_data: dict):
     return {"wallet_amount": current_user.wallet_amount, "transactions": transactions_data}
 
 async def borrow_edition(db: AsyncSession,token_data: dict,edition_id: int):
-    result = await db.execute(select(models.User).where(models.User.id == token_data["user_id"], models.User.is_deleted == False))
+    result = await db.execute(
+        select(models.User)
+                          .join(models.BaseUser,models.BaseUser.id == models.User.id)
+                          .where(models.User.id == token_data["user_id"], models.BaseUser.is_deleted == False))
     current_user = result.scalar_one_or_none()
     if current_user is None:
         raise HTTPException(status_code=400, detail="Invalid token user")

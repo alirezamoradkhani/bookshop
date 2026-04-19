@@ -7,7 +7,8 @@ engine = create_async_engine(POSTGRES_DATABASE_URL)
 SessionLocal = async_sessionmaker(
     autocommit=False,
     autoflush=False,
-    bind=engine
+    bind=engine,
+    expire_on_commit= False
 )
 
 async def get_db():

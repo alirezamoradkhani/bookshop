@@ -13,9 +13,14 @@ async def startup():
     scheduler.scheduler.start()
 
 
-@app.get("/")
-async def test():
-    return "hello"
+
+@app.get("/test2")
+async def test2(db=Depends(get_db)):
+    return await crud.test(db)
+
+# @app.get("/")
+# async def test():
+#     return "hello"
 #user crud
 @app.post("/users/singin",response_model= str)
 async def verify_email(email: str, db: AsyncSession = Depends(get_db)):
@@ -38,7 +43,7 @@ async def login(email:str,otp :str, db: AsyncSession = Depends(get_db)):
 async def get_all_users(db: AsyncSession = Depends(get_db), token_data: dict = Depends(get_current_user)):
     return await crud.get_all_users(db=db, token_data=token_data)
 
-@app.get("/users/authors", response_model=list[schemas.UserResponse])
+@app.get("/users/authors")
 async def get_authors(db: AsyncSession = Depends(get_db)):
     return await crud.get_authors(db=db)
 
@@ -51,7 +56,7 @@ async def remove_user(user_id: int, token_data: dict = Depends(get_current_user)
     return await crud.remove_user(db=db, token_data=token_data, user_id=user_id)
 
 #books crud
-@app.post("/books", response_model=schemas.BookResponse)
+@app.post("/books")
 async def add_book(book: schemas.BookCreate, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     return await crud.add_book(db=db, token_data=token_data, book=book)
 
@@ -151,7 +156,7 @@ async def best_edition_in_borrow(db = Depends(get_db)):
 
 @app.get("/record/category")
 async def best_category_in_sell(db= Depends(get_db)):
-    return await crud.best_category_in_sell()
+    return await crud.best_category_in_sell(db=db)
 
 @app.get("record/author/monthly-income")
 async def monthly_income(token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
