@@ -31,3 +31,4 @@ passlib[argon2]
 argon2-cffi
 types-passlib
 apscheduler
+swagger_ui_bundle==1.1.0

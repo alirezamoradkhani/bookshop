@@ -7,16 +7,7 @@ from sqlalchemy import DateTime
 from datetime import datetime
 
 
-class Role(str, pyEnum):
-    ADMIN = "admin"
-    AUTHOR = "author"
-    USER = "user"
-
-class UserPlan(str, pyEnum):
-    BRONZE = "bronze"
-    SILVER = "silver"
-    GOLD = "gold"
-    PLATINUM = "platinum"
+from app.user.models.enums import Role, UserPlan
 
 class Category(str, pyEnum):
     SCIENCE = "science"
@@ -61,40 +52,7 @@ class TransactionType(str, pyEnum):
     RECEIVE = "receive"
 
 
-class BaseUser(Base):
-    __tablename__ = "base_users"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String)
-    email: Mapped[str] = mapped_column(String, unique=True)
-    password: Mapped[str] = mapped_column(String)
-
-    role: Mapped[Role] = mapped_column(sqlEnum(Role))
-    wallet_amount: Mapped[int] = mapped_column(Integer, default=0)
-
-    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-
-
-class User(Base):
-    __tablename__ = "users"
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
-    plan: Mapped[UserPlan] = mapped_column(
-        sqlEnum(UserPlan, name="plan_enum"),
-        default=UserPlan.BRONZE,
-        nullable=False
-    )
-
-
-class Author(Base):
-    __tablename__ = "authors"
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
-
-
-class Admin(Base):
-    __tablename__ = "admins"
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
-
-
+from app.user.models.model import BaseUser, User, Author, Admin
 
 class Book(Base):
     __tablename__ = "books"

@@ -4,9 +4,21 @@ from app.database import get_db, engine
 from app import models, schemas, crud, scheduler
 from app.security import  get_current_user
 # models.Base.metadata.create_all(bind=engine)
+from app.get_unit_of_work import get_uow
+import app.user.schemas.outputs as output
+import app.user.schemas.inputs as inputs
+from app.user.services.create_baseuser import email_register, create_user
+from app.user.services.authenticate import athenticate,verify_email
+from app.api.router import api_router
 
-app = FastAPI()
 
+app = FastAPI(
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
+
+app.include_router(api_router)
 
 @app.on_event("startup")
 async def startup():
@@ -14,30 +26,10 @@ async def startup():
 
 
 
-@app.get("/test2")
-async def test2(db=Depends(get_db)):
-    return await crud.test(db)
-
-# @app.get("/")
-# async def test():
-#     return "hello"
+@app.get("/")
+async def test():
+    return "hello"
 #user crud
-@app.post("/users/singin",response_model= str)
-async def verify_email(email: str, db: AsyncSession = Depends(get_db)):
-    return await crud.singin(email=email, db=db)
-
-@app.post("/users/create", response_model=schemas.UserResponse)
-async def create_user(user: schemas.UserCreate, otp: str, db: AsyncSession = Depends(get_db)):
-    db_user = await crud.create_user(db=db, otp=otp, user=user)
-    return db_user
-
-@app.post("/users/register")
-async def login_step_one(user: schemas.UserLogin,db=Depends(get_db)):
-    return await crud.login_step_one(db=db,user=user)
-
-@app.post("/users/login", response_model=schemas.TokenResponse)
-async def login(email:str,otp :str, db: AsyncSession = Depends(get_db)):
-    return await crud.login_step_two(email=email,otp=otp, db=db)
 
 @app.get("/users/all", response_model=list[schemas.UserResponse])
 async def get_all_users(db: AsyncSession = Depends(get_db), token_data: dict = Depends(get_current_user)):
@@ -47,9 +39,9 @@ async def get_all_users(db: AsyncSession = Depends(get_db), token_data: dict = D
 async def get_authors(db: AsyncSession = Depends(get_db)):
     return await crud.get_authors(db=db)
 
-@app.patch("/user/plan")
-async def upgrade_plan(new_plan: models.UserPlan,token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.upgrade_plan(db=db,token_data=token_data,new_plan=new_plan)
+# @app.patch("/user/plan")
+# async def upgrade_plan(new_plan: models.UserPlan,token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+#     return await crud.upgrade_plan(db=db,token_data=token_data,new_plan=new_plan)
 
 @app.delete("/users")
 async def remove_user(user_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
@@ -165,3 +157,16 @@ async def monthly_income(token_data = Depends(get_current_user), db: AsyncSessio
 @app.get("/record/user/number-of-buy")
 async def best_user_in_buy(db: AsyncSession = Depends(get_db)):
     return await crud.best_user_in_buy(db=db)
+
+# async def create_user_usecase(user: CreateUserRequest, uow):
+#     new_user = User(**user)
+#     created_user = await uow.user_repo.create(new_user)
+#     await uow.flush()
+#     return created_user
+
+# @app.post()
+# async def create_user(user: CreateUserRequest, uow: Depends(get_uow)):
+#     async with uow:
+#         user = await create_user_usecase(user)
+#         await uow.commit()
+#         return user
