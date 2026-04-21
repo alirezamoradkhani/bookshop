@@ -10,11 +10,8 @@ from app.user.models.model import BaseUser, User, Author, Admin
 from app.user.models.enums import Role, UserPlan
 from app.book.models.enums import Category
 from app.book.models.model import Book, BookAuthor
-
-class Language(str,pyEnum):
-    FA = "fa"
-    EN = "en"
-    ARB = "arb"
+from app.edition.models.enums import Language
+from app.edition.models.model import Edition
 
 
 class OrderState(str, pyEnum):
@@ -43,18 +40,6 @@ class TransactionType(str, pyEnum):
     WITHDRAWAL = "withdrawal"
     SEND = "send"
     RECEIVE = "receive"
-
-
-class Edition(Base):
-    __tablename__ = "editions"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"))
-    price: Mapped[int] = mapped_column(Integer)
-    amount: Mapped[int] = mapped_column(Integer, default=0)
-    language : Mapped[Language] = mapped_column(sqlEnum(Language, name = "language_enm"))
-    specefic_edition_title : Mapped[str] = mapped_column(String, default= None)
-    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class Borrow(Base):
