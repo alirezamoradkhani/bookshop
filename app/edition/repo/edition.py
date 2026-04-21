@@ -10,8 +10,9 @@ class EditionRepository:
     async def create_edition(self,new_edition: Edition):
         self.db.add(new_edition)
     
-    async def get_edition(self,edition_id:int):
-        result = await self.db.execute(select(Edition).where(Edition.id == edition_id))
+    async def get_by_id(self,edition_id:int):
+        result = await self.db.execute(select(Edition).where(Edition.id == edition_id, Edition.is_deleted == False))
+        return result.scalar_one_or_none()
 
     async def update_amount(self,edition:Edition ,new_amount:int):
         edition.amount = new_amount
