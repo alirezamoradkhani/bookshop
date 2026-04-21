@@ -52,25 +52,25 @@ async def get_authors(db: AsyncSession = Depends(get_db)):
 # async def add_book(book: schemas.BookCreate, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
 #     return await crud.add_book(db=db, token_data=token_data, book=book)
 
-@app.get("/books", response_model=list[schemas.BookResponse])
-async def search_books(
-    title: str | None = Query(None),
-    autho: str | None = Query(None),
-    id: int | None = Query(None),
-    limit: int = Query(default=10, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
-    db: AsyncSession = Depends(get_db),
-):
-    return await crud.search_books(db=db, title=title, author=autho, id=id, limit=limit, offset=offset)
+# @app.get("/books", response_model=list[schemas.BookResponse])
+# async def search_books(
+#     title: str | None = Query(None),
+#     autho: str | None = Query(None),
+#     id: int | None = Query(None),
+#     limit: int = Query(default=10, ge=1, le=100),
+#     offset: int = Query(default=0, ge=0),
+#     db: AsyncSession = Depends(get_db),
+# ):
+#     return await crud.search_books(db=db, title=title, author=autho, id=id, limit=limit, offset=offset)
     
 
-@app.delete("/books")
-async def remove_book(book_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.remove_book(db=db, token_data=token_data, book_id=book_id)
+# @app.delete("/books")
+# async def remove_book(book_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+#     return await crud.remove_book(db=db, token_data=token_data, book_id=book_id)
 
-@app.patch("/books", response_model=schemas.BookResponse)
-async def update_book(book_id: int, book: schemas.BookUpdate, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.update_book(db=db, token_data=token_data, book_id=book_id, book_update=book)
+# @app.patch("/books", response_model=schemas.BookResponse)
+# async def update_book(book_id: int, book: schemas.BookUpdate, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+#     return await crud.update_book(db=db, token_data=token_data, book_id=book_id, book_update=book)
 
 #edition crud
 @app.post("/editions")

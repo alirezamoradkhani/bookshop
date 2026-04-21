@@ -7,6 +7,7 @@ from app.book.services.create_book import create_book
 from app.book.services.update_book import update_book
 from app.book.services.delete_book import delete_book
 from app.book.services.search_book import search_books
+from app.book.services.get_book_details import book_detail
 
 
 router = APIRouter(prefix="/books", tags=["books"])
@@ -28,3 +29,7 @@ async def Search_book(category: Category | None = None
                 ,authors_id: list[int] | None = None
                 ,title: str | None = None,uow = Depends(get_uow)):
     return await search_books(uow=uow,category=category,title=title,authors_id=authors_id)
+
+@router.get("details",response_model=outputs.BookDetails)
+async def get_detail(book_id:int,uow = Depends(get_uow)):
+    return await book_detail(uow=uow,book_id=book_id)

@@ -16,3 +16,7 @@ class BookAuthorRepository:
     async def get_by_author_id(self,author_id):
         result = await self.db.execute(select(model.BookAuthor).where(model.BookAuthor.author_id == author_id))
         return result.scalars().all()
+    
+    async def get_by_book_id(self,book_id):
+        result = await self.db.execute(select(model.BookAuthor).where(model.BookAuthor.book_id == book_id))
+        return result.scalars().all()
