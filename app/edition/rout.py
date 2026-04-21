@@ -5,6 +5,7 @@ from app.edition.schemas.inputs import EditionCreate
 from app.edition.services.create_edition import create_edition
 from app.edition.services.update_amount import update_amount
 from app.edition.services.update_price import update_price
+from app.edition.services.delete_edition import remove_edition
 
 
 router = APIRouter(prefix="/editions", tags=["editions"])
@@ -20,3 +21,7 @@ async def change_amount(new_amount: int,edition_id : int,uow = Depends(get_uow),
 @router.patch("/price")
 async def change_price(new_price: int,edition_id : int,uow = Depends(get_uow),token_data = Depends(get_current_user)):
     return await update_price(uow=uow,token_data=token_data,new_price=new_price,edition_id=edition_id)
+
+@router.delete("/delete")
+async def delete_edition(edition_id : int,uow = Depends(get_uow),token_data = Depends(get_current_user)):
+    return await remove_edition(uow=uow,token_data=token_data,edition_id=edition_id)
