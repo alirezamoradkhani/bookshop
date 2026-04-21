@@ -12,20 +12,9 @@ from app.book.models.enums import Category
 from app.book.models.model import Book, BookAuthor
 from app.edition.models.enums import Language
 from app.edition.models.model import Edition
+from app.order.models.enums import OrderState, OrderItemState
+from app.order.models.model import Order, OrderEdition
 
-
-class OrderState(str, pyEnum):
-    WAITING = "waiting"
-    IN_PROCCESE = "in_proccese"
-    DONE = "done"
-    CANCELED = "canceled"
-
-class OrderItemState(str, pyEnum):
-    WAITING = "waiting"
-    ACCEPTED = "accepted"
-    REJECTED = "rejected"
-    PREPARING = "preparing"
-    DONE = "done"
 
 class BorrowStatus(str, pyEnum):
     # WAITING = "waiting"
@@ -67,25 +56,6 @@ class Waitlist(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
-
-
-class Order(Base):
-    __tablename__ = "orders"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-
-    state: Mapped[OrderState] = mapped_column(sqlEnum(OrderState), default= OrderState.WAITING)
-    final_price: Mapped[int] = mapped_column(Integer)
-    date: Mapped[str] = mapped_column(String)
-
-
-class OrderEdition(Base):
-    __tablename__ = "orders_editions"
-
-    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), primary_key=True)
-    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"), primary_key=True)
-    state: Mapped[OrderItemState] = mapped_column(sqlEnum(OrderItemState), default=OrderItemState.WAITING)
 
 class Transaction(Base):
     __tablename__ = "transactions"
