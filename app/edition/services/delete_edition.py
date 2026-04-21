@@ -3,14 +3,14 @@ from app.user.models.enums import Role
 
 from app.unit_of_work import UnitOfWork
 
-async def update_amount(uow:UnitOfWork,token_data:dict, new_amount:int,edition_id:int):
+async def remove_edition(uow:UnitOfWork, token_data:dict,edition_id:int):
     async with uow:
         current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
         if current_user is None:
             raise HTTPException(status_code=400, detail="Invalid token user")
         
         if current_user.role == Role.USER:
-            raise HTTPException(status_code=400, detail="User does not have permission to change amount.")
+            raise HTTPException(status_code=403, detail="User does not have permission to delete editions.")
         
         edition = await uow.edition.get_by_id(edition_id)
         if not edition:
@@ -22,7 +22,5 @@ async def update_amount(uow:UnitOfWork,token_data:dict, new_amount:int,edition_i
             )
             if bookauthor is None:
                 raise HTTPException(status_code=403, detail="You are not the author of this book")
-        if new_amount < 0:
-            raise HTTPException(status_code=400, detail="Amount cannot be negative")
-        edition.amount = new_amount
+        edition.is_deleted = True
     return edition

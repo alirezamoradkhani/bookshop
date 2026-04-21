@@ -3,14 +3,14 @@ from app.user.models.enums import Role
 
 from app.unit_of_work import UnitOfWork
 
-async def update_amount(uow:UnitOfWork, token_data:dict,edition_id:int, new_price: int):
+async def update_price(uow:UnitOfWork, token_data:dict,edition_id:int, new_price: int):
     async with uow:
         current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
         if current_user is None:
             raise HTTPException(status_code=400, detail="Invalid token user")
         
         if current_user.role == Role.USER:
-            raise HTTPException(status_code=403, detail="User does not have permission to add editions.")
+            raise HTTPException(status_code=403, detail="User does not have permission to change price")
         
         edition = await uow.edition.get_by_id(edition_id)
         if not edition:
