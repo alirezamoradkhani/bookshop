@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app.edition.models.model import Edition
 
 
-class BaseUserRepository:
+class EditionRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
