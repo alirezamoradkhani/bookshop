@@ -43,14 +43,14 @@ async def get_authors(db: AsyncSession = Depends(get_db)):
 # async def upgrade_plan(new_plan: models.UserPlan,token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
 #     return await crud.upgrade_plan(db=db,token_data=token_data,new_plan=new_plan)
 
-@app.delete("/users")
-async def remove_user(user_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.remove_user(db=db, token_data=token_data, user_id=user_id)
+# @app.delete("/users")
+# async def remove_user(user_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+#     return await crud.remove_user(db=db, token_data=token_data, user_id=user_id)
 
 #books crud
-@app.post("/books")
-async def add_book(book: schemas.BookCreate, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.add_book(db=db, token_data=token_data, book=book)
+# @app.post("/books")
+# async def add_book(book: schemas.BookCreate, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+#     return await crud.add_book(db=db, token_data=token_data, book=book)
 
 @app.get("/books", response_model=list[schemas.BookResponse])
 async def search_books(

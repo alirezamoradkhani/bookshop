@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import Enum
 from app.database import Base
-from app.book.models.enums import Category,Language
+from app.book.models.enums import Category
 
 class Book(Base):
     __tablename__ = "books"
