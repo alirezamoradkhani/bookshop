@@ -6,23 +6,10 @@ from sqlalchemy.types import Enum as sqlEnum
 from sqlalchemy import DateTime
 from datetime import datetime
 
-
+from app.user.models.model import BaseUser, User, Author, Admin
 from app.user.models.enums import Role, UserPlan
-
-class Category(str, pyEnum):
-    SCIENCE = "science"
-    ART = "art"
-    HISTORY = "history"
-    TECHNOLOGY = "technology"
-    PROGRAMMING = "programming"
-    BUSINESS = "business"
-    LITERATURE = "literature"
-
-class Language(str,pyEnum):
-    FA = "fa"
-    EN = "en"
-    ARB = "arb"
-    
+from app.book.models.enums import Category, Language
+from app.book.models.model import Book, BookAuthor
 
 class OrderState(str, pyEnum):
     WAITING = "waiting"
@@ -52,17 +39,6 @@ class TransactionType(str, pyEnum):
     RECEIVE = "receive"
 
 
-from app.user.models.model import BaseUser, User, Author, Admin
-
-class Book(Base):
-    __tablename__ = "books"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String)
-    category: Mapped[Category] = mapped_column(sqlEnum(Category))
-    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-
-
 class Edition(Base):
     __tablename__ = "editions"
 
@@ -73,12 +49,6 @@ class Edition(Base):
     language : Mapped[Language] = mapped_column(sqlEnum(Language, name = "language_enm"))
     specefic_edition_title : Mapped[str] = mapped_column(String, default= None)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-
-class BookAuthor(Base):
-    __tablename__ = "book_authors"
-
-    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), primary_key=True)
-    author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), primary_key=True)
 
 
 class Borrow(Base):
