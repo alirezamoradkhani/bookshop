@@ -17,8 +17,8 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
         await uow.book.create_book(book)
         await uow.flush()
         for author_id in new_book.authors_id:
-            # if await uow.author.get_by_id(author_id) is None:
-            #     raise HTTPException (status_code=400,detail= f"there is no author with id {author_id}")
+            if await uow.author.get_by_id(author_id) is None:
+                raise HTTPException (status_code=400,detail= f"there is no author with id {author_id}")
             book_author = model.BookAuthor(book_id=book.id, author_id = author_id)
             await uow.bookauthor.create(book_author=book_author)
         return book

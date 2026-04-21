@@ -12,3 +12,4 @@ class AuthorRepository:
         return new_user
     async def get_by_id(self,id:int):
         result = await self.db.execute(select(model.Author).where(model.Author.id == id))
+        return result.scalar_one_or_none()
