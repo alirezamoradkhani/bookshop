@@ -102,110 +102,110 @@ async def get_authors(db: AsyncSession):
     result = await db.execute(select(models.Author))
     return result.scalars().all()
 
-async def add_book(db: AsyncSession, token_data: dict, book: schemas.BookCreate):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
-    current_user = result.scalar_one_or_none()
-    if current_user is None:
-        raise HTTPException(status_code=400, detail="Invalid token user")
+# async def add_book(db: AsyncSession, token_data: dict, book: schemas.BookCreate):
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
+#     current_user = result.scalar_one_or_none()
+#     if current_user is None:
+#         raise HTTPException(status_code=400, detail="Invalid token user")
 
-    if current_user.role == models.Role.USER:
-        raise HTTPException(status_code=400, detail="User does not have permission to add books.")
-    if current_user.role == models.Role.AUTHOR:
-        db_book = models.Book(title=book.title, category = book.category)
-        db.add(db_book)
-        await db.commit()
-        await db.refresh(db_book)
-        for author_id in book.authors_id:
-            book_author = models.BookAuthor(book_id=db_book.id, author_id = author_id)
-            db.add(book_author)
-        await db.commit()
-        return f"id: {db_book.id}"
+#     if current_user.role == models.Role.USER:
+#         raise HTTPException(status_code=400, detail="User does not have permission to add books.")
+#     if current_user.role == models.Role.AUTHOR:
+#         db_book = models.Book(title=book.title, category = book.category)
+#         db.add(db_book)
+#         await db.commit()
+#         await db.refresh(db_book)
+#         for author_id in book.authors_id:
+#             book_author = models.BookAuthor(book_id=db_book.id, author_id = author_id)
+#             db.add(book_author)
+#         await db.commit()
+#         return f"id: {db_book.id}"
 
-async def remove_book(db: AsyncSession, token_data: dict, book_id: int):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
-    current_user = result.scalar_one_or_none()
-    if current_user is None:
-        raise HTTPException(status_code=400, detail="Invalid token user")
+# async def remove_book(db: AsyncSession, token_data: dict, book_id: int):
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
+#     current_user = result.scalar_one_or_none()
+#     if current_user is None:
+#         raise HTTPException(status_code=400, detail="Invalid token user")
 
-    if current_user.role == models.Role.USER:
-        raise HTTPException(status_code=400, detail="User does not have permission to remove books.")
-    if current_user.role == models.Role.AUTHOR:
-        result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.is_deleted == False))
-        book = result.scalar_one_or_none()
-        if book is None:
-            raise HTTPException(status_code=404, detail="Book not found or you do not have permission to remove this book.")
-        book.is_deleted = True
-        await db.commit()
-    elif current_user.role == models.Role.ADMIN:
-        result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.delete_time.is_(None)))
-        book = result.scalar_one_or_none()
-        if book is None:
-            raise HTTPException(status_code=404, detail="Book not found.")
-        book.is_deleted = True
-        await db.commit()
+#     if current_user.role == models.Role.USER:
+#         raise HTTPException(status_code=400, detail="User does not have permission to remove books.")
+#     if current_user.role == models.Role.AUTHOR:
+#         result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.is_deleted == False))
+#         book = result.scalar_one_or_none()
+#         if book is None:
+#             raise HTTPException(status_code=404, detail="Book not found or you do not have permission to remove this book.")
+#         book.is_deleted = True
+#         await db.commit()
+#     elif current_user.role == models.Role.ADMIN:
+#         result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.delete_time.is_(None)))
+#         book = result.scalar_one_or_none()
+#         if book is None:
+#             raise HTTPException(status_code=404, detail="Book not found.")
+#         book.is_deleted = True
+#         await db.commit()
 
-async def update_book(db: AsyncSession, token_data: dict, book_id: int, book_update: schemas.BookUpdate):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
-    current_user = result.scalar_one_or_none()
-    if current_user is None:
-        raise HTTPException(status_code=400, detail="Invalid token user")
+# async def update_book(db: AsyncSession, token_data: dict, book_id: int, book_update: schemas.BookUpdate):
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
+#     current_user = result.scalar_one_or_none()
+#     if current_user is None:
+#         raise HTTPException(status_code=400, detail="Invalid token user")
 
-    if current_user.role == models.Role.USER:
-        raise HTTPException(status_code=400, detail="User does not have permission to update books.")
+#     if current_user.role == models.Role.USER:
+#         raise HTTPException(status_code=400, detail="User does not have permission to update books.")
 
-    if current_user.role == models.Role.AUTHOR:
-        result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.is_deleted == False))
-        book = result.scalar_one_or_none()
-        result = await db.execute(select(models.BookAuthor).where(models.BookAuthor.book_id == book_id, models.BookAuthor.author_id == current_user.id))
-        book_author = result.scalar_one_or_none()
-        if book_author is None or book is None:
-            raise HTTPException(status_code=404, detail="Book not found or you do not have permission to update this book.")
-        if book_update.title is not None:
-            book.title = book_update.title
-        if book_update.category is not None:
-            book.category = book_update.category
-        await db.commit()
-        await db.refresh(book)
-        return book
+#     if current_user.role == models.Role.AUTHOR:
+#         result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.is_deleted == False))
+#         book = result.scalar_one_or_none()
+#         result = await db.execute(select(models.BookAuthor).where(models.BookAuthor.book_id == book_id, models.BookAuthor.author_id == current_user.id))
+#         book_author = result.scalar_one_or_none()
+#         if book_author is None or book is None:
+#             raise HTTPException(status_code=404, detail="Book not found or you do not have permission to update this book.")
+#         if book_update.title is not None:
+#             book.title = book_update.title
+#         if book_update.category is not None:
+#             book.category = book_update.category
+#         await db.commit()
+#         await db.refresh(book)
+#         return book
 
-    if current_user.role == models.Role.ADMIN:
-        result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.delete_time.is_(None)))
-        book = result.scalar_one_or_none()
-        if book is None:
-            raise HTTPException(status_code=404, detail="Book not found.")
-        if book_update.title is not None:
-            book.title = book_update.title
-        if book_update.category is not None:
-            book.category = book_update.category
-        await db.commit()
-        await db.refresh(book)
-        return book
+#     if current_user.role == models.Role.ADMIN:
+#         result = await db.execute(select(models.Book).where(models.Book.id == book_id, models.Book.delete_time.is_(None)))
+#         book = result.scalar_one_or_none()
+#         if book is None:
+#             raise HTTPException(status_code=404, detail="Book not found.")
+#         if book_update.title is not None:
+#             book.title = book_update.title
+#         if book_update.category is not None:
+#             book.category = book_update.category
+#         await db.commit()
+#         await db.refresh(book)
+#         return book
 
-async def search_books(db: AsyncSession,title: str | None = None,author: str | None = None,id: int | None = None,limit: int = 10, offset: int = 0):
-    query = select(models.Book)
+# async def search_books(db: AsyncSession,title: str | None = None,author: str | None = None,id: int | None = None,limit: int = 10, offset: int = 0):
+#     query = select(models.Book)
 
-    if author:
-        query = query.join(models.BookAuthor, models.BookAuthor.book_id == models.Book.id)\
-                     .join(models.Author, models.Author.id == models.BookAuthor.author_id)\
-                     .where(
-                         models.Author.username.ilike(f"%{author}%"),
-                         models.Author.is_deleted == False,
-                         models.Book.is_deleted == False
-                     )
+#     if author:
+#         query = query.join(models.BookAuthor, models.BookAuthor.book_id == models.Book.id)\
+#                      .join(models.Author, models.Author.id == models.BookAuthor.author_id)\
+#                      .where(
+#                          models.Author.username.ilike(f"%{author}%"),
+#                          models.Author.is_deleted == False,
+#                          models.Book.is_deleted == False
+#                      )
 
-    if title:
-        query = query.where(
-            models.Book.title.ilike(f"%{title}%"),
-            models.Book.is_deleted == False
-        )
+#     if title:
+#         query = query.where(
+#             models.Book.title.ilike(f"%{title}%"),
+#             models.Book.is_deleted == False
+#         )
 
-    if id is not None:
-        query = query.where(models.Book.id == id)
+#     if id is not None:
+#         query = query.where(models.Book.id == id)
 
-    query = query.offset(offset).limit(limit)
+#     query = query.offset(offset).limit(limit)
 
-    result = await db.execute(query)
-    return result.scalars().all()
+#     result = await db.execute(query)
+#     return result.scalars().all()
 
 async def add_edition(db: AsyncSession, token_data: dict, edition: schemas.EditionCreate):
     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
