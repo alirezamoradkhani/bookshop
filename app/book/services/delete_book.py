@@ -1,7 +1,4 @@
 from fastapi import HTTPException
-import app.book.models.model as model
-import app.book.schemas.inputs as inputs
-import app.book.models.enums as enums
 from app.user.models.enums import Role
 
 from app.unit_of_work import UnitOfWork
