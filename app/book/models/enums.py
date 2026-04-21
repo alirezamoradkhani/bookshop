@@ -10,7 +10,3 @@ class Category(str, Enum):
     BUSINESS = "business"
     LITERATURE = "literature"
 
-class Language(str,Enum):
-    FA = "fa"
-    EN = "en"
-    ARB = "arb"

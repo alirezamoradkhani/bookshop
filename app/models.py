@@ -8,8 +8,14 @@ from datetime import datetime
 
 from app.user.models.model import BaseUser, User, Author, Admin
 from app.user.models.enums import Role, UserPlan
-from app.book.models.enums import Category, Language
+from app.book.models.enums import Category
 from app.book.models.model import Book, BookAuthor
+
+class Language(str,pyEnum):
+    FA = "fa"
+    EN = "en"
+    ARB = "arb"
+
 
 class OrderState(str, pyEnum):
     WAITING = "waiting"

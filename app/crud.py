@@ -13,80 +13,80 @@ async def test(db:AsyncSession):
     result = await db.execute(select(models.BaseUser))
     return result.scalars().all()
 
-async def singin(email: str,db: AsyncSession):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.email == email, models.BaseUser.is_deleted == False))
-    if result.scalar_one_or_none() is not None:
-        raise HTTPException(status_code=400, detail="email already registered")
-    await create_otp(email)
-    return "OTP sent to email"
+# async def singin(email: str,db: AsyncSession):
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.email == email, models.BaseUser.is_deleted == False))
+#     if result.scalar_one_or_none() is not None:
+#         raise HTTPException(status_code=400, detail="email already registered")
+#     await create_otp(email)
+#     return "OTP sent to email"
 
-async def create_user(db: AsyncSession, otp: str, user: schemas.UserCreate):
-    if not await verify_otp(user.email, otp):
-        raise HTTPException(status_code=400, detail="Invalid OTP")
-    if user.role not in [models.Role.USER.value, models.Role.AUTHOR.value]:
-        raise HTTPException(status_code=400, detail="Invalid role")
-    hashed_password = hash_password(user.password)
-    new_user = models.BaseUser(username=user.username, email=user.email, password=hashed_password, role=user.role)
-    db.add(new_user)
-    await db.flush()
-    if user.role == models.Role.AUTHOR:
-        author = models.Author(id=new_user.id)
-        db.add(author)
-    if user.role == models.Role.USER:
-        user = models.User(id=new_user.id)
-        db.add(user)
-    await db.commit()
-    await db.refresh(new_user)
-    return new_user
+# async def create_user(db: AsyncSession, otp: str, user: schemas.UserCreate):
+#     if not await verify_otp(user.email, otp):
+#         raise HTTPException(status_code=400, detail="Invalid OTP")
+#     if user.role not in [models.Role.USER.value, models.Role.AUTHOR.value]:
+#         raise HTTPException(status_code=400, detail="Invalid role")
+#     hashed_password = hash_password(user.password)
+#     new_user = models.BaseUser(username=user.username, email=user.email, password=hashed_password, role=user.role)
+#     db.add(new_user)
+#     await db.flush()
+#     if user.role == models.Role.AUTHOR:
+#         author = models.Author(id=new_user.id)
+#         db.add(author)
+#     if user.role == models.Role.USER:
+#         user = models.User(id=new_user.id)
+#         db.add(user)
+#     await db.commit()
+#     await db.refresh(new_user)
+#     return new_user
 
-async def create_author(db: AsyncSession, otp: str):
-    ...
+# async def create_author(db: AsyncSession, otp: str):
+#     ...
 
-async def remove_user(db: AsyncSession, token_data: dict, user_id: int):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == user_id, models.BaseUser.is_deleted == False))
-    current_user = result.scalar_one_or_none()
-    if current_user is None:
-        raise HTTPException(status_code=400, detail="Invalid token user")
-    if current_user.role != models.Role.ADMIN:
-        raise HTTPException(status_code=400, detail="Only admin users can remove users.")
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == user_id, models.BaseUser.is_deleted == False))
-    user_to_remove = result.scalar_one_or_none()
-    if user_to_remove is None:
-        raise HTTPException(status_code=404, detail="User not found.")
-    user_to_remove.is_deleted = True
-    await db.commit()
+# async def remove_user(db: AsyncSession, token_data: dict, user_id: int):
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == user_id, models.BaseUser.is_deleted == False))
+#     current_user = result.scalar_one_or_none()
+#     if current_user is None:
+#         raise HTTPException(status_code=400, detail="Invalid token user")
+#     if current_user.role != models.Role.ADMIN:
+#         raise HTTPException(status_code=400, detail="Only admin users can remove users.")
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == user_id, models.BaseUser.is_deleted == False))
+#     user_to_remove = result.scalar_one_or_none()
+#     if user_to_remove is None:
+#         raise HTTPException(status_code=404, detail="User not found.")
+#     user_to_remove.is_deleted = True
+#     await db.commit()
 
-async def login_step_one(db: AsyncSession, user: schemas.UserLogin):
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.username == user.username, models.BaseUser.is_deleted == False))
-    user_in_db = result.scalar_one_or_none()
-    if user_in_db is None or not verify_password(user.password, user_in_db.password):
-        raise HTTPException(status_code=400, detail="Invalid username or password")
-    await create_otp(user_in_db.email)
-    return "OTP sent to email"
+# async def login_step_one(db: AsyncSession, user: schemas.UserLogin):
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.username == user.username, models.BaseUser.is_deleted == False))
+#     user_in_db = result.scalar_one_or_none()
+#     if user_in_db is None or not verify_password(user.password, user_in_db.password):
+#         raise HTTPException(status_code=400, detail="Invalid username or password")
+#     await create_otp(user_in_db.email)
+#     return "OTP sent to email"
 
-async def login_step_two(db: AsyncSession, email: str, otp: str):
-    if not await verify_otp(email, otp):
-        raise HTTPException(status_code=400, detail="Invalid OTP")
-    result = await db.execute(select(models.BaseUser).where(models.BaseUser.email == email, models.BaseUser.is_deleted == False))
-    user = result.scalar_one_or_none()
-    if user is None:
-        raise HTTPException(status_code=400, detail="Invalid email or password")
-    token_data = {
-        "user_id": user.id,
-    }
-    access_token = create_access_token(token_data)
-    return {"access_token": access_token, "token_type": "bearer"}
+# async def login_step_two(db: AsyncSession, email: str, otp: str):
+#     if not await verify_otp(email, otp):
+#         raise HTTPException(status_code=400, detail="Invalid OTP")
+#     result = await db.execute(select(models.BaseUser).where(models.BaseUser.email == email, models.BaseUser.is_deleted == False))
+#     user = result.scalar_one_or_none()
+#     if user is None:
+#         raise HTTPException(status_code=400, detail="Invalid email or password")
+#     token_data = {
+#         "user_id": user.id,
+#     }
+#     access_token = create_access_token(token_data)
+#     return {"access_token": access_token, "token_type": "bearer"}
 
-async def upgrade_plan(db: AsyncSession, token_data: dict,new_plan: models.UserPlan):
-    result = await db.execute(select(models.User)
-                              .join(models.BaseUser,models.BaseUser.id == models.User.id)
-                              .where(models.User.id == token_data["user_id"], models.BaseUser.is_deleted == False))
-    current_user = result.scalar_one_or_none()
-    if current_user is None:
-        raise HTTPException(status_code=400, detail="Invalid token user")
-    current_user.plan = new_plan
-    await db.commit()
-    return "ok"
+# async def upgrade_plan(db: AsyncSession, token_data: dict,new_plan: models.UserPlan):
+#     result = await db.execute(select(models.User)
+#                               .join(models.BaseUser,models.BaseUser.id == models.User.id)
+#                               .where(models.User.id == token_data["user_id"], models.BaseUser.is_deleted == False))
+#     current_user = result.scalar_one_or_none()
+#     if current_user is None:
+#         raise HTTPException(status_code=400, detail="Invalid token user")
+#     current_user.plan = new_plan
+#     await db.commit()
+#     return "ok"
 
 async def get_all_users(db: AsyncSession, token_data: dict):
     result = await db.execute(select(models.BaseUser).where(models.BaseUser.id == token_data["user_id"], models.BaseUser.is_deleted == False))
