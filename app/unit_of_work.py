@@ -5,6 +5,8 @@ from app.user.repo.author import AuthorRepository
 from app.book.repo.book import BookRepository
 from app.book.repo.book_author import BookAuthorRepository
 from app.edition.repo.edition import EditionRepository
+from app.order.repo.order import OrderRepository
+from app.order.repo.order_edition import OrderEditionRepository
 from app.database import get_db
 from fastapi import Depends
 
@@ -18,6 +20,8 @@ class UnitOfWork:
         self.book = BookRepository(db)
         self.bookauthor = BookAuthorRepository(db)
         self.edition = EditionRepository(db)
+        self.order = OrderRepository(db)
+        self.orderedition = OrderEditionRepository(db)
 
     async def __aenter__(self):
         return self
