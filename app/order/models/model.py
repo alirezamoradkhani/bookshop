@@ -15,6 +15,7 @@ class Order(Base):
     final_price: Mapped[int] = mapped_column(Integer)
     date: Mapped[str] = mapped_column(String)
 
+#order edition is for author to manage their order
 class OrderEdition(Base):
     __tablename__ = "orders_editions"
 
