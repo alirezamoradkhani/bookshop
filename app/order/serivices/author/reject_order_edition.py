@@ -23,4 +23,8 @@ async def reject_order_edition(uow:UnitOfWork,order_edition_id: int, token_data:
             if book_author is None:
                 raise HTTPException(status_code=400, detail="this is not your order edition.")
             await uow.orderedition.update_state(new_state=enums.OrderItemState.REJECTED,orderedition=order_edition)
+            order = await uow.order.get_by_id(order_edition.order_id)    
+            await uow.order.update_final_price(order=order,change=edition.price)
+            customer = await uow.baseusers.get_by_id(order.user_id)
+            await uow.baseusers.increase_wallet_amount(user=customer,change=order_edition.price)
         return order_edition

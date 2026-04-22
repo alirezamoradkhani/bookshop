@@ -25,3 +25,4 @@ class OrderEdition(Base):
     edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"), primary_key=True)
     state: Mapped[OrderItemState] = mapped_column(Enum(OrderItemState), default=OrderItemState.WAITING)
     last_modify: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    price : Mapped[int] = mapped_column(Integer)
