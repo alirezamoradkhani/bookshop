@@ -16,38 +16,5 @@ from app.order.models.enums import OrderState, OrderItemState
 from app.order.models.model import Order, OrderEdition
 from app.transaction.models.enums import TransactionType
 from app.transaction.models.model import Transaction
-
-
-class BorrowStatus(str, pyEnum):
-    # WAITING = "waiting"
-    ACTIVE = "active"
-    OVERDUE = "overdue"
-    RETURNED = "returned"
-    # CANCELLED = "cancelled"
-
-
-class Borrow(Base):
-    __tablename__ = "borrows"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"))
-
-    status: Mapped[BorrowStatus] = mapped_column(sqlEnum(BorrowStatus),default= BorrowStatus.ACTIVE)
-
-    borrowed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    returned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-
-
-class Waitlist(Base):
-    __tablename__ = "waitlist"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"))
-
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-
+from app.borrow.models.enums import BorrowStatus
+from app.borrow.models.model import Borrow, Waitlist
