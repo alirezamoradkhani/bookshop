@@ -10,3 +10,7 @@ class TransactionRepository:
     
     async def create(self,transaction:model.Transaction):
         self.db.add(transaction)
+    
+    async def get_by_user_id(self,user_id:int):
+        result = await self.db.execute(select(model.Transaction).where(model.Transaction.user_id == user_id))
+        return result.scalars().all()
