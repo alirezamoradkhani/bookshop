@@ -2,11 +2,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.user.repo.baseuser import BaseUserRepository
 from app.user.repo.user import UserRepository
 from app.user.repo.author import AuthorRepository
+from app.user.repo.admin import AdminRepository
 from app.book.repo.book import BookRepository
 from app.book.repo.book_author import BookAuthorRepository
 from app.edition.repo.edition import EditionRepository
 from app.order.repo.order import OrderRepository
 from app.order.repo.order_edition import OrderEditionRepository
+from app.transaction.repo.transaction import TransactionRepository
+
 from app.database import get_db
 from fastapi import Depends
 
@@ -22,6 +25,8 @@ class UnitOfWork:
         self.edition = EditionRepository(db)
         self.order = OrderRepository(db)
         self.orderedition = OrderEditionRepository(db)
+        self.admin = AdminRepository
+        self.transaction = TransactionRepository(db)
 
     async def __aenter__(self):
         return self

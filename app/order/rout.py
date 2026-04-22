@@ -6,6 +6,7 @@ from app.order.serivices.user.cancel_order import cancel_order
 from app.order.serivices.author.get_orderedition import get_order_edition
 from app.order.serivices.author.accept_order_edition import accept_order_edition
 from app.order.serivices.author.reject_order_edition import reject_order_edition
+from app.order.serivices.admin.confirm_delivery_edition import confirm_delivery_to_courier
 from app.order.schemas.outputs import OrderResponse
 
 
@@ -30,3 +31,7 @@ async def Accept_order_edition(order_edition_id: int,uow = Depends(get_uow),toke
 @router.patch("/author/reject")
 async def reject_orderedition(order_edition_id: int,uow = Depends(get_uow),token_data = Depends(get_current_user)):
     return await reject_order_edition(uow=uow,token_data=token_data,order_edition_id=order_edition_id)
+
+@router.patch("/admin")
+async def confirm_delivery(order_edition_id: int,uow = Depends(get_uow),token_data = Depends(get_current_user)):
+    return await confirm_delivery_to_courier(uow=uow,token_data=token_data,order_edition_id=order_edition_id)
