@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db, engine
-from app import models, schemas, crud, scheduler
+from app import models, schemas, crud
 from app.security import  get_current_user
 # models.Base.metadata.create_all(bind=engine)
 from app.get_unit_of_work import get_uow
@@ -10,6 +10,7 @@ import app.user.schemas.inputs as inputs
 from app.user.services.create_baseuser import email_register, create_user
 from app.user.services.authenticate import athenticate,verify_email
 from app.api.router import api_router
+from app.workers.scheduler import scheduler
 
 
 app = FastAPI(
@@ -22,7 +23,7 @@ app.include_router(api_router)
 
 @app.on_event("startup")
 async def startup():
-    scheduler.scheduler.start()
+    scheduler.start()
 
 
 
