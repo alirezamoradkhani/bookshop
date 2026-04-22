@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from app.security import get_current_user
 from app.get_unit_of_work import get_uow
-from app.order.serivices.create_oreder import create_order
+from app.order.serivices.user.create_oreder import create_order
 from app.order.schemas.outputs import OrderResponse
 
 

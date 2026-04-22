@@ -1,8 +1,9 @@
 from app.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, Integer, String, Boolean
+from sqlalchemy import ForeignKey, Integer, String, Boolean,DateTime
 from sqlalchemy.types import Enum
 from app.order.models.enums import OrderState, OrderItemState
+from datetime import datetime
 
 
 class Order(Base):
@@ -13,12 +14,14 @@ class Order(Base):
 
     state: Mapped[OrderState] = mapped_column(Enum(OrderState), default= OrderState.WAITING)
     final_price: Mapped[int] = mapped_column(Integer)
-    date: Mapped[str] = mapped_column(String)
+    date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 #order edition is for author to manage their order
 class OrderEdition(Base):
     __tablename__ = "orders_editions"
 
-    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), primary_key=True)
+    order_edition_id : Mapped[int] = mapped_column(primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
     edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"), primary_key=True)
     state: Mapped[OrderItemState] = mapped_column(Enum(OrderItemState), default=OrderItemState.WAITING)
+    last_modify: Mapped[datetime] = mapped_column(DateTime(timezone=True))

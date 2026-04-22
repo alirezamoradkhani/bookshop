@@ -24,11 +24,11 @@ async def create_order(uow:UnitOfWork,edition_ids: list[int], token_data: dict):
             edition.amount -= 1
         if current_user.wallet_amount < final_price:
             raise HTTPException(status_code=400, detail="Insufficient funds in wallet.")
-        current_user.wallet_amount -= final_price
+        await uow.baseusers.decrease_wallet_amount(user=current_user,change=final_price)
         new_order = model.Order(
             user_id = current_user.id
             ,final_price = final_price
-            ,date = str(datetime.utcnow()))
+            ,date = datetime.utcnow())
         await uow.order.create_order(new_order)
         await uow.flush()
         for edition_id in edition_ids:
@@ -36,6 +36,7 @@ async def create_order(uow:UnitOfWork,edition_ids: list[int], token_data: dict):
             new_orderedition = model.OrderEdition(
                 order_id=new_order.id
                 ,edition_id=edition_id
+                ,last_modify=new_order.date
                 )
             await uow.orderedition.create(new_orderedition)
         return new_order

@@ -41,3 +41,12 @@ class BaseUserRepository:
     async def soft_delete(self, user: model.BaseUser):
         user.is_deleted = True
         return user
+    
+    async def update_wallet_amount(self,user:model.BaseUser,new_amount:int):
+        user.wallet_amount = new_amount
+    
+    async def increase_wallet_amount(self,user:model.BaseUser,change:int):
+        user.wallet_amount += change
+
+    async def decrease_wallet_amount(self,user:model.BaseUser,change:int):
+        user.wallet_amount -= change
