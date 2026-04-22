@@ -15,6 +15,8 @@ async def accept_order_edition(uow:UnitOfWork,order_edition_id: int, token_data:
         order_edition = await uow.orderedition.get_by_order_edition_id(order_edition_id)
         if order_edition is None:
             raise HTTPException(status_code=400, detail="orderedition not found.")
+        if order_edition.state != enums.OrderItemState.WAITING:
+            raise HTTPException(status_code=400, detail="can't rejevt orderedition at this state.")
         if current_user.role == Role.AUTHOR:
             edition = await uow.edition.get_by_id(order_edition.edition_id)
             book_author = await uow.bookauthor.get_by_authorid_and_bookid(author_id=current_user.id,book_id=edition.book_id)
