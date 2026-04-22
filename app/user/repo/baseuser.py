@@ -50,3 +50,7 @@ class BaseUserRepository:
 
     async def decrease_wallet_amount(self,user:model.BaseUser,change:int):
         user.wallet_amount -= change
+
+    async def get_by_username(self,name:str):
+        result = await self.db.execute(select(model.BaseUser).where(model.BaseUser.username == name))
+        return result.scalar_one_or_none()

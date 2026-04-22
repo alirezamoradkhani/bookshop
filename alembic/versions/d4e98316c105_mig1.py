@@ -1,8 +1,8 @@
-"""mig2
+"""mig1
 
-Revision ID: e1477143a07b
+Revision ID: d4e98316c105
 Revises: 
-Create Date: 2026-04-18 07:44:36.848914
+Create Date: 2026-04-22 12:17:36.464599
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e1477143a07b'
+revision: str = 'd4e98316c105'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -65,7 +65,7 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('type', sa.Enum('DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', name='transactiontype'), nullable=False),
-    sa.Column('date', sa.String(), nullable=False),
+    sa.Column('date', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['base_users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -99,7 +99,7 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('state', sa.Enum('WAITING', 'IN_PROCCESE', 'DONE', 'CANCELED', name='orderstate'), nullable=False),
     sa.Column('final_price', sa.Integer(), nullable=False),
-    sa.Column('date', sa.String(), nullable=False),
+    sa.Column('date', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -113,12 +113,15 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('orders_editions',
+    sa.Column('order_edition_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('edition_id', sa.Integer(), nullable=False),
-    sa.Column('state', sa.Enum('WAITING', 'ACCEPTED', 'REJECTED', 'PREPARING', 'DONE', name='orderitemstate'), nullable=False),
+    sa.Column('state', sa.Enum('WAITING', 'ACCEPTED', 'REJECTED', 'FORCEREJECTED', 'PREPARING', 'DONE', 'CANCELED', name='orderitemstate'), nullable=False),
+    sa.Column('last_modify', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('price', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['edition_id'], ['editions.id'], ),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
-    sa.PrimaryKeyConstraint('order_id', 'edition_id')
+    sa.PrimaryKeyConstraint('order_edition_id')
     )
     # ### end Alembic commands ###
 

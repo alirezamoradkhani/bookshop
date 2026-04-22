@@ -35,9 +35,10 @@ async def create_order(uow:UnitOfWork,edition_ids: list[int], token_data: dict):
             edition = await uow.edition.get_by_id(edition_id)
             new_orderedition = model.OrderEdition(
                 order_id=new_order.id
-                ,edition_id=edition_id
+                ,edition_id=edition.id
                 ,last_modify=new_order.date
                 ,price=edition.price
                 )
             await uow.orderedition.create(new_orderedition)
+            await uow.flush()
         return new_order

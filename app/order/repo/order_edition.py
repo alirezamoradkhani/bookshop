@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.order.models import model
 from app.order.models import enums
+from app.edition.models.model import Edition
 from datetime import datetime, timedelta
 
 class OrderEditionRepository:
@@ -48,4 +49,8 @@ class OrderEditionRepository:
             .where(model.OrderEdition.last_modify >= start
                    ,model.OrderEdition.last_modify < end
                    ,model.OrderEdition.state == state))
+        return result.scalars().all()
+    
+    async def get_orderedition_by_list_of_edition(self,editions:list[Edition]):
+        result = await self.db.execute(select(model.OrderEdition).where(model.OrderEdition.edition_id.in_([e.id for e in editions])))
         return result.scalars().all()

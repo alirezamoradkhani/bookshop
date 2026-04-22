@@ -22,3 +22,7 @@ class EditionRepository:
 
     async def soft_delete(self,edition:Edition):
         edition.is_deleted = True
+    
+    async def get_by_book_id(self,book_id:int):
+        result = await self.db.execute(select(Edition).where(Edition.book_id == book_id))
+        return result.scalars().all()

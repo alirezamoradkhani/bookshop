@@ -17,7 +17,7 @@ async def cancel_order(uow:UnitOfWork,order_id: int, token_data: dict):
 
         if current_user.role == Role.AUTHOR:
              raise HTTPException(status_code=400, detail="authors can't cancel user's orders.")
-        
+        await uow.flush()
         order_editions = await uow.orderedition.get_by_order_id(order.id)
         if current_user.role == Role.USER:
             if order.user_id != current_user.id:
@@ -30,4 +30,4 @@ async def cancel_order(uow:UnitOfWork,order_id: int, token_data: dict):
                 await uow.orderedition.update_state(orderedition=order_edition,new_state=enums.OrderItemState.CANCELED)
             await uow.baseusers.increase_wallet_amount(user=current_user,change=order.final_price)
                 
-            return order
+        return order

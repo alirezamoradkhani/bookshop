@@ -20,9 +20,9 @@ class Order(Base):
 class OrderEdition(Base):
     __tablename__ = "orders_editions"
 
-    order_edition_id : Mapped[int] = mapped_column(primary_key=True)
-    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
-    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"), primary_key=True)
+    order_edition_id : Mapped[int] = mapped_column(Integer,primary_key=True, autoincrement=True)
+    order_id: Mapped[int] = mapped_column(Integer,ForeignKey("orders.id"))
+    edition_id: Mapped[int] = mapped_column(Integer,ForeignKey("editions.id"))
     state: Mapped[OrderItemState] = mapped_column(Enum(OrderItemState), default=OrderItemState.WAITING)
     last_modify: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     price : Mapped[int] = mapped_column(Integer)
