@@ -9,6 +9,7 @@ from app.edition.repo.edition import EditionRepository
 from app.order.repo.order import OrderRepository
 from app.order.repo.order_edition import OrderEditionRepository
 from app.transaction.repo.transaction import TransactionRepository
+from app.borrow.repo.borrow import Borrowpository
 
 from app.database import get_db
 from fastapi import Depends
@@ -27,6 +28,7 @@ class UnitOfWork:
         self.orderedition = OrderEditionRepository(db)
         self.admin = AdminRepository
         self.transaction = TransactionRepository(db)
+        self.borrow = Borrowpository(db)
 
     async def __aenter__(self):
         return self
