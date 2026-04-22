@@ -10,6 +10,7 @@ class OrderItemState(str, Enum):
     WAITING = "waiting"
     ACCEPTED = "accepted"
     REJECTED = "rejected"
+    FORCEREJECTED = "forcerejected"
     PREPARING = "preparing"
     DONE = "done"
     CANCELED = "canceled"
