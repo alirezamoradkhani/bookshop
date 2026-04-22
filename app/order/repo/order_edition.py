@@ -21,7 +21,7 @@ class OrderEditionRepository:
     
     async def get_by_order_edition_id(self,order_edition_id:int):
         result = await self.db.execute(select(model.OrderEdition).where(model.OrderEdition.order_edition_id == order_edition_id))
-        return result.scalar_one_or_none()
+        return result.scalars().all()
     
     async def get_by_state(self,state:enums.OrderItemState):
         result = await self.db.execute(select(model.OrderEdition).where(model.OrderEdition.state == state))

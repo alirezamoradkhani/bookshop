@@ -16,5 +16,10 @@ class OrderRepository:
     
     async def update_order_atate(self,order:model.Order, new_state: enums.OrderState):
         order.state = new_state
+
     async def update_final_price(self,order:model.Order,change: int):
         order.final_price -= change
+
+    async def get_by_state(self,state:enums.OrderState):
+        result = await self.db.execute(select(model.Order).where(model.Order.state == state))
+        return result.scalars().all()
