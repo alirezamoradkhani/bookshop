@@ -1,10 +1,10 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore
-from app.workers.tasks import mark_ordere_dition_as_done
+from app.workers.tasks import order_tasks
 
 scheduler = AsyncIOScheduler()
 
 scheduler.add_job(
-    mark_ordere_dition_as_done,
+    order_tasks,
     "interval",
     minutes=5
 )
