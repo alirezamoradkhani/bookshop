@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from app.book.models import model
 
 class BookAuthorRepository:
@@ -17,6 +17,9 @@ class BookAuthorRepository:
         result = await self.db.execute(select(model.BookAuthor).where(model.BookAuthor.author_id == author_id))
         return result.scalars().all()
     
-    async def get_by_book_id(self,book_id):
+    async def get_by_book_id(self,book_id:int):
         result = await self.db.execute(select(model.BookAuthor).where(model.BookAuthor.book_id == book_id))
         return result.scalars().all()
+    async def count_of_author(self,book_id:int):
+        result = await self.db.execute(select(func.count(model.BookAuthor.author_id)).where(model.BookAuthor.book_id == book_id))
+        return result.scalar_one()
