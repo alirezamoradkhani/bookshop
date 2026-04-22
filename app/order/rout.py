@@ -4,6 +4,7 @@ from app.get_unit_of_work import get_uow
 from app.order.serivices.user.create_oreder import create_order
 from app.order.serivices.user.cancel_order import cancel_order
 from app.order.serivices.author.get_orderedition import get_order_edition
+from app.order.serivices.author.accept_order_edition import accept_order_edition
 from app.order.schemas.outputs import OrderResponse
 
 
@@ -20,3 +21,7 @@ async def Cancel_order(order_id:int ,uow = Depends(get_uow),token_data = Depends
 @router.get("/user/order")
 async def get_ordereditions(uow = Depends(get_uow),token_data = Depends(get_current_user)):
     return await get_order_edition(uow=uow,token_data=token_data)
+
+@router.patch("/author/accept")
+async def Accept_order_edition(order_edition_id: int,uow = Depends(get_uow),token_data = Depends(get_current_user)):
+    return await accept_order_edition(uow=uow,token_data=token_data,order_edition_id=order_edition_id)
