@@ -30,3 +30,6 @@ class Borrowpository:
                    ,model.Borrow.status == enums.BorrowStatus.ACTIVE)
                    )
         return result.scalars().all()
+    
+    async def mark_as_owerdue(self,borrow:model.Borrow):
+        borrow.is_overdue = True

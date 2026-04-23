@@ -2,7 +2,7 @@ from app.database import Base
 from app.borrow.models.enums import BorrowStatus
 from datetime import datetime
 from sqlalchemy.types import Enum
-from sqlalchemy import Integer,ForeignKey, DateTime
+from sqlalchemy import Integer,ForeignKey, DateTime,Boolean, text
 from sqlalchemy.orm import Mapped,mapped_column
 
 
@@ -20,6 +20,7 @@ class Borrow(Base):
     borrowed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     returned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    is_overdue: Mapped[bool] = mapped_column(Boolean,default=False,server_default=text("false"),nullable=False)
 
 class Waitlist(Base):
     __tablename__ = "waitlist"
