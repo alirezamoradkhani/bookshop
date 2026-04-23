@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.borrow.models import model, enums
-from datetime import datetime
+from datetime import datetime,timedelta
 
 class Borrowpository:
     def __init__(self, db: AsyncSession):
@@ -19,3 +19,14 @@ class Borrowpository:
 
     async def set_Return_time(self,borrow:model.Borrow,return_time:datetime):
         borrow.returned_at = return_time
+
+    async def get_owerdue_by_date(self,now:datetime):
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timedelta(days=1)
+        result = await self.db.execute(
+            select(model.Borrow)
+            .where(model.Borrow.due_at >= start
+                   ,model.Borrow.due_at < end
+                   ,model.Borrow.status == enums.BorrowStatus.ACTIVE)
+                   )
+        return result.scalars().all()
