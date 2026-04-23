@@ -22,4 +22,7 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
         await uow.borrow.update_status(borrow=borrow,new_status=enums.BorrowStatus.RETURNED)
         now = datetime.utcnow()
         await uow.borrow.set_Return_time(borrow=borrow,return_time=now)
+        edition = await uow.edition.get_by_id(edition_id=borrow.edition_id)
+        amount = edition.amount
+        await uow.edition.update_amount(edition=edition,new_amount=amount+1)
         return borrow

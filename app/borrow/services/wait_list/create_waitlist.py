@@ -20,7 +20,9 @@ async def add_to_wait_list(uow:UnitOfWork,token_data:dict,edition_id):
         plan = await uow.user.get_plan_by_id(current_user.id)
         if plan == UserPlan.BRONZE:
             raise HTTPException(status_code=400, detail="bronze User dose not have permission to borrow.")
+        if await uow.waitlist.get_by_user_id_and_edition_id(user_id=current_user.id,edition_id=edition.id) is not None:
+            raise HTTPException(status_code=400, detail="you are in the waitlist")
         now = datetime.utcnow()
-        new_waitlist = Waitlist(user_id=current_user.id,edition_id=edition_id,create_at=now)
+        new_waitlist = Waitlist(user_id=current_user.id,edition_id=edition_id,created_at=now)
         await uow.waitlist.create(waitlist=new_waitlist)
-        return Waitlist
+        return new_waitlist

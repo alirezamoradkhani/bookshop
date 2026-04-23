@@ -32,5 +32,7 @@ async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
         due_at = now + timedelta(days=day)
         new_borrow = model.Borrow(user_id=current_user.id,edition_id=edition.id,borrowed_at=now,due_at=due_at)
         await uow.borrow.create(new_borrow=new_borrow)
+        amount = edition.amount
+        await uow.edition.update_amount(edition=edition,new_amount=amount-1)
         return new_borrow
         

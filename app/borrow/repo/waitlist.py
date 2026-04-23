@@ -25,4 +25,7 @@ class Waitlistpository:
             .order_by(model.Waitlist.created_at)
             )
         return result.scalars().first()
-        
+    
+    async def get_by_user_id_and_edition_id(self,edition_id:int,user_id:int):
+        result = await self.db.execute(select(model.Waitlist).where(model.Waitlist.edition_id==edition_id,model.Waitlist.user_id==user_id))
+        return result.scalars().first()     
