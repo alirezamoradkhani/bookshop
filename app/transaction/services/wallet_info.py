@@ -5,7 +5,7 @@ from app.transaction.models.enums import TransactionType
 from datetime import datetime
 
 
-async def withdraw(uow:UnitOfWork,token_data: dict):
+async def walletinfo(uow:UnitOfWork,token_data: dict):
     async with uow:
         current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
         if current_user is None:
