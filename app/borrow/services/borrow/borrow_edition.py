@@ -22,7 +22,7 @@ async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
         plan = await uow.user.get_plan_by_id(current_user.id)
         if plan == UserPlan.BRONZE:
             raise HTTPException(status_code=400, detail="bronze User dose not have permission to borrow.")
-        elif plan ==UserPlan.SILVER:
+        elif plan ==UserPlan.SILVER :
             day = 7
         elif plan == UserPlan.GOLD:
             day = 14
