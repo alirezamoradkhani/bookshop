@@ -7,5 +7,4 @@ scheduler.add_job(
     order_tasks,
     "interval",
     minutes=5,
-    days=1
 )

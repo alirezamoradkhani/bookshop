@@ -3,6 +3,8 @@ import app.borrow.models.model as model
 import app.book.schemas.inputs as inputs
 import app.borrow.models.enums as enums
 from app.user.models.enums import Role,UserPlan
+from app.borrow.services.wait_list.get_qualified_waitlist import get_qualified_waitlist
+from app.borrow.services.wait_list.give_edition_to_qualified_waitlist import give_edition_to_qualified_wailist
 from datetime import datetime, timedelta
 
 from app.unit_of_work import UnitOfWork
@@ -25,4 +27,7 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
         edition = await uow.edition.get_by_id(edition_id=borrow.edition_id)
         amount = edition.amount
         await uow.edition.update_amount(edition=edition,new_amount=amount+1)
+        next_user = await get_qualified_waitlist(uow=uow,edition_id=borrow.edition_id)
+        if next_user is not None:
+            await give_edition_to_qualified_wailist(uow=uow,waitlist=next_user)
         return borrow
