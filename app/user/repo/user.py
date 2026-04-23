@@ -19,3 +19,7 @@ class UserRepository:
         user = result.scalar_one_or_none()
         user.plan = new_plan
         return user
+    
+    async def get_plan_by_id(self,user_id:int):
+        result = await self.db.execute(select(model.User.plan).where(model.User.id == id))
+        return result.scalar_one_or_none()
