@@ -21,4 +21,8 @@ class Waitlistpository:
             select(model.Waitlist)
             .join(User, User.id== model.Waitlist.user_id)
             .where(model.Waitlist.edition_id == edition_id,
-            User.plan == user_plan))
+            User.plan == user_plan)
+            .order_by(model.Waitlist.created_at)
+            )
+        return result.scalars().first()
+        
