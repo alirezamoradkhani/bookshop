@@ -4,6 +4,7 @@ from app.get_unit_of_work import get_uow
 from app.transaction.services.deposit import deposit
 from app.transaction.services.transfer import transfer
 from app.transaction.services.wallet_info import walletinfo
+from app.transaction.services.withdraw import withdraw
 from app.transaction.schemas.outputs import BaseUserResponse
 
 
@@ -21,3 +22,7 @@ async def Transfer(amount:int,reciver_id:int ,uow = Depends(get_uow),toke_data =
 @router.get("/info")
 async def wallet_info(uow = Depends(get_uow),toke_data = Depends(get_current_user)):
     return await walletinfo(uow=uow,token_data=toke_data)
+
+@router.post("/withdraw",response_model=BaseUserResponse)
+async def Withdraw(amount:int,uow = Depends(get_uow),toke_data = Depends(get_current_user)):
+    return await withdraw(uow=uow,token_data=toke_data,amount=amount)
