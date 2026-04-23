@@ -113,13 +113,13 @@ async def transfer_funds(recipient_email: str, amount: int, token_data: dict = D
 
 #borrows
 
-@app.post("/borrows/take")
-async def borrow_edition(edition_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.borrow_edition(db=db,token_data=token_data,edition_id=edition_id)
+# @app.post("/borrows/take")
+# async def borrow_edition(edition_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+#     return await crud.borrow_edition(db=db,token_data=token_data,edition_id=edition_id)
 
-@app.post("/borrow/return")
-async def return_borrow(borrow_id:int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.return_borrow(db=db,token_data=token_data,borrow_id=borrow_id)
+# @app.post("/borrow/return")
+# async def return_borrow(borrow_id:int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+#     return await crud.return_borrow(db=db,token_data=token_data,borrow_id=borrow_id)
 
 @app.post("/borrow/waitlist")
 async def add_to_waitlist(edition_id: int, token_data: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
