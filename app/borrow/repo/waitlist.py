@@ -29,3 +29,6 @@ class Waitlistpository:
     async def get_by_user_id_and_edition_id(self,edition_id:int,user_id:int):
         result = await self.db.execute(select(model.Waitlist).where(model.Waitlist.edition_id==edition_id,model.Waitlist.user_id==user_id))
         return result.scalar_one_or_none()
+    
+    async def delete(self,waitlist:model.Waitlist):
+        await self.db.delete(waitlist)

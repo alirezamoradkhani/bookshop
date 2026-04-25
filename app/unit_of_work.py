@@ -12,6 +12,8 @@ from app.transaction.repo.transaction import TransactionRepository
 from app.borrow.repo.borrow import Borrowpository
 from app.borrow.repo.waitlist import Waitlistpository
 
+from app.outbox.repo import OutboxRepository
+
 from app.database import get_db
 from fastapi import Depends
 
@@ -31,6 +33,7 @@ class UnitOfWork:
         self.transaction = TransactionRepository(db)
         self.borrow = Borrowpository(db)
         self.waitlist = Waitlistpository(db)
+        self.outbox = OutboxRepository(db)
 
     async def __aenter__(self):
         return self

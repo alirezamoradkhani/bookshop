@@ -6,6 +6,8 @@ from app.user.models.enums import Role,UserPlan
 from app.borrow.services.wait_list.get_qualified_waitlist import get_qualified_waitlist
 from app.borrow.services.wait_list.give_edition_to_qualified_waitlist import give_edition_to_qualified_wailist
 from datetime import datetime, timedelta
+from app.events.borrow.borrow_events import BorrowReturnedEvent
+from app.outbox.model import OutboxEvent
 
 from app.unit_of_work import UnitOfWork
 
@@ -25,9 +27,17 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
         now = datetime.utcnow()
         await uow.borrow.set_Return_time(borrow=borrow,return_time=now)
         edition = await uow.edition.get_by_id(edition_id=borrow.edition_id)
-        amount = edition.amount
-        await uow.edition.update_amount(edition=edition,new_amount=amount+1)
-        next_user = await get_qualified_waitlist(uow=uow,edition_id=borrow.edition_id)
-        if next_user is not None:
-            await give_edition_to_qualified_wailist(uow=uow,waitlist=next_user)
+    
+        await uow.edition.update_amount(edition=edition,new_amount=edition.amount+1)
+        event = BorrowReturnedEvent(
+            edition_id=borrow.edition_id,
+            returned_by=current_user.id
+        )
+
+        outbox_event = OutboxEvent(
+            event_type=event.event_type,
+            payload=event.__dict__
+        )
+        await uow.outbox.add(event=outbox_event)
+
         return borrow
