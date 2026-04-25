@@ -5,7 +5,7 @@ class BookResponse(BaseModel):
     title: str
     category: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class BookDetails(BaseModel):
     id: int
@@ -13,4 +13,4 @@ class BookDetails(BaseModel):
     category: str
     authors : list[str]
     class Config:
-        orm_mode = True
+        from_attributes = True

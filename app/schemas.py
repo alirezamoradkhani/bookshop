@@ -16,7 +16,7 @@ class UserResponse(BaseModel):
     wallet_amount: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserLogin(BaseModel):
     username: str
@@ -40,7 +40,7 @@ class BookResponse(BaseModel):
     title: str
     category: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class BookSearch(BaseModel):
     id : int | None = None
@@ -49,7 +49,7 @@ class BookSearch(BaseModel):
     price: int | None = None
     category: str | None = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class OrderResponse(BaseModel):
     id: int
@@ -58,7 +58,7 @@ class OrderResponse(BaseModel):
     final_price: int
     date: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class OrderState(str, pyEnum):
     WAITING = "waiting"

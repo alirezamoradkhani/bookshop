@@ -6,3 +6,5 @@ class BaseUserResponse(BaseModel):
     email: str
     role: str
     wallet_amount: int
+    class Config:
+        from_attributes = True
