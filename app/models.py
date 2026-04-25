@@ -18,3 +18,4 @@ from app.transaction.models.enums import TransactionType
 from app.transaction.models.model import Transaction
 from app.borrow.models.enums import BorrowStatus
 from app.borrow.models.model import Borrow, Waitlist
+from app.outbox.model import OutboxEvent

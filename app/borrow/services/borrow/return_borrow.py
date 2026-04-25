@@ -7,6 +7,7 @@ from app.borrow.services.wait_list.get_qualified_waitlist import get_qualified_w
 from app.borrow.services.wait_list.give_edition_to_qualified_waitlist import give_edition_to_qualified_wailist
 from datetime import datetime, timedelta
 from app.events.borrow.borrow_events import BorrowReturnedEvent
+from app.events.base import event_to_payload
 from app.outbox.model import OutboxEvent
 
 from app.unit_of_work import UnitOfWork
@@ -36,7 +37,7 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
 
         outbox_event = OutboxEvent(
             event_type=event.event_type,
-            payload=event.__dict__
+            payload = event_to_payload(event=event)
         )
         await uow.outbox.add(event=outbox_event)
 
