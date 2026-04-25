@@ -24,6 +24,8 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
             raise HTTPException(status_code=400, detail="borrow not found")
         if borrow.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="this not your borrow")
+        if borrow.status == enums.BorrowStatus.RETURNED:
+            raise HTTPException(status_code=400, detail="the borrow already returned")
         await uow.borrow.update_status(borrow=borrow,new_status=enums.BorrowStatus.RETURNED)
         now = datetime.utcnow()
         await uow.borrow.set_Return_time(borrow=borrow,return_time=now)
