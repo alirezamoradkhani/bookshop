@@ -1,14 +1,13 @@
+from app.workers.consumers.borrow.borrow_create_cunsomer import BorrowCreatedcunsomer
 import json
-from app.workers.consumers.borrow.borrow_return_cunsomer import BorrowReturnedConsumer
 import asyncio
 
-async def run_borrow_return_consumer(broker, uow_factory):
+async def run_borrow_create_consumer(broker,uow_factory):
 
-    consumer = BorrowReturnedConsumer()
-
+    consumer = BorrowCreatedcunsomer
     while True:
         try:
-            pubsub = await broker.subscribe("BookReturned")
+            pubsub = await broker.subscribe("BorrowCreated")
 
             async for message in pubsub.listen():
 
@@ -26,5 +25,3 @@ async def run_borrow_return_consumer(broker, uow_factory):
         except Exception as e:
             print(f"consumer worker restart: {e}")
             await asyncio.sleep(2)
-
-#ایونت های پابلیش شده با تایپ مشخص رو میگیره و کارهای مورد نیاز اونو انجام میده
