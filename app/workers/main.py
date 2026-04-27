@@ -3,7 +3,7 @@ import asyncio
 from app.unit_of_work import UnitOfWork
 from app.database import SessionLocal
 from app.broker.redis_broker import RedisBroker
-from app.workers.runner import all_runner
+from app.workers.all_runner import all_runner
 from app.workers.outbox_worker import run_outbox_worker
 
 broker = RedisBroker(url="redis://localhost:6379")
