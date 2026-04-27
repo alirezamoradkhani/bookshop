@@ -38,6 +38,19 @@ services:
 
     # 👇 مهم برای auto reload
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+  
+  worker:
+    build: .
+    container_name: fastapi-worker
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: python -m app.workers.main
 
 volumes:
   pgdata:

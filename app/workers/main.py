@@ -6,7 +6,7 @@ from app.broker.redis_broker import RedisBroker
 from app.workers.all_runner import all_runner
 from app.workers.outbox_worker import run_outbox_worker
 
-broker = RedisBroker(url="redis://localhost:6379")
+broker = RedisBroker(url="redis://redis:6379")
 
 def uow_factory():
     db = SessionLocal()

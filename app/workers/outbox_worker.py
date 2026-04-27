@@ -10,11 +10,11 @@ async def run_outbox_worker(uow_factory, broker):
             async with uow_factory() as uow:
                 processed_count = await publish_outbox_events(uow, broker)
 
-            # adaptive sleep
-            if processed_count == 0:
-                await asyncio.sleep(3)
-            else:
-                await asyncio.sleep(0.5)
+                # adaptive sleep
+                if processed_count == 0:
+                    await asyncio.sleep(3)
+                else:
+                    await asyncio.sleep(0.5)
 
         except Exception as e:
             print(f"outbox worker error: {e}")
