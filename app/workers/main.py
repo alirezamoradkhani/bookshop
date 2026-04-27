@@ -16,7 +16,7 @@ async def main():
 
     await asyncio.gather(
         all_runner(broker=broker,uow_factory=uow_factory),
-        run_outbox_worker(broker=broker,uow=uow_factory),
+        run_outbox_worker(broker=broker,uow_factory=uow_factory),
     )
 
 
