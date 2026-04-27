@@ -3,6 +3,7 @@ from app.exeptions.base import DomainException
 
 
 class InvalidCredentials(DomainException):
+    status_code = 401
     def __init__(self):
         super().__init__(
             message="Invalid username or password",
@@ -11,6 +12,7 @@ class InvalidCredentials(DomainException):
 
 
 class InvalidOTP(DomainException):
+    status_code = 401
     def __init__(self):
         super().__init__(
             message="Invalid OTP",
