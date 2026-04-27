@@ -10,8 +10,8 @@ class OutboxRepository:
     async def add(self, event: OutboxEvent):
         self.db.add(event)
 
-    async def get_unprocessed(self):
+    async def get_unprocessed(self,limit:int):
         result = await self.db.execute(
-            select(OutboxEvent).where(OutboxEvent.processed == False)
+            select(OutboxEvent).where(OutboxEvent.processed == False).limit(limit=limit)
         )
         return result.scalars().all()

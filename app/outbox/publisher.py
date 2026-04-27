@@ -1,4 +1,7 @@
-async def publish_outbox_events(uow, broker):
+from app.unit_of_work import UnitOfWork
+from app.broker.redis_broker import RedisBroker
+
+async def publish_outbox_events(uow:UnitOfWork, broker:RedisBroker):
 
     processed_count = 0
 
