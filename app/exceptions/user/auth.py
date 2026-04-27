@@ -1,5 +1,5 @@
 # domain/exceptions/auth.py
-from app.exeptions.base import DomainException
+from app.exceptions.base import DomainException
 
 
 class InvalidCredentials(DomainException):

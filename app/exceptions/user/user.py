@@ -1,5 +1,5 @@
 # domain/exceptions/user.py
-from app.exeptions.base import DomainException
+from app.exceptions.base import DomainException
 
 
 class InvalidTokenUser(DomainException):
