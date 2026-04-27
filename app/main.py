@@ -11,6 +11,8 @@ from app.user.services.create_baseuser import email_register, create_user
 from app.user.services.authenticate import athenticate,verify_email
 from app.api.router import api_router
 from app.workers.scheduler import scheduler
+from app.exceptions.base import DomainException
+from app.exceptions.exception_handler import domain_exception_handler
 
 
 app = FastAPI(
@@ -20,6 +22,7 @@ app = FastAPI(
 )
 
 app.include_router(api_router)
+app.add_exception_handler(DomainException,domain_exception_handler)
 
 @app.on_event("startup")
 async def startup():
