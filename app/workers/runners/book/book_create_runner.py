@@ -4,7 +4,7 @@ import asyncio
 
 async def run_book_create_consumer(broker,uow_factory):
 
-    consumer = BookCreateConsumer
+    consumer = BookCreateConsumer()
     while True:
         try:
             pubsub = await broker.subscribe("BookCreated")

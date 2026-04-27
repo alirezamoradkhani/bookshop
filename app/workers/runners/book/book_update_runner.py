@@ -4,7 +4,7 @@ import asyncio
 
 async def run_book_update_consumer(broker,uow_factory):
 
-    consumer = BookUpdateConsumer
+    consumer = BookUpdateConsumer()
     while True:
         try:
             pubsub = await broker.subscribe("BookUpdated")

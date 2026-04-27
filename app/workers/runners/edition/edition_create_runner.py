@@ -4,7 +4,7 @@ import asyncio
 
 async def run_edition_create_consumer(broker, uow_factory):
 
-    consumer = EditionCreateConsumer
+    consumer = EditionCreateConsumer()
 
     while True:
         try:

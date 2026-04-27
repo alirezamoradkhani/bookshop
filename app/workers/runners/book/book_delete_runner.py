@@ -4,7 +4,7 @@ import asyncio
 
 async def run_book_delete_consumer(broker,uow_factory):
 
-    consumer = BookDeleteConsumer
+    consumer = BookDeleteConsumer()
     while True:
         try:
             pubsub = await broker.subscribe("BookDeleted")

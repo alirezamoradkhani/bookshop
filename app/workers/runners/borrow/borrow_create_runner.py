@@ -4,7 +4,7 @@ import asyncio
 
 async def run_borrow_create_consumer(broker,uow_factory):
 
-    consumer = BorrowCreatedConsumer
+    consumer = BorrowCreatedConsumer()
     while True:
         try:
             pubsub = await broker.subscribe("BorrowCreated")
