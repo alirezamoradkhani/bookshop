@@ -1,14 +1,14 @@
 import json
-from app.workers.consumers.order.order_create_consumer import OrderCreateConsumer
+from app.workers.consumers.order.order_Cancel_consumer import OrderCancelConsumer
 import asyncio
 
-async def run_order_create_consumer(broker, uow_factory):
+async def run_edition_cancel_consumer(broker, uow_factory):
 
-    consumer = OrderCreateConsumer()
+    consumer = OrderCancelConsumer()
 
     while True:
         try:
-            pubsub = await broker.subscribe("OrderCreated")
+            pubsub = await broker.subscribe("OrderCanceled")
 
             async for message in pubsub.listen():
 
