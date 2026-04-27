@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 import app.user.models.model as model
 from app.otp import create_otp, verify_otp
 from app.security import hash_password
