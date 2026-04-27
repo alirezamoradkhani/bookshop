@@ -12,6 +12,7 @@ from app.workers.runners.edition.edition_delete_runner import run_edition_delete
 from app.workers.runners.order.order_create_runner import run_order_create_consumer
 from app.workers.runners.order.order_cancel_runner import run_order_cancel_consumer
 from app.workers.runners.order.order_item_accept_runner import run_order_item_accept_consumer
+from app.workers.runners.order.order_item_reject_runner import run_order_item_reject_consumer
 
 async def all_runner(broker, uow_factory):
     await run_borrow_return_consumer(uow_factory=uow_factory,broker=broker)
@@ -26,4 +27,5 @@ async def all_runner(broker, uow_factory):
     await run_order_create_consumer(broker=broker,uow_factory=uow_factory)
     await run_order_cancel_consumer(broker=broker,uow_factory=uow_factory)
     await run_order_item_accept_consumer(broker=broker,uow_factory=uow_factory)
+    await run_order_item_reject_consumer(broker=broker,uow_factory=uow_factory)
 #ایونت های پابلیش شده با تایپ مشخص رو میگیره و کارهای مورد نیاز اونو انجام میده
