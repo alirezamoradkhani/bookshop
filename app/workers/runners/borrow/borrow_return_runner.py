@@ -1,10 +1,10 @@
 import json
-from app.workers.consumers.book_cunsomer import BookReturnedConsumer
+from app.workers.consumers.borrow.borrow_return_cunsomer import BorrowReturnedConsumer
 import asyncio
 
 async def run_book_consumer(broker, uow_factory):
 
-    consumer = BookReturnedConsumer()
+    consumer = BorrowReturnedConsumer()
 
     while True:
         try:

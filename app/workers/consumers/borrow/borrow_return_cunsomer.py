@@ -3,7 +3,7 @@ from app.user.models.enums import UserPlan
 from app.borrow.models.model import Borrow,Waitlist
 from app.unit_of_work import UnitOfWork
 
-class BookReturnedConsumer:
+class BorrowReturnedConsumer:
 
     async def get_qualified_waitlist(self, uow:UnitOfWork, edition_id):
 
