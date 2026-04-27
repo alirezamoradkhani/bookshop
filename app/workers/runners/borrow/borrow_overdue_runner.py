@@ -1,14 +1,14 @@
 import json
-from app.workers.consumers.borrow.borrow_return_consumer import BorrowReturnedConsumer
+from app.workers.consumers.borrow.borrow_overdue_consomer import BorrowOverdueConsumer
 import asyncio
 
-async def run_borrow_return_consumer(broker, uow_factory):
+async def run_borrow_overdue_consumer(broker, uow_factory):
 
-    consumer = BorrowReturnedConsumer()
+    consumer = BorrowOverdueConsumer()
 
     while True:
         try:
-            pubsub = await broker.subscribe("BorrowReturned")
+            pubsub = await broker.subscribe("BorrowOverdue")
 
             async for message in pubsub.listen():
 
