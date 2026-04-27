@@ -1,14 +1,14 @@
 import json
-from app.workers.consumers.edition.edition_update_consumer import EditionUpdateConsumer
+from app.workers.consumers.edition.edition_delete_consumer import EditionDeleteConsumer
 import asyncio
 
-async def run_edition_update_consumer(broker, uow_factory):
+async def run_edition_delete_consumer(broker, uow_factory):
 
-    consumer = EditionUpdateConsumer()
+    consumer = EditionDeleteConsumer()
 
     while True:
         try:
-            pubsub = await broker.subscribe("EditionUpdated")
+            pubsub = await broker.subscribe("EditionDeleted")
 
             async for message in pubsub.listen():
 
