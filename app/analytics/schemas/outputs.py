@@ -30,3 +30,9 @@ class Best_author_in_sell(BaseModel):
 class Best_category_in_sell(BaseModel):
     category: str
     total_sales: int
+
+class Best_user_in_buy(BaseModel):
+    user_id: int
+    user_name: str
+    user_plan: str
+    total_buys: int
