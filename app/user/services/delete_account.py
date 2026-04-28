@@ -1,6 +1,6 @@
 from app.unit_of_work import UnitOfWork
 from app.user.models.enums import UserPlan
-from app.exceptions.user.auth import InvalidOTP
+from app.exceptions.models.user import InvalidOTP
 
 
 async def delete_account(uow:UnitOfWork,token_data:dict):

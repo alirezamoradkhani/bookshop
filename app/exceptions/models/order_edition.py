@@ -1,4 +1,4 @@
-from app.exeptions.base import DomainException
+from app.exceptions.base import DomainException
 
 class OrderEditionNotFound(DomainException):
     def __init__(self):

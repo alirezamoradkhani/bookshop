@@ -1,6 +1,6 @@
 from app.unit_of_work import UnitOfWork
 from app.user.schemas.inputs import UserPlanUpgrade
-from app.exceptions.user.auth import InvalidOTP
+from app.exceptions.models.user import InvalidOTP
 
 
 async def upgrade_plan(uow:UnitOfWork,new_plan:UserPlanUpgrade,token_data: dict):

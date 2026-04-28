@@ -3,6 +3,7 @@ import app.book.models.model as model
 import app.book.schemas.inputs as inputs
 import app.book.models.enums as enums
 from app.user.models.enums import Role
+from app.exceptions.models.user import InvalidOTP
 
 from app.unit_of_work import UnitOfWork
 
@@ -10,7 +11,7 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
     async with uow:
         current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
         if current_user is None:
-            raise HTTPException(status_code=400, detail="Invalid token user")
+            raise InvalidOTP
         if current_user.role == Role.USER:
             raise HTTPException(status_code=400, detail="User does not have permission to add books.")
         book = model.Book(title=new_book.title, category = new_book.category)

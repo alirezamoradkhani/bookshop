@@ -1,5 +1,4 @@
-# domain/exceptions/order.py
-from app.exeptions.base import DomainException
+from app.exceptions.base import DomainException
 
 class OrderNotFound(DomainException):
     def __init__(self):
@@ -31,3 +30,5 @@ class InvalidOrderItemState(DomainException):
             message="Invalid order item state",
             code="INVALID_ORDER_ITEM_STATE"
         )
+
+

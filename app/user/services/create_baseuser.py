@@ -3,8 +3,7 @@ from app.otp import create_otp, verify_otp
 from app.security import hash_password
 import app.user.schemas.inputs as inputs
 import app.user.models.enums as enums
-from app.exceptions.user.user import EmailAlreadyRegistered,UsernameAlreadyExists
-from app.exceptions.user.auth import InvalidOTP
+from app.exceptions.models.user import EmailAlreadyRegistered,UsernameAlreadyExists,InvalidOTP
 
 from app.unit_of_work import UnitOfWork
 

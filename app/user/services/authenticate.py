@@ -1,7 +1,7 @@
 from app.otp import create_otp, verify_otp
 from app.security import verify_password, create_access_token
 import app.user.schemas.inputs as inputs
-from app.exceptions.user.auth import InvalidOTP,InvalidCredentials
+from app.exceptions.models.user import InvalidCredentials,InvalidOTP
 
 from app.unit_of_work import UnitOfWork
 

@@ -1,5 +1,5 @@
 # domain/exceptions/inventory.py
-from app.exeptions.base import DomainException
+from app.exceptions.base import DomainException
 
 class EditionNotFound(DomainException):
     def __init__(self, edition_id: int):

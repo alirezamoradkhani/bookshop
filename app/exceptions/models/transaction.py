@@ -1,5 +1,4 @@
-# domain/exceptions/payment.py
-from app.exeptions.base import DomainException
+from app.exceptions.base import DomainException
 
 class InsufficientFunds(DomainException):
     def __init__(self):
