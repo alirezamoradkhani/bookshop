@@ -1,8 +1,17 @@
 from app.exceptions.base import DomainException
 
-class EditionNotFound(DomainException):
-    def __init__(self, edition_id: int):
+class BookNotFound(DomainException):
+    def __init__(self):
         super().__init__(
-            message=f"Edition with id={edition_id} not found",
-            code="EDITION_NOT_FOUND"
+            message=f"Book not found",
+            code="BOOK_NOT_FOUND"
         )
+
+class OnlyAuthorCanCreateBook(DomainException):
+    status_code=403
+    def __init__(self):
+        super().__init__(
+            message="Only authors have permission to create books.",
+            code="ONLY_AUTHOR_CAN_CREATE_BOOK",
+        )
+

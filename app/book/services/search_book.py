@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-import app.book.schemas.inputs as inputs
 from app.book.models.enums import Category
 
 from app.unit_of_work import UnitOfWork

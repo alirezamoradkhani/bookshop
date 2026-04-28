@@ -53,6 +53,14 @@ class UserNotFound(DomainException):
             
         )
 
+class AuthorNotFound(DomainException):
+    def __init__(self):
+        super().__init__(
+            message="Author not found",
+            code="AUTHOR_NOT_FOUND"
+            
+        )
+
 
 class UserPermissionDenied(DomainException):
     def __init__(self):
@@ -62,9 +70,23 @@ class UserPermissionDenied(DomainException):
         )
 
 
-class OnlyUserCanBuy(DomainException):
+class OnlyUserHavePrimition(DomainException):
     def __init__(self):
         super().__init__(
-            message="Only users can buy books",
-            code="ONLY_USER_CAN_BUY"
+            message="Only users have primition",
+            code="ONLY_USER_HAVE_PRIMITION"
+        )
+
+class OnlyAuthorPrimition(DomainException):
+    def __init__(self):
+        super().__init__(
+            message="Only Authors have primition",
+            code="ONLY_AUTHOR_HAVE_PRIMITION"
+        )
+
+class OnlyAdminPrimition(DomainException):
+    def __init__(self):
+        super().__init__(
+            message="Only Admins have primition",
+            code="ONLY_ADMIN_HAVE_PRIMITION"
         )
