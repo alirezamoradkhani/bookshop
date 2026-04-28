@@ -72,6 +72,14 @@ class UserPermissionDenied(DomainException):
             code="USER_PERMISSION_DENIED"
         )
 
+class PlanPermissionDenied(DomainException):
+    status_code = 403
+    def __init__(self):
+        super().__init__(
+            message="plan does not have permission",
+            code="PLAN_PERMISSION_DENIED"
+        )
+
 
 class OnlyUserHavePrimition(DomainException):
     status_code = 403

@@ -4,7 +4,7 @@ class BookNotFound(DomainException):
     status_code = 404
     def __init__(self):
         super().__init__(
-            message=f"Book not found",
+            message="Book not found",
             code="BOOK_NOT_FOUND"
         )
 
