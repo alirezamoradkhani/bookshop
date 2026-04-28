@@ -17,3 +17,17 @@ class EditionOutOfStock(DomainException):
             message="Edition is out of stock",
             code="EDITION_OUT_OF_STOCK"
         )
+
+class InvalidAmount(DomainException):
+    status_code = 400
+    def __init__(self):
+        super().__init__(
+            message="Invalid amount",
+            code="INVALID_AMOUNT")
+        
+class InvalidPrice(DomainException):
+    status_code = 400
+    def __init__(self):
+        super().__init__(
+            message="Invalid price",
+            code="INVALID_PRICE")
