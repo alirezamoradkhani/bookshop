@@ -10,7 +10,7 @@ from app.edition.services.delete_edition import remove_edition
 
 router = APIRouter(prefix="/editions", tags=["editions"])
 
-@router.post("/create")
+@router.post("/")
 async def add_edition(edition: EditionCreate,uow = Depends(get_uow),token_data = Depends(get_current_user)):
     return await create_edition(uow=uow,token_data=token_data,edition=edition)
 

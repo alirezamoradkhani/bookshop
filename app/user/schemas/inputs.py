@@ -15,3 +15,7 @@ class UserPlanUpgrade(str, Enum):
     SILVER = "silver"
     GOLD = "gold"
     PLATINUM = "platinum"
+
+class SearchAuthor(BaseModel):
+    id: int | None = None
+    name: str | None = None

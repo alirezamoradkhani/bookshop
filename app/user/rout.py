@@ -5,6 +5,7 @@ from app.user.services.authenticate import athenticate, verify_email
 from app.user.services.create_baseuser import create_user, email_register
 from app.user.services.delete_account import delete_account
 from app.user.services.upgrade_user_plan import upgrade_plan
+from app.user.services.search_author import search_author
 from app.get_unit_of_work import get_uow
 from app.user.schemas import inputs, outputs
 
@@ -34,3 +35,7 @@ async def Delete_account(token_data: dict = Depends(get_current_user), uow = Dep
 @router.patch("/plan",response_model= outputs.UserResponse)
 async def Upgrade_plan(new_plan:inputs.UserPlanUpgrade,token_data: dict = Depends(get_current_user),uow = Depends(get_uow)):
     return await upgrade_plan(uow=uow,new_plan=new_plan, token_data=token_data)
+
+@router.get("/author/search",response_model=list[outputs.AuthorResponse])
+async def Search_author(name:str | None=None,id:int | None=None,uow=Depends(get_uow)):
+    return await search_author(uow=uow,name=name,id=id)
