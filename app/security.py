@@ -3,6 +3,7 @@ from jose import jwt, JWTError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException, status
 import redis.asyncio as redis
+from app.exceptions.models.user import InvalidTokenUser
 import random
 from passlib.context import CryptContext
 from app.core.setting import settings
@@ -57,7 +58,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_
     token = credentials.credentials
     payload = decode_token(token)
     if payload is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise InvalidTokenUser
     return payload
 
 pwd_context = CryptContext(
