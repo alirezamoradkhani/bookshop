@@ -50,13 +50,13 @@ async def user_with_over_due(db = Depends(get_db)):
 
 #records
 
-@app.get("/record/authors/number-of-sell")
-async def best_author_in_sell(db = Depends(get_db)):
-    return await crud.best_author_in_sell(db=db)
+# @app.get("/record/authors/number-of-sell")
+# async def best_author_in_sell(db = Depends(get_db)):
+#     return await crud.best_author_in_sell(db=db)
 
-@app.get("/record/authors/total-income")
-async def best_author_in_income(db = Depends(get_db)):
-    return await crud.best_author_in_income(db=db)
+# @app.get("/record/authors/total-income")
+# async def best_author_in_income(db = Depends(get_db)):
+#     return await crud.best_author_in_income(db=db)
 
 @app.get("/record/editions/number-of-sell")
 async def best_edition_in_sell(db = Depends(get_db)):

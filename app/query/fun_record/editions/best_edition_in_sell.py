@@ -9,7 +9,7 @@ async def best_edition_in_sell(db: AsyncSession):
                Book.title,
                Edition.id,
                Edition.specefic_edition_title,
-               func.count(OrderEdition.id).label("total_sales"))
+               func.count(OrderEdition.order_edition_id).label("total_sales"))
                .join(Edition,Book.id == Edition.book_id)
                .join(OrderEdition,OrderEdition.edition_id == Edition.id)
                .join(Order,Order.id == OrderEdition.order_id)
