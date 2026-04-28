@@ -1,6 +1,7 @@
 from app.exceptions.base import DomainException
 
 class BookNotFound(DomainException):
+    status_code = 404
     def __init__(self):
         super().__init__(
             message=f"Book not found",

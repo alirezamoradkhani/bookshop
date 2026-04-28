@@ -2,6 +2,7 @@
 from app.exceptions.base import DomainException
 
 class EditionNotFound(DomainException):
+    status_code = 404
     def __init__(self, edition_id: int):
         super().__init__(
             message=f"Edition with id={edition_id} not found",
@@ -10,6 +11,7 @@ class EditionNotFound(DomainException):
 
 
 class EditionOutOfStock(DomainException):
+    status_code = 400
     def __init__(self, edition_id: int):
         super().__init__(
             message=f"Edition with id={edition_id} is out of stock",

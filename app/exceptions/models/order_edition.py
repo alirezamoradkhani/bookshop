@@ -1,6 +1,7 @@
 from app.exceptions.base import DomainException
 
 class OrderEditionNotFound(DomainException):
+    status_code = 404
     def __init__(self):
         super().__init__(
             message="Order edition not found",
@@ -9,6 +10,7 @@ class OrderEditionNotFound(DomainException):
 
 
 class OrderEditionPermissionDenied(DomainException):
+    status_code = 403
     def __init__(self):
         super().__init__(
             message="This is not your order edition",

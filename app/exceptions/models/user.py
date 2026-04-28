@@ -46,6 +46,7 @@ class InvalidOTP(DomainException):
         )
 
 class UserNotFound(DomainException):
+    status_code = 404
     def __init__(self):
         super().__init__(
             message="User not found",
@@ -54,6 +55,7 @@ class UserNotFound(DomainException):
         )
 
 class AuthorNotFound(DomainException):
+    status_code = 404
     def __init__(self):
         super().__init__(
             message="Author not found",
@@ -63,6 +65,7 @@ class AuthorNotFound(DomainException):
 
 
 class UserPermissionDenied(DomainException):
+    status_code = 403
     def __init__(self):
         super().__init__(
             message="User does not have permission",
@@ -71,6 +74,7 @@ class UserPermissionDenied(DomainException):
 
 
 class OnlyUserHavePrimition(DomainException):
+    status_code = 403
     def __init__(self):
         super().__init__(
             message="Only users have primition",
@@ -78,6 +82,7 @@ class OnlyUserHavePrimition(DomainException):
         )
 
 class OnlyAuthorPrimition(DomainException):
+    status_code = 403
     def __init__(self):
         super().__init__(
             message="Only Authors have primition",
@@ -85,6 +90,7 @@ class OnlyAuthorPrimition(DomainException):
         )
 
 class OnlyAdminPrimition(DomainException):
+    status_code = 403
     def __init__(self):
         super().__init__(
             message="Only Admins have primition",

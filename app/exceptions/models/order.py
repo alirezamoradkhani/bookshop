@@ -1,6 +1,7 @@
 from app.exceptions.base import DomainException
 
 class OrderNotFound(DomainException):
+    status_code = 404
     def __init__(self):
         super().__init__(
             message="Order not found",
@@ -9,6 +10,7 @@ class OrderNotFound(DomainException):
 
 
 class OrderDoesNotBelongToUser(DomainException):
+    status_code = 403
     def __init__(self):
         super().__init__(
             message="You are not the owner of this order",
@@ -17,6 +19,7 @@ class OrderDoesNotBelongToUser(DomainException):
 
 
 class OrderNotCancelable(DomainException):
+    status_code = 403
     def __init__(self):
         super().__init__(
             message="You do not have permission to cancel this order",
@@ -25,6 +28,7 @@ class OrderNotCancelable(DomainException):
 
 
 class InvalidOrderItemState(DomainException):
+    status_code = 400
     def __init__(self):
         super().__init__(
             message="Invalid order item state",
