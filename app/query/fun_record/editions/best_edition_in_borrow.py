@@ -6,11 +6,11 @@ from app.models import *
 
 async def best_edition_in_borrow(db: AsyncSession):
     result = await db.execute(
-        select(Book.id,
-               Book.title,
-               Book.category,
-               Edition.id,
-               Edition.specefic_edition_title,
+        select(Book.id.label("book_id"),
+               Book.title.label("book_title"),
+               Book.category.label("book_category"),
+               Edition.id.label("edition_id"),
+               Edition.specefic_edition_title.label("specefic_edition_title"),
                func.count(Borrow.id).label("total_borrow"))
                .join(Edition, Edition.book_id == Book.id)
                .join(Borrow, Borrow.edition_id == Edition.id)

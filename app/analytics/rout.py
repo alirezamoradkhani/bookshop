@@ -3,6 +3,9 @@ from app.get_unit_of_work import get_uow
 from app.analytics.service.author.best_author_in_sell import best_author_in_sell
 from app.analytics.service.author.best_author_in_income import best_author_in_income
 from app.analytics.service.edition.best_edition_in_sell import best_edition_in_sell
+from app.analytics.service.edition.best_edition_in_borrow import best_edition_in_borrow
+
+from app.analytics.schemas.outputs import Best_edition_in_borrow
 
 router = APIRouter(prefix="/records", tags=["records"])
 
@@ -19,3 +22,7 @@ async def author_in_income(uow=Depends(get_uow)):
 @router.get("/edition/number_of_sell")
 async def edition_in_sell(uow=Depends(get_uow)):
     return await best_edition_in_sell(uow=uow)
+
+@router.get("/edition/best_in_borrow",response_model=list[Best_edition_in_borrow])
+async def edition_in_borrow(uow=Depends(get_uow)):
+    return await best_edition_in_borrow(uow=uow)
