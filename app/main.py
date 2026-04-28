@@ -39,17 +39,10 @@ async def test():
 async def get_all_users(db: AsyncSession = Depends(get_db), token_data: dict = Depends(get_current_user)):
     return await crud.get_all_users(db=db, token_data=token_data)
 
-@app.get("/users/authors")
-async def get_authors(db: AsyncSession = Depends(get_db)):
-    return await crud.get_authors(db=db)
-
 #edition crud
 
 #orders crud
     
-@app.get("/orders")
-async def get_order(order_id: int, token_data = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await crud.get_order(db=db, token_data=token_data)
 
 @app.get("/borrow/overdue")
 async def user_with_over_due(db = Depends(get_db)):

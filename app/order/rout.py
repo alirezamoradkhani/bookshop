@@ -7,6 +7,7 @@ from app.order.serivices.author.get_orderedition import get_order_edition
 from app.order.serivices.author.accept_order_edition import accept_order_edition
 from app.order.serivices.author.reject_order_edition import reject_order_edition
 from app.order.serivices.admin.confirm_delivery_edition import confirm_delivery_to_courier
+from app.order.serivices.user.get_orders import get_user_orders
 from app.order.schemas.outputs import OrderResponse
 
 
@@ -20,7 +21,11 @@ async def buy(edition_ids: list[int] ,uow = Depends(get_uow),token_data = Depend
 async def Cancel_order(order_id:int ,uow = Depends(get_uow),token_data = Depends(get_current_user)):
     return await cancel_order(uow=uow,token_data=token_data,order_id=order_id)
 
-@router.get("/user/order")
+@router.get("/user/")
+async def Get_order(uow = Depends(get_uow),token_data = Depends(get_current_user)):
+    return await get_user_orders(uow=uow,token_data=token_data)
+
+@router.get("/author/")
 async def get_ordereditions(uow = Depends(get_uow),token_data = Depends(get_current_user)):
     return await get_order_edition(uow=uow,token_data=token_data)
 
