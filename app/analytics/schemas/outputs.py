@@ -26,3 +26,7 @@ class Best_author_in_sell(BaseModel):
     author_id: int
     author_name: str
     total_sales: int
+
+class Best_category_in_sell(BaseModel):
+    category: str
+    total_sales: int

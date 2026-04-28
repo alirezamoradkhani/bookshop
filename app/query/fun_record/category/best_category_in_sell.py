@@ -5,7 +5,7 @@ from app.models import *
 
 async def best_category_in_sell(db: AsyncSession):
     result = await db.execute(
-        select(Book.category,
+        select(Book.category.label("categorys"),
                func.count(Book.category).label("total_sales"))
                .join(Edition,Edition.book_id == Book.id)
                .join(OrderEdition,OrderEdition.edition_id == Edition.id)

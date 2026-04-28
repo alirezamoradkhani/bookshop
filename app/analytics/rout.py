@@ -4,6 +4,7 @@ from app.analytics.service.author.best_author_in_sell import best_author_in_sell
 from app.analytics.service.author.best_author_in_income import best_author_in_income
 from app.analytics.service.edition.best_edition_in_sell import best_edition_in_sell
 from app.analytics.service.edition.best_edition_in_borrow import best_edition_in_borrow
+from app.analytics.service.category.best_category_in_sell import best_category_in_sell
 
 from app.analytics.schemas.outputs import Best_edition_in_borrow
 
@@ -26,3 +27,7 @@ async def edition_in_sell(uow=Depends(get_uow)):
 @router.get("/edition/best_in_borrow",response_model=list[Best_edition_in_borrow])
 async def edition_in_borrow(uow=Depends(get_uow)):
     return await best_edition_in_borrow(uow=uow)
+
+@router.get("/category/best_in_sales")
+async def category_in_borrow(uow=Depends(get_uow)):
+    return await best_category_in_sell(uow=uow)
