@@ -13,7 +13,7 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
             raise InvalidOTP
         if current_user.role == Role.USER:
             raise OnlyAuthorPrimition
-        book = model.Book(title=new_book.title, category = new_book.category)
+        book = model.Book(title=new_book.title)
         await uow.book.create_book(book)
         await uow.flush()
         for author_id in new_book.authors_id:
@@ -21,5 +21,8 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
                 raise AuthorNotFound
             book_author = model.BookAuthor(book_id=book.id, author_id = author_id)
             await uow.bookauthor.create(book_author=book_author)
+        for category in new_book.categorys:
+            book_category = model.BookCategory(book_id = book.id, category = category.lower())
+            await uow.bookcategory.create(book_category=book_category)
         return book
         

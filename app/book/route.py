@@ -25,10 +25,10 @@ async def remove_book(book_id: int,uow = Depends(get_uow),toke_data = Depends(ge
     return await delete_book(uow=uow,token_data=toke_data,book_id=book_id)
 
 @router.get("/search",response_model= list[outputs.BookResponse])
-async def Search_book(category: Category | None = None
-                ,authors_id: list[int] | None = None
+async def Search_book(category: str | None = None
+                ,author_id: int | None = None
                 ,title: str | None = None,uow = Depends(get_uow)):
-    return await search_books(uow=uow,category=category,title=title,authors_id=authors_id)
+    return await search_books(uow=uow,category=category,title=title,author_id=author_id)
 
 @router.get("details",response_model=outputs.BookDetails)
 async def get_detail(book_id:int,uow = Depends(get_uow)):

@@ -9,7 +9,6 @@ class Book(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String)
-    category: Mapped[Category] = mapped_column(Enum(Category))
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
 class BookAuthor(Base):
@@ -17,3 +16,9 @@ class BookAuthor(Base):
 
     book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), primary_key=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), primary_key=True)
+
+class BookCategory(Base):
+    __tablename__ = "book_categorys"
+    
+    book_id : Mapped[int] = mapped_column(Integer,ForeignKey("books.id"),primary_key=True)
+    category : Mapped[str] = mapped_column(String,primary_key=True) 
