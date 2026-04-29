@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends
 from app.security import get_current_user
 from app.get_unit_of_work import get_uow
-from app.order.serivices.user.create_oreder import create_order
-from app.order.serivices.user.cancel_order import cancel_order
-from app.order.serivices.author.get_orderedition import get_order_edition
-from app.order.serivices.author.accept_order_edition import accept_order_edition
-from app.order.serivices.author.reject_order_edition import reject_order_edition
+from app.order.serivices.user.command.create_oreder import create_order
+from app.order.serivices.user.command.cancel_order import cancel_order
+from app.order.serivices.author.querys.get_orderedition import get_order_edition
+from app.order.serivices.author.command.accept_order_edition import accept_order_edition
+from app.order.serivices.author.command.reject_order_edition import reject_order_edition
 from app.order.serivices.admin.confirm_delivery_edition import confirm_delivery_to_courier
-from app.order.serivices.user.get_orders import get_user_orders
+from app.order.serivices.user.querys.get_orders import get_user_orders
 from app.order.schemas.outputs import OrderResponse
 
 
