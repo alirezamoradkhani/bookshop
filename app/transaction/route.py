@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from app.security import get_current_user
 from app.get_unit_of_work import get_uow
-from app.transaction.services.deposit import deposit
-from app.transaction.services.transfer import transfer
-from app.transaction.services.wallet_info import walletinfo
-from app.transaction.services.withdraw import withdraw
+from app.transaction.services.command.deposit import deposit
+from app.transaction.services.command.transfer import transfer
+from app.transaction.services.querys.wallet_info import walletinfo
+from app.transaction.services.command.withdraw import withdraw
 from app.transaction.schemas.outputs import BaseUserResponse
 
 
