@@ -1,6 +1,5 @@
 import app.book.schemas.inputs as inputs
 from app.book.models import model
-import app.book.models.enums as enums
 from app.user.models.enums import Role
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.book import BookNotFound
@@ -25,18 +24,25 @@ async def update_book(uow:UnitOfWork, token_data:dict,book_id:int,book_update:in
                 await uow.book.update_book_title(book=book,title=book_update.title)
 
             if book_update.categorys is not None:
-                categorys = await uow.bookcategory.get_by_book_id(book_id=book_id)
+                existing_categorys = await uow.bookcategory.get_by_book_id(book_id=book_id)
                 for new_category in book_update.categorys:
-                    if new_category not in categorys:
+                    if new_category not in existing_categorys:
                         book_category = model.BookCategory(book_id=book.id,category=new_category)
                         await uow.bookcategory.create(book_category=book_category)
+                for existing_category in existing_categorys:
+                    if existing_category not in book_update.categorys:
+                        await uow.bookcategory.delete(existing_category)
         elif current_user.role == Role.ADMIN:
-            if book_update.categorys is not None:
-                categorys = await uow.bookcategory.get_by_book_id(book_id=book_id)
-                for new_category in book_update.categorys:
-                    if new_category not in categorys:
-                        book_category = model.BookCategory(book_id=book.id,category=new_category)
-                        await uow.bookcategory.create(book_category=book_category)
             if book_update.title is not None:
                 await uow.book.update_book_title(book=book,title=book_update.title)
+
+            if book_update.categorys is not None:
+                existing_categorys = await uow.bookcategory.get_by_book_id(book_id=book_id)
+                for new_category in book_update.categorys:
+                    if new_category not in existing_categorys:
+                        book_category = model.BookCategory(book_id=book.id,category=new_category)
+                        await uow.bookcategory.create(book_category=book_category)
+                for existing_category in existing_categorys:
+                    if existing_category not in book_update.categorys:
+                        await uow.bookcategory.delete(existing_category)
         return book
