@@ -6,7 +6,7 @@ from app.order.serivices.user.command.cancel_order import cancel_order
 from app.order.serivices.author.querys.get_orderedition import get_order_edition
 from app.order.serivices.author.command.accept_order_edition import accept_order_edition
 from app.order.serivices.author.command.reject_order_edition import reject_order_edition
-from app.order.serivices.admin.confirm_delivery_edition import confirm_delivery_to_courier
+from app.order.serivices.admin.command.confirm_delivery_edition import confirm_delivery_to_courier
 from app.order.serivices.user.querys.get_orders import get_user_orders
 from app.order.schemas.outputs import OrderResponse
 
