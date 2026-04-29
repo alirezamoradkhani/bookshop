@@ -1,12 +1,16 @@
 import redis.asyncio as redis
 import random
-from fastapi import Depends
-from app.redis import get_redis
+
+redis_client = redis.Redis(
+    host="redis",
+    port=6379,
+    decode_responses=True
+)
 
 async def send_otp(otp):
     print("otp: ", otp)
 
-async def create_otp(email: str,redis_client=Depends(get_redis)):
+async def create_otp(email: str):
     otp = str(random.randint(100000, 999999))
 
     await redis_client.set(f"otp:{email}", otp, ex=120)
@@ -15,7 +19,7 @@ async def create_otp(email: str,redis_client=Depends(get_redis)):
 
     return otp
 
-async def verify_otp(email: str, otp: str,redis_client=Depends(get_redis)):
+async def verify_otp(email: str, otp: str):
     saved_otp = await redis_client.get(f"otp:{email}")
     if saved_otp is None:
         return False
