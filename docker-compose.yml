@@ -18,6 +18,14 @@ services:
     restart: always
     ports:
       - "6380:6379"
+    
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: fastapi-rabbitmq
+  #   restart: always
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
 
   app:
     build: .
@@ -28,6 +36,7 @@ services:
     depends_on:
       - postgres
       - redis
+      # - rabbitmq
 
     # 👇 مهم
     env_file:
@@ -46,6 +55,7 @@ services:
     depends_on:
       - postgres
       - redis
+      # - rabbitmq
     env_file:
       - .env
     volumes:
