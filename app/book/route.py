@@ -3,11 +3,11 @@ from app.security import get_current_user
 from app.get_unit_of_work import get_uow
 from app.book.schemas import inputs, outputs
 from app.book.models.enums import Category
-from app.book.services.create_book import create_book
-from app.book.services.update_book import update_book
-from app.book.services.delete_book import delete_book
-from app.book.services.search_book import search_books
-from app.book.services.get_book_details import book_detail
+from app.book.services.command.create_book import create_book
+from app.book.services.command.update_book import update_book
+from app.book.services.command.delete_book import delete_book
+from app.book.services.querys.search_book import search_books
+from app.book.services.querys.get_book_details import book_detail
 
 
 router = APIRouter(prefix="/books", tags=["books"])
