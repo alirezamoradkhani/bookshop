@@ -8,7 +8,7 @@ async def best_author_in_sell(db: AsyncSession):
     select(
         Author.id.label("author_id"),
         BaseUser.username.label("author_name"),
-        func.count(OrderEdition.edition_id).label("total_sales")
+        func.count(OrderEdition.order_edition_id).label("total_sales")
     )
     .join(BaseUser,BaseUser.id == Author.id)
     .join(BookAuthor, BookAuthor.author_id == Author.id)

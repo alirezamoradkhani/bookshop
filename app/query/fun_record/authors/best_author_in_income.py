@@ -8,7 +8,7 @@ async def best_author_in_income(db:AsyncSession):
         select(
             Author.id.label("author_id"),
             BaseUser.username.label("author_name"),
-            func.sum(Edition.price).label("total_income"))
+            func.sum(OrderEdition.price).label("total_income"))
             .join(BaseUser,BaseUser.id == Author.id)
             .join(BookAuthor,BookAuthor.author_id == Author.id)
             .join(Book,Book.id == BookAuthor.book_id)
