@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends
 from app.security import get_current_user
 from app.get_unit_of_work import get_uow
 from app.edition.schemas.inputs import EditionCreate
-from app.edition.services.create_edition import create_edition
-from app.edition.services.update_amount import update_amount
-from app.edition.services.update_price import update_price
-from app.edition.services.delete_edition import remove_edition
+from app.edition.services.command.create_edition import create_edition
+from app.edition.services.command.update_amount import update_amount
+from app.edition.services.command.update_price import update_price
+from app.edition.services.command.delete_edition import remove_edition
 
 
 router = APIRouter(prefix="/editions", tags=["editions"])
