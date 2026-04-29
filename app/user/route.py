@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.security import get_current_user
-from app.user.services.authenticate import athenticate, verify_email
-from app.user.services.create_baseuser import create_user, email_register
-from app.user.services.delete_account import delete_account
-from app.user.services.upgrade_user_plan import upgrade_plan
-from app.user.services.search_author import search_author
+from app.user.services.command.authenticate import athenticate, verify_email
+from app.user.services.command.create_baseuser import create_user, email_register
+from app.user.services.command.delete_account import delete_account
+from app.user.services.command.upgrade_user_plan import upgrade_plan
+from app.user.services.querys.search_author import search_author
 from app.get_unit_of_work import get_uow
 from app.user.schemas import inputs, outputs
 
