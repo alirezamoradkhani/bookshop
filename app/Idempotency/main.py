@@ -32,7 +32,6 @@ def build_idempotency_handler(
         # 3. execute safely
         try:
             result = await usecase(*args, **kwargs)
-            print(result)
 
             await service.save_result(key, result, result_ttl)
 
