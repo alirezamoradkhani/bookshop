@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.user.models import model, enums
+from datetime import datetime
 
 class UserRepository:
     def __init__(self, db: AsyncSession):
@@ -14,7 +15,7 @@ class UserRepository:
         result = await self.db.execute(select(model.User).where(model.User.id == id))
         return result.scalar_one_or_none()
 
-    async def update_plan(self,new_plan: enums.UserPlan,id:int):
+    async def update_plan(self,new_plan: enums.UserPlan,id:int,ex: datetime):
         result = await self.db.execute(select(model.User).where(model.User.id == id))
         user = result.scalar_one_or_none()
         user.plan = new_plan
