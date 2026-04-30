@@ -3,6 +3,7 @@ from app.order.serivices.checks.mark_orderedition_as_rejected import mark_ordere
 from app.order.serivices.checks.mark_orderedition_as_forcereject import mark_orderedition_as_forcereject
 from app.order.serivices.checks.mark_order_as_inprogres import mark_ordere_as_inprogres
 from app.order.serivices.checks.mark_order_as_done import mark_ordere_as_inprogres
+from app.user.services.checks.dowgrade_expired_plan import downgrdae_expired_plan
 
 from app.borrow.services.checks.mark_borrow_as_overdue import mark_borrow_as_overdue
 from app.unit_of_work import UnitOfWork
@@ -20,3 +21,9 @@ async def borrow_task():
     async with SessionLocal() as db:
         async with UnitOfWork(db) as uow:
             await mark_borrow_as_overdue(uow)
+
+
+async def plan_task():
+    async with SessionLocal() as db:
+        async with UnitOfWork(db) as uow:
+            await downgrdae_expired_plan(uow)
