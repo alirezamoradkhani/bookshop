@@ -42,3 +42,6 @@ async def rabit_base_runner(broker, uow_factory, consumer, event_type: str):
             except Exception as e:
                 print(f"consumer error: {e}")
                 raise
+
+async def base_runner(broker, uow_factory, consumer, event_type: str):
+    await redis_base_runner(broker, uow_factory, consumer, event_type)

@@ -1,30 +1,12 @@
 import json
 import asyncio
 from app.workers.consumers.user.user_create_consumer import UserCreateConsumer
+from app.workers.runners.base_runner import base_runner
 
 async def run_user_create_consumer(broker, uow_factory):
 
     consumer = UserCreateConsumer()
-
-    while True:
-        try:
-            pubsub = await broker.subscribe("UserCreated")
-
-            async for message in pubsub.listen():
-
-                if message["type"] != "message":
-                    continue
-
-                event = json.loads(message["data"])
-
-                try:
-                    async with uow_factory() as uow:
-                        await consumer.handle(event, uow)
-                except Exception as e:
-                    print(f"consumer error: {e}")
-
-        except Exception as e:
-            print(f"consumer worker restart: {e}")
-            await asyncio.sleep(2)
+    event_type = "UserCreated"
+    await base_runner(broker, uow_factory, consumer, event_type)
 
 #ایونت های پابلیش شده با تایپ مشخص رو میگیره و کارهای مورد نیاز اونو انجام میده

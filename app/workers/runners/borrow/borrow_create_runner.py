@@ -1,27 +1,9 @@
 from app.workers.consumers.borrow.borrow_create_consumer import BorrowCreatedConsumer
 import json
 import asyncio
-
+from app.workers.runners.base_runner import base_runner
 async def run_borrow_create_consumer(broker,uow_factory):
 
     consumer = BorrowCreatedConsumer()
-    while True:
-        try:
-            pubsub = await broker.subscribe("BorrowCreated")
-
-            async for message in pubsub.listen():
-
-                if message["type"] != "message":
-                    continue
-
-                event = json.loads(message["data"])
-
-                try:
-                    async with uow_factory() as uow:
-                        await consumer.handle(event, uow)
-                except Exception as e:
-                    print(f"consumer error: {e}")
-
-        except Exception as e:
-            print(f"consumer worker restart: {e}")
-            await asyncio.sleep(2)
+    event_type = "BorrowCreated"
+    await base_runner(broker, uow_factory, consumer, event_type)
