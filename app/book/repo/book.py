@@ -23,15 +23,15 @@ class BookRepository:
     async def delete_book(self,book:model.Book):
         book.is_deleted = True
 
-    async def search_books(self, title=None, category=None, author_ids=None):
+    async def search_books(self, title=None, category=None, author_id=None):
         result = select(model.Book).where(model.Book.is_deleted == False)
         
         if title:
             result = result.where(model.Book.title.ilike(f"%{title}%"))
+        if author_id:
+            result = result.join(model.BookAuthor,model.BookAuthor.book_id == model.Book.id).where(model.BookAuthor.author_id == author_id)
         if category:
-            result = result.where(model.Book.category == category)
-        if author_ids:
-            result = result.join(model.BookAuthor).where(model.BookAuthor.author_id.in_(author_ids))
+            result = result.join(model.BookCategory).where(model.BookCategory.Category == category)
         
         result = await self.db.execute(result)
         return result.scalars().all()

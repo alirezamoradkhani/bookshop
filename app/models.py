@@ -9,7 +9,7 @@ from datetime import datetime
 from app.user.models.model import BaseUser, User, Author, Admin
 from app.user.models.enums import Role, UserPlan
 from app.book.models.enums import Category
-from app.book.models.model import Book, BookAuthor
+from app.book.models.model import Book, BookAuthor,BookCategory
 from app.edition.models.enums import Language
 from app.edition.models.model import Edition
 from app.order.models.enums import OrderState, OrderItemState

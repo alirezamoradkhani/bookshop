@@ -20,3 +20,9 @@ class TokenResponse(BaseModel):
     token_type: str
     class Config:
         from_attributes = True
+
+class AuthorResponse(BaseModel):
+    id: int
+    username: str
+    class Config:
+        from_attributes = True

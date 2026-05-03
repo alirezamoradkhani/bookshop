@@ -1,8 +1,9 @@
-from sqlalchemy import ForeignKey, Integer, String, Boolean
+from sqlalchemy import ForeignKey, Integer, String, Boolean,DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 import app.user.models.enums as enum
 from sqlalchemy.types import Enum as sqlEnum
+from datetime import datetime
 
 
 
@@ -28,6 +29,7 @@ class User(Base):
         default=enum.UserPlan.BRONZE,
         nullable=False
     )
+    plan_expire : Mapped[datetime] = mapped_column(DateTime(timezone=True),nullable=True)
     
 
 

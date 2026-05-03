@@ -5,11 +5,11 @@ from app.models import *
 
 async def best_edition_in_sell(db: AsyncSession):
     result = await db.execute(
-        select(Book.id,
-               Book.title,
-               Edition.id,
-               Edition.specefic_edition_title,
-               func.count(OrderEdition.id).label("total_sales"))
+        select(Book.id.label("book_id"),
+               Book.title.label("book_title"),
+               Edition.id.label("edition_id"),
+               Edition.specefic_edition_title.label("specefic_edition_title"),
+               func.count(OrderEdition.order_edition_id).label("total_sales"))
                .join(Edition,Book.id == Edition.book_id)
                .join(OrderEdition,OrderEdition.edition_id == Edition.id)
                .join(Order,Order.id == OrderEdition.order_id)

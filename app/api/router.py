@@ -1,11 +1,11 @@
 from fastapi import APIRouter
-from app.user.rout import router as user_router
-from app.book.rout import router as book_router
-from app.edition.rout import router as edition_router
-from app.order.rout import router as order_router
-from app.transaction.rout import router as transaction_router
-from app.borrow.rout import router as borrow_router
-from app.analytics.rout import router as analytics_router
+from app.user.route import router as user_router
+from app.book.route import router as book_router
+from app.edition.route import router as edition_router
+from app.order.route import router as order_router
+from app.transaction.route import router as transaction_router
+from app.borrow.route import router as borrow_router
+from app.analytics.route import router as analytics_router
 
 
 api_router = APIRouter()

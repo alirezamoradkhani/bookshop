@@ -1,6 +1,11 @@
 from app.unit_of_work import UnitOfWork
 from app.query.fun_record.editions.best_edition_in_borrow import best_edition_in_borrow as query
+from app.analytics.schemas.outputs import Best_edition_in_borrow
 
-async def best_author_in_income(uow:UnitOfWork):
+async def best_edition_in_borrow(uow:UnitOfWork):
     async with uow:
-        return await query(uow.db)
+        rows = await query(uow.db)
+    return [
+        Best_edition_in_borrow(**row._mapping)
+        for row in rows
+    ]

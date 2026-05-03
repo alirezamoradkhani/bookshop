@@ -23,3 +23,7 @@ class OrderRepository:
     async def get_by_state(self,state:enums.OrderState):
         result = await self.db.execute(select(model.Order).where(model.Order.state == state))
         return result.scalars().all()
+    
+    async def get_by_user_id(self,id:int):
+        result = await self.db.execute(select(model.Order).where(model.Order.user_id == id))
+        return result.scalars().all()

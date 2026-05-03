@@ -6,9 +6,9 @@ from app.models import *
 async def best_author_in_sell(db: AsyncSession):
     result = await db.execute(
     select(
-        Author.id,
-        BaseUser.username,
-        func.count(OrderEdition.edition_id).label("total_sales")
+        Author.id.label("author_id"),
+        BaseUser.username.label("author_name"),
+        func.count(OrderEdition.order_edition_id).label("total_sales")
     )
     .join(BaseUser,BaseUser.id == Author.id)
     .join(BookAuthor, BookAuthor.author_id == Author.id)

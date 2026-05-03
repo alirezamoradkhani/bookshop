@@ -6,9 +6,9 @@ from app.models import *
 
 async def monthly_income(db:AsyncSession, user:BaseUser):
     result = await db.execute(
-        select(BaseUser.id,
-               BaseUser.username,
-               func.sum(Edition.price).label("monthly_income"))
+        select(BaseUser.id.label("author_id"),
+               BaseUser.username.label("aythor_name"),
+               func.sum(OrderEdition.price).label("monthly_income"))
                .join(BookAuthor,BookAuthor.author_id == BaseUser.id)
                .join(Edition, Edition.book_id == BookAuthor.book_id)
                .join(OrderEdition, OrderEdition.edition_id == Edition.id)

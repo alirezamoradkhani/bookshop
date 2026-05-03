@@ -17,7 +17,15 @@ services:
     container_name: fastapi-redis
     restart: always
     ports:
-      - "6379:6379"
+      - "6380:6379"
+    
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: fastapi-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 
   app:
     build: .
@@ -28,16 +36,29 @@ services:
     depends_on:
       - postgres
       - redis
+      - rabbitmq
 
-    # 👇 مهم
     env_file:
       - .env
 
     volumes:
       - .:/app
 
-    # 👇 مهم برای auto reload
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+  
+  worker:
+    build: .
+    container_name: fastapi-worker
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: python -m app.workers.main
 
 volumes:
   pgdata:

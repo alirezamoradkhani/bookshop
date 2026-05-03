@@ -5,6 +5,7 @@ from app.user.repo.author import AuthorRepository
 from app.user.repo.admin import AdminRepository
 from app.book.repo.book import BookRepository
 from app.book.repo.book_author import BookAuthorRepository
+from app.book.repo.book_category import BookCategoryRepository
 from app.edition.repo.edition import EditionRepository
 from app.order.repo.order import OrderRepository
 from app.order.repo.order_edition import OrderEditionRepository
@@ -26,6 +27,7 @@ class UnitOfWork:
         self.author = AuthorRepository(db)
         self.book = BookRepository(db)
         self.bookauthor = BookAuthorRepository(db)
+        self.bookcategory = BookCategoryRepository(db)
         self.edition = EditionRepository(db)
         self.order = OrderRepository(db)
         self.orderedition = OrderEditionRepository(db)

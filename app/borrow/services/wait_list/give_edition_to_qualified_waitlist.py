@@ -1,8 +1,8 @@
-from fastapi import HTTPException
 from app.user.models.enums import UserPlan
 from app.borrow.models.model import Waitlist,Borrow
 from app.unit_of_work import UnitOfWork
 from datetime import datetime, timedelta
+from app.exceptions.models.user import PlanPermissionDenied
 
 
 async def give_edition_to_qualified_wailist(uow:UnitOfWork,waitlist:Waitlist):
@@ -10,7 +10,7 @@ async def give_edition_to_qualified_wailist(uow:UnitOfWork,waitlist:Waitlist):
         now = datetime.utcnow()
         plan = await uow.user.get_plan_by_id(user_id=waitlist.user_id)
         if plan == UserPlan.BRONZE:
-            raise HTTPException(status_code=400, detail="bronze User dose not have permission to borrow.")
+            raise PlanPermissionDenied
         elif plan ==UserPlan.SILVER :
             day = 7
         elif plan == UserPlan.GOLD:

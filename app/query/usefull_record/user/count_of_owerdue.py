@@ -6,7 +6,7 @@ from app.models import *
 
 async def count_of_owerdue(db:AsyncSession,user:BaseUser):
     result = await db.execute(
-        select(func.count(Borrow.id))
+        select(func.count(Borrow.id).label("count_od_overdue"))
         .join(BaseUser,BaseUser.id == Borrow.user_id)
         .where(
             BaseUser.id == user.id
