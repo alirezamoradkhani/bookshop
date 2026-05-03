@@ -15,7 +15,7 @@ async def athenticate(uow:UnitOfWork,user: inputs.UserLogin):
         return "OTP sent to email"
     
 async def verify_email(uow:UnitOfWork,otp: str,email:str):
-    if not verify_otp(email=email,otp=otp):
+    if not await verify_otp(email=email,otp=otp):
             raise InvalidOTP
     async with uow:
         user_in = await uow.baseusers.get_by_email(email)
