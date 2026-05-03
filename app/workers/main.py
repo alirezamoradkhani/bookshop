@@ -18,8 +18,8 @@ def uow_factory():
 async def main():
 
     await asyncio.gather(
-        all_runner(broker=redis_broker,uow_factory=uow_factory),
-        run_outbox_worker(broker=redis_broker,uow_factory=uow_factory),
+        all_runner(broker=rabit_broker,uow_factory=uow_factory),
+        run_outbox_worker(broker=rabit_broker,uow_factory=uow_factory),
     )
 
 
