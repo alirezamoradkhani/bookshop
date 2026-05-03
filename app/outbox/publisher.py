@@ -1,8 +1,8 @@
 from app.unit_of_work import UnitOfWork
 from app.broker.redis_broker import RedisBroker
-# from app.broker.rabit_broker import RabbitMQBroker
+from app.broker.rabit_broker import RabbitMQBroker
 
-async def publish_outbox_events(uow:UnitOfWork, broker:RedisBroker):
+async def publish_outbox_events(uow:UnitOfWork, broker:RedisBroker | RabbitMQBroker):
 
     processed_count = 0
 
