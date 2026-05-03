@@ -44,4 +44,4 @@ async def rabit_base_runner(broker, uow_factory, consumer, event_type: str):
                 raise
 
 async def base_runner(broker, uow_factory, consumer, event_type: str):
-    await redis_base_runner(broker, uow_factory, consumer, event_type)
+    await rabit_base_runner(broker, uow_factory, consumer, event_type)
