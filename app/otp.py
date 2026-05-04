@@ -1,9 +1,9 @@
 import redis.asyncio as redis
 import random
+from app.core.setting import settings
 
-redis_client = redis.Redis(
-    host="redis",
-    port=6379,
+redis_client = redis.Redis.from_url(
+    settings.redis_url,
     decode_responses=True
 )
 

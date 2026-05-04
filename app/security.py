@@ -14,9 +14,8 @@ SECRET_KEY = settings.jwt_secret
 ALGORITHM = settings.jwt_algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
-redis_client = redis.Redis(
-    host="redis",
-    port=6379,
+redis_client = redis.Redis.from_url(
+    settings.redis_url,
     decode_responses=True
 )
 

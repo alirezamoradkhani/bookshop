@@ -6,9 +6,11 @@ from app.broker.redis_broker import RedisBroker
 from app.broker.rabit_broker import RabbitMQBroker
 from app.workers.all_runner import all_runner
 from app.workers.outbox_worker import run_outbox_worker
+from app.core.setting import settings
 
-redis_broker = RedisBroker(url="redis://redis:6379")
-rabit_broker = RabbitMQBroker(url="amqp://guest:guest@rabbitmq:5672/")
+
+redis_broker = RedisBroker(url=settings.redis_url)
+rabit_broker = RabbitMQBroker(url=settings.rabbitmq_url)
 
 
 def uow_factory():
