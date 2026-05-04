@@ -7,14 +7,17 @@ scheduler.add_job(
     order_tasks,
     "interval",
     minutes=5,
+    misfire_grace_time=30
 )
 scheduler.add_job(
     borrow_task,
     "interval",
     minutes=5,
+    misfire_grace_time=30
 )
 scheduler.add_job(
     plan_task,
     "interval",
     minutes=5,
+    misfire_grace_time=30
 )
