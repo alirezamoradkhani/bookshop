@@ -6,7 +6,8 @@ class Settings(BaseSettings):
     debug: bool = False
 
     database_url: str
-
+    redis_url: str
+    rabbitmq_url: str
     jwt_secret: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
