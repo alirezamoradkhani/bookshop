@@ -11,7 +11,7 @@ async def run_outbox_worker(uow_factory, broker):
                 processed_count = await publish_outbox_events(uow, broker)
 
                 if processed_count == 0:
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(5)
                 else:
                     await asyncio.sleep(0.5)
 
