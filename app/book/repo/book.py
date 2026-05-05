@@ -31,7 +31,7 @@ class BookRepository:
         if author_id:
             result = result.join(model.BookAuthor,model.BookAuthor.book_id == model.Book.id).where(model.BookAuthor.author_id == author_id)
         if category:
-            result = result.join(model.BookCategory).where(model.BookCategory.Category == category)
+            result = result.join(model.BookCategory).where(model.BookCategory.category == category)
         
         result = await self.db.execute(result)
         return result.scalars().all()
