@@ -1,6 +1,4 @@
-import json
 from app.workers.consumers.borrow.borrow_overdue_consomer import BorrowOverdueConsumer
-import asyncio
 from app.workers.runners.base_runner import base_runner
 
 

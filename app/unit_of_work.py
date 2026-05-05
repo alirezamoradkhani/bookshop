@@ -15,9 +15,6 @@ from app.borrow.repo.waitlist import Waitlistpository
 
 from app.outbox.repo import OutboxRepository
 
-from app.database import get_db
-from fastapi import Depends
-
 class UnitOfWork:
     def __init__(self, db: AsyncSession):
         self.db = db

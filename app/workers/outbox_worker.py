@@ -1,5 +1,3 @@
-# worker/outbox_worker.py
-
 import asyncio
 from app.outbox.publisher import publish_outbox_events
 

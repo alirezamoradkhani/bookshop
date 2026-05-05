@@ -1,6 +1,5 @@
 from app.unit_of_work import UnitOfWork
-from app.borrow.models import enums
-from datetime import datetime, timedelta
+from datetime import datetime
 
 async def mark_borrow_as_overdue(uow: UnitOfWork):
     now = datetime.utcnow()

@@ -1,5 +1,3 @@
-import json
-import asyncio
 from app.workers.consumers.user.user_create_consumer import UserCreateConsumer
 from app.workers.runners.base_runner import base_runner
 

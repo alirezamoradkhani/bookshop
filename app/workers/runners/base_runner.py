@@ -1,6 +1,6 @@
 import json
 import asyncio
-from app.broker.rabit_broker import RabbitMQBroker
+
 
 async def redis_base_runner(broker,uow_factory,consumer,event_type:str):
 

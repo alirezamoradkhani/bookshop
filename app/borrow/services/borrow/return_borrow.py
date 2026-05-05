@@ -1,8 +1,6 @@
-import app.borrow.models.model as model
-import app.book.schemas.inputs as inputs
 import app.borrow.models.enums as enums
 from app.user.models.enums import Role
-from datetime import datetime, timedelta
+from datetime import datetime
 from app.events.borrow.borrow_events import BorrowReturnedEvent
 from app.events.base import event_to_payload
 from app.outbox.model import OutboxEvent

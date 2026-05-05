@@ -1,5 +1,3 @@
-import json
-import asyncio
 from app.workers.consumers.order.order_item_reject_consumer import OrderItemRejectConsumer
 from app.workers.runners.base_runner import base_runner
 

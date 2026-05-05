@@ -1,5 +1,3 @@
-import json
-from app.workers.consumers.borrow.borrow_return_consumer import BorrowReturnedConsumer
 from app.workers.runners.borrow.borrow_create_runner import run_borrow_create_consumer
 from app.workers.runners.borrow.borrow_return_runner import run_borrow_return_consumer
 from app.workers.runners.borrow.borrow_overdue_runner import run_borrow_overdue_consumer

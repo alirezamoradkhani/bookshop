@@ -1,6 +1,4 @@
-import json
 from app.workers.consumers.borrow.borrow_return_consumer import BorrowReturnedConsumer
-import asyncio
 from app.workers.runners.base_runner import base_runner
 
 

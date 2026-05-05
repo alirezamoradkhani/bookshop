@@ -1,6 +1,6 @@
 from app.unit_of_work import UnitOfWork
 from app.order.models import enums
-from datetime import datetime, timedelta
+
 
 async def mark_ordere_as_inprogres(uow: UnitOfWork):
     async with uow:

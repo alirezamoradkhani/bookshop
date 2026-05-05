@@ -1,6 +1,6 @@
 from app.unit_of_work import UnitOfWork
 from app.user.models.enums import Role
-from app.order.models import model, enums
+from app.order.models import enums
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.order_edition import OrderEditionNotFound,InvalidChangeStatus
 

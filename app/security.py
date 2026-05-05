@@ -1,12 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 import redis.asyncio as redis
 from app.exceptions.models.user import InvalidTokenUser
-import random
 from passlib.context import CryptContext
 from app.core.setting import settings
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 bearer_scheme = HTTPBearer()
 
@@ -18,24 +17,6 @@ redis_client = redis.Redis.from_url(
     settings.redis_url,
     decode_responses=True
 )
-
-# async def send_otp(email: str):
-#     otp = str(random.randint(100000, 999999))
-
-#     await redis_client.set(f"otp:{email}", otp, ex=120)
-
-#     print("OTP:", otp)
-
-#     return otp
-
-# async def verify_otp(email: str, otp: str):
-#     saved_otp = await redis_client.get(f"otp:{email}")
-#     if saved_otp is None:
-#         return False
-#     if saved_otp == otp:
-#         await redis_client.delete(f"otp:{email}")
-#         return True
-#     return False
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -70,5 +51,3 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
-
-#its turned async

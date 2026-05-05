@@ -1,5 +1,3 @@
-import json
-import asyncio
 from app.workers.consumers.waitlist.waitlist_create_consumer import WaitlistCreate
 from app.workers.runners.base_runner import base_runner
 

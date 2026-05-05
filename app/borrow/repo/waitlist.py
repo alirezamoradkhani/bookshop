@@ -1,9 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.borrow.models import model, enums
+from app.borrow.models import model
 from app.user.models.model import User
 from app.user.models.enums import UserPlan
-from datetime import datetime
 
 class Waitlistpository:
     def __init__(self, db: AsyncSession):

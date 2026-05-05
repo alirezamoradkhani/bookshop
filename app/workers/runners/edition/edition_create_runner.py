@@ -1,6 +1,4 @@
-import json
 from app.workers.consumers.edition.edition_create_consumer import EditionCreateConsumer
-import asyncio
 from app.workers.runners.base_runner import base_runner
 
 async def run_edition_create_consumer(broker, uow_factory):

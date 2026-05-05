@@ -27,5 +27,3 @@ async def verify_otp(email: str, otp: str):
         await redis_client.delete(f"otp:{email}")
         return True
     return False
-
-#its turned to async
