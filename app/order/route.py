@@ -9,13 +9,19 @@ from app.order.serivices.author.command.reject_order_edition import reject_order
 from app.order.serivices.admin.command.confirm_delivery_edition import confirm_delivery_to_courier
 from app.order.serivices.user.querys.get_orders import get_user_orders
 from app.order.schemas.outputs import OrderResponse
+from app.Idempotency.dependency import get_idempotency_handler
+from app.Idempotency.get_idempotency_key import get_idempotency_key
 
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 @router.post("/user/buy",response_model= OrderResponse)
-async def buy(edition_ids: list[int] ,uow = Depends(get_uow),token_data = Depends(get_current_user)):
-    return await create_order(uow=uow,token_data=token_data,edition_ids=edition_ids)
+async def buy(edition_ids: list[int] ,uow = Depends(get_uow),token_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
+    # return await create_order(uow=uow,token_data=token_data,edition_ids=edition_ids)
+    handeler = get_idempotency_handler()
+    return await handeler(key=idempotency_key,usecase=create_order,uow=uow,token_data=token_data,edition_ids=edition_ids)
+
+
 
 @router.patch("/user/cancel",response_model= OrderResponse)
 async def Cancel_order(order_id:int ,uow = Depends(get_uow),token_data = Depends(get_current_user)):
