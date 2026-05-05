@@ -13,6 +13,7 @@ from app.book.services.external.querys.external_search_book_by_author import ext
 from app.book.services.external.querys.external_search_book_by_ISBN import external_search_book_by_ISBN
 from app.book.services.external.querys.external_book_detail_by_id import external_book_detail_by_id
 from app.external_API.providers.open_library.get_extternal_services import get_openlibrary_provider
+from app.book.services.external.command.import_external_book import import_book
 
 router = APIRouter(prefix="/books", tags=["books"])
 
@@ -38,18 +39,22 @@ async def Search_book(category: str | None = None
 async def get_detail(book_id:int,uow = Depends(get_uow)):
     return await book_detail(uow=uow,book_id=book_id)
 
-@router.get("external/search/by_title")
+@router.get("/external/search/by_title")
 async def External_search_book_by_title(title:str, provider = Depends(get_openlibrary_provider)):
     return await external_search_book_by_title(title=title, provider=provider)
 
-@router.get("external/search/by_author")
+@router.get("/external/search/by_author")
 async def External_search_book_by_author(author:str, provider = Depends(get_openlibrary_provider)):
     return await external_search_book_by_author(author=author, provider=provider)
 
-@router.get("external/search/by_isbn")
+@router.get("/external/search/by_isbn")
 async def External_search_book_by_isbn(isbn:str, provider = Depends(get_openlibrary_provider)):
     return await external_search_book_by_ISBN(isbn=isbn, provider=provider)
 
-@router.get("external/detail_by_id")
+@router.get("/external/detail_by_id")
 async def External_book_detail_by_id(book_id:str, provider = Depends(get_openlibrary_provider)):
     return await external_book_detail_by_id(provider=provider,work_id=book_id)
+
+@router.post("/external")
+async def import_book_by_name(book_title:str ,uow = Depends(get_uow),toke_data = Depends(get_current_user),provider = Depends(get_openlibrary_provider)):
+    return await import_book(uow=uow,book_title=book_title,token_data=toke_data,provider=provider)
