@@ -12,7 +12,7 @@ class OpenLibraryMapper:
             isbn=item.get("isbn", []),
             language=item.get("language", []),
             cover_id=item.get("cover_i"),
-            work_id=item.get("key")
+            work_id=item.get("key", "").split("/")[-1]
         )
     
     @staticmethod
