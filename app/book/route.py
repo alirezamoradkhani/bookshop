@@ -56,5 +56,5 @@ async def External_book_detail_by_id(book_id:str, provider = Depends(get_openlib
     return await external_book_detail_by_id(provider=provider,work_id=book_id)
 
 @router.post("/external")
-async def import_book_by_name(book_title:str ,uow = Depends(get_uow),toke_data = Depends(get_current_user),provider = Depends(get_openlibrary_provider)):
-    return await import_book(uow=uow,book_title=book_title,token_data=toke_data,provider=provider)
+async def import_book_by_name(ext_book_id:str ,uow = Depends(get_uow),toke_data = Depends(get_current_user),provider = Depends(get_openlibrary_provider)):
+    return await import_book(uow=uow,ext_book_id=ext_book_id,token_data=toke_data,provider=provider)
