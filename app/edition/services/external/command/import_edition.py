@@ -40,4 +40,5 @@ async def import_edition(uow:UnitOfWork,provider:OpenLibraryProvider,book_id:int
         await uow.flush()
         for language in external_edition.language:
             new_edition_language = model.EditionLanguage(edition_id = new_edition.id, language = language)
+            await uow.editionlanguage.create(new_edition_language)
         return new_edition
