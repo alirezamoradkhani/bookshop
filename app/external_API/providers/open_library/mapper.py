@@ -12,13 +12,13 @@ class OpenLibraryMapper:
             isbn=item.get("isbn", []),
             language=item.get("language", []),
             cover_id=item.get("cover_i"),
-            work_id=item.get("key", "").split("/")[-1]
+            ext_book_id=item.get("key", "").split("/")[-1]
         )
     
     @staticmethod
     def map_work_result(item: dict) -> WorkBookDTO:
         return WorkBookDTO(
-            work_id=item.get("key", "").split("/")[-1],
+            ext_book_id=item.get("key", "").split("/")[-1],
             title=item.get("title", ""),
 
             description=(

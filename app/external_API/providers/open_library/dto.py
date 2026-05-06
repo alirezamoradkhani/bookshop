@@ -9,11 +9,11 @@ class ExternalBookDTO(BaseModel):
     isbn: List[str] = []
     language: List[str] = []
     cover_id: Optional[int] = None
-    work_id: Optional[str] = None
+    ext_book_id: Optional[str] = None
 
 
 class WorkBookDTO(BaseModel):
-    work_id: str
+    ext_book_id: str
     title: str
     description: str | None = None
     subjects: List[str] = []
