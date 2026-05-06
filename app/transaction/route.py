@@ -14,15 +14,13 @@ router = APIRouter(prefix="/transaction", tags=["transaction"])
 
 
 @router.post("/deposit")
-async def Deposit(amount:int,uow = Depends(get_uow),toke_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
+async def Deposit(amount:int, handeler = Depends(get_idempotency_handler), uow = Depends(get_uow),toke_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
     # return await deposit(uow=uow,token_data=toke_data,amount=amount)
-    handeler = get_idempotency_handler()
     return await handeler(key=idempotency_key,usecase=deposit,uow=uow,token_data=toke_data,amount=amount)
 
 @router.post("/transfer",response_model=BaseUserResponse)
-async def Transfer(amount:int,reciver_id:int ,uow = Depends(get_uow),toke_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
+async def Transfer(amount:int,reciver_id:int ,handeler = Depends(get_idempotency_handler), uow = Depends(get_uow),toke_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
     # return await transfer(uow=uow,token_data=toke_data,amount=amount,reciver_id=reciver_id)
-    handeler = get_idempotency_handler()
     return await handeler(key=idempotency_key,usecase=transfer,uow=uow,token_data=toke_data,amount=amount,reciver_id=reciver_id)
 
 @router.get("/info")
@@ -30,7 +28,6 @@ async def wallet_info(uow = Depends(get_uow),toke_data = Depends(get_current_use
     return await walletinfo(uow=uow,token_data=toke_data)
 
 @router.post("/withdraw",response_model=BaseUserResponse)
-async def Withdraw(amount:int,uow = Depends(get_uow),toke_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
+async def Withdraw(amount:int, handeler = Depends(get_idempotency_handler), uow = Depends(get_uow),toke_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
     # return await withdraw(uow=uow,token_data=toke_data,amount=amount)
-    handeler = get_idempotency_handler()
     return await handeler(key=idempotency_key,usecase=transfer,uow=uow,token_data=toke_data,amount=amount)

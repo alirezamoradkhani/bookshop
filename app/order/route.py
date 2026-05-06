@@ -16,9 +16,8 @@ from app.Idempotency.get_idempotency_key import get_idempotency_key
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 @router.post("/user/buy",response_model= OrderResponse)
-async def buy(edition_ids: list[int] ,uow = Depends(get_uow),token_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
+async def buy(edition_ids: list[int] ,handeler = Depends(get_idempotency_handler), uow = Depends(get_uow),token_data = Depends(get_current_user),idempotency_key: str = Depends(get_idempotency_key)):
     # return await create_order(uow=uow,token_data=token_data,edition_ids=edition_ids)
-    handeler = get_idempotency_handler()
     return await handeler(key=idempotency_key,usecase=create_order,uow=uow,token_data=token_data,edition_ids=edition_ids)
 
 
