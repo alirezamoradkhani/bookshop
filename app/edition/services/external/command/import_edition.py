@@ -29,21 +29,15 @@ async def import_edition(uow:UnitOfWork,provider:OpenLibraryProvider,book_id:int
         external_edition = external_editions[0]
         if current_user.username not in external_edition.authors:
             raise UserPermissionDenied
-        if "eng" in external_edition.language:
-            language = "en"
-        elif "per" in external_edition.language:
-            language = "fa"
-        elif "ara" in external_edition.language:
-            language = "arb"
-        else:
-            raise LanguageNotSuported
+        
         new_edition = model.Edition(
             book_id=internal_book.id
             ,price=0
             ,amount = 0
-            ,language=language
             ,specefic_edition_title = "imported"
             )
         await uow.edition.create_edition(new_edition)
         await uow.flush()
+        for language in external_edition.language:
+            new_edition_language = model.EditionLanguage(edition_id = new_edition.id, language = language)
         return new_edition
