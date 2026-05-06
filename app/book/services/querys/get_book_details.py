@@ -14,7 +14,7 @@ async def book_detail(uow:UnitOfWork,book_id: int):
             authors.append(user.username)
     categorys = []
     for category in await uow.bookcategory.get_by_book_id(book_id=book_id):
-        categorys.append(category)
+        categorys.append(category.category)
 
     return {"id":book.id,
             "title":book.title,
