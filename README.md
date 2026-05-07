@@ -94,6 +94,7 @@ This ensures **eventual consistency and reliability** across the system.
 - Password hashing (secure storage)
 - OTP verification via Redis
 - Idempotent request handling for critical operations
+- Rate limiting (SlowAPI) to prevent abuse and brute-force attacks
 
 ---
 
