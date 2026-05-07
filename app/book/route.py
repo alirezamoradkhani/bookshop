@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from app.security import get_current_user
 from app.get_unit_of_work import get_uow
 from app.book.schemas import inputs, outputs
@@ -14,47 +14,60 @@ from app.book.services.external.querys.external_search_book_by_ISBN import exter
 from app.book.services.external.querys.external_book_detail_by_id import external_book_detail_by_id
 from app.external_API.providers.open_library.get_extternal_services import get_openlibrary_provider
 from app.book.services.external.command.import_external_book import import_book
+from app.ratelimiter.limiter import limiter
+
 
 router = APIRouter(prefix="/books", tags=["books"])
 
 @router.post("/",response_model=outputs.BookResponse)
-async def add_book(new_book:inputs.BookCreate,uow = Depends(get_uow),toke_data = Depends(get_current_user)):
+@limiter.limit("5/minute")
+async def add_book(request: Request,new_book:inputs.BookCreate,uow = Depends(get_uow),toke_data = Depends(get_current_user)):
     return await create_book(uow=uow,new_book=new_book,token_data=toke_data)
 
 @router.patch("/", response_model= outputs.BookResponse)
-async def Update_book(book_id :int,book_update:inputs.BookUpdate,uow = Depends(get_uow),toke_data = Depends(get_current_user)):
+@limiter.limit("5/minute")
+async def Update_book(request: Request,book_id :int,book_update:inputs.BookUpdate,uow = Depends(get_uow),toke_data = Depends(get_current_user)):
     return await update_book(uow=uow,token_data=toke_data,book_id=book_id,book_update=book_update)
 
 @router.delete("/",response_model=outputs.BookResponse)
-async def remove_book(book_id: int,uow = Depends(get_uow),toke_data = Depends(get_current_user)):
+@limiter.limit("5/minute")
+async def remove_book(request: Request,book_id: int,uow = Depends(get_uow),toke_data = Depends(get_current_user)):
     return await delete_book(uow=uow,token_data=toke_data,book_id=book_id)
 
 @router.get("/search",response_model= list[outputs.BookResponse])
-async def Search_book(category: str | None = None
+@limiter.limit("5/minute")
+async def Search_book(request: Request
+                ,category: str | None = None
                 ,author_id: int | None = None
                 ,title: str | None = None,uow = Depends(get_uow)):
     return await search_books(uow=uow,category=category,title=title,author_id=author_id)
 
 @router.get("/details",response_model=outputs.BookDetails)
-async def get_detail(book_id:int,uow = Depends(get_uow)):
+@limiter.limit("5/minute")
+async def get_detail(request: Request,book_id:int,uow = Depends(get_uow)):
     return await book_detail(uow=uow,book_id=book_id)
 
 @router.get("/external/search/by_title")
-async def External_search_book_by_title(title:str, provider = Depends(get_openlibrary_provider)):
+@limiter.limit("5/minute")
+async def External_search_book_by_title(request: Request, title:str, provider = Depends(get_openlibrary_provider)):
     return await external_search_book_by_title(title=title, provider=provider)
 
 @router.get("/external/search/by_author")
-async def External_search_book_by_author(author:str, provider = Depends(get_openlibrary_provider)):
+@limiter.limit("5/minute")
+async def External_search_book_by_author(request: Request, author:str, provider = Depends(get_openlibrary_provider)):
     return await external_search_book_by_author(author=author, provider=provider)
 
 @router.get("/external/search/by_isbn")
-async def External_search_book_by_isbn(isbn:str, provider = Depends(get_openlibrary_provider)):
+@limiter.limit("5/minute")
+async def External_search_book_by_isbn(request: Request, isbn:str, provider = Depends(get_openlibrary_provider)):
     return await external_search_book_by_ISBN(isbn=isbn, provider=provider)
 
 @router.get("/external/detail_by_id")
-async def External_book_detail_by_id(book_id:str, provider = Depends(get_openlibrary_provider)):
+@limiter.limit("5/minute")
+async def External_book_detail_by_id(request: Request, book_id:str, provider = Depends(get_openlibrary_provider)):
     return await external_book_detail_by_id(provider=provider,work_id=book_id)
 
 @router.post("/external")
-async def import_book_by_name(ext_book_id:str ,uow = Depends(get_uow),toke_data = Depends(get_current_user),provider = Depends(get_openlibrary_provider)):
+@limiter.limit("5/minute")
+async def import_book_by_name(request: Request, ext_book_id:str ,uow = Depends(get_uow),toke_data = Depends(get_current_user),provider = Depends(get_openlibrary_provider)):
     return await import_book(uow=uow,ext_book_id=ext_book_id,token_data=toke_data,provider=provider)
