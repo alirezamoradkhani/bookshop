@@ -9,6 +9,10 @@ from app.workers.scheduler import scheduler
 from app.exceptions.base import DomainException
 from app.exceptions.exception_handler import domain_exception_handler
 
+from app.ratelimiter.limiter import limiter
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
 app = FastAPI(
     docs_url="/docs",
@@ -18,6 +22,11 @@ app = FastAPI(
 
 app.include_router(api_router)
 app.add_exception_handler(DomainException,domain_exception_handler)
+app.add_exception_handler(RateLimitExceeded,_rate_limit_exceeded_handler) # type: ignore
+
+app.state.limiter = limiter
+
+app.add_middleware(SlowAPIMiddleware)
 
 @app.on_event("startup")
 async def startup():
