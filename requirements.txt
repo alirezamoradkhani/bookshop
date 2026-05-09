@@ -36,3 +36,4 @@ aio-pika
 httpx
 tenacity
 slowapi
+dependency_injector

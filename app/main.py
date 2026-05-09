@@ -14,6 +14,23 @@ from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 
+from fastapi import FastAPI
+from app.dependency_injection.container import Container
+
+container = Container()
+
+container.wire(
+    packages=[
+        "app.api",
+        "app.book.route",
+        "app.user.route",
+        "app.order.route",
+        "app.edition.route",
+        "app.borrow.route",
+        "app.analytics.route",
+    ]
+)
+
 app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
