@@ -25,7 +25,7 @@ async def cancel_order(uow:UnitOfWork,order_id: int, token_data: dict):
             for order_edition in order_editions:
                 if order_edition.state not in [enums.OrderItemState.WAITING,enums.OrderItemState.REJECTED,enums.OrderItemState.CANCELED]:
                     raise OrderNotCancelable
-            await uow.order.update_order_atate(order=order,new_state=enums.OrderState.CANCELED)
+            await uow.order.update_order_state(order=order,new_state=enums.OrderState.CANCELED)
             for order_edition in order_editions:
                 await uow.orderedition.update_state(orderedition=order_edition,new_state=enums.OrderItemState.CANCELED)
             await uow.baseusers.increase_wallet_amount(user=current_user,change=order.final_price)

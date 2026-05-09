@@ -54,3 +54,7 @@ class OrderEditionRepository:
     async def get_orderedition_by_list_of_edition(self,editions:list[Edition]):
         result = await self.db.execute(select(model.OrderEdition).where(model.OrderEdition.edition_id.in_([e.id for e in editions])))
         return result.scalars().all()
+    
+    async def get_by_order_ids(self,order_ids:list[int]):
+        result = await self.db.execute(select(model.OrderEdition).where(model.OrderEdition.order_id.in_(order_ids)))
+        return result.scalars().all()
