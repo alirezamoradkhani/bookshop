@@ -12,6 +12,9 @@ class OrderEditionRepository:
     async def create(self,orderedition: model.OrderEdition):
         self.db.add(orderedition)
 
+    async def create_many(self, order_editions: list[model.OrderEdition]):
+        self.db.add_all(order_editions)
+
     async def update_state(self,new_state:enums.OrderItemState,orderedition: model.OrderEdition):
         orderedition.state = new_state
         orderedition.last_modify = datetime.utcnow()
