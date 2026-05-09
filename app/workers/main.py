@@ -9,7 +9,7 @@ from app.workers.outbox_worker import run_outbox_worker
 from app.core.setting import settings
 
 
-redis_broker = RedisBroker(url=settings.redis_url)
+# redis_broker = RedisBroker(url=settings.redis_url)
 rabit_broker = RabbitMQBroker(url=settings.rabbitmq_url)
 
 
