@@ -9,6 +9,9 @@ class BookAuthorRepository:
     async def create(self, book_author:model.BookAuthor):
         self.db.add(book_author)
 
+    async def create_many(self, items: list[model.BookAuthor]):
+        self.db.add_all(items)
+
     async def get_by_authorid_and_bookid(self,book_id:int, author_id:int):
         result = await self.db.execute(select(model.BookAuthor).where(model.BookAuthor.author_id == author_id,model.BookAuthor.book_id == book_id))
         return result.scalar_one_or_none()

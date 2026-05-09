@@ -19,6 +19,12 @@ class AuthorRepository:
         result = await self.db.execute(select(model.BaseUser).where(model.BaseUser.username == name,model.BaseUser.role == Role.AUTHOR))
         return result.scalar_one_or_none()
     
+    async def get_by_names(self, names: list[str]):
+        result = await self.db.execute(
+            select(model.BaseUser).where(model.BaseUser.username.in_(names),model.BaseUser.role == Role.AUTHOR))
+        
+        return result.scalars().all()
+        
     async def search(self,id = None,name = None):
         query = select(model.BaseUser).where(model.BaseUser.role == Role.AUTHOR)
         if id:
