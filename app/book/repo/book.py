@@ -13,6 +13,15 @@ class BookRepository:
     async def get_by_id(self,id:int):
         result = await self.db.execute(select(model.Book).where(model.Book.id == id))
         return result.scalar_one_or_none()
+    
+    async def get_by_external_id(self, external_provider: str, external_id: str):
+        result = await self.db.execute(
+            select(model.Book).where(
+                model.Book.external_provider == external_provider,
+                model.Book.external_id == external_id
+            )
+        )
+        return result.scalar_one_or_none()
 
     async def update_book_title(self,book:model.Book,title:str):
         book.title = title
