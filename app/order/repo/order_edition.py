@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 from app.order.models import model
 from app.order.models import enums
 from app.edition.models.model import Edition
@@ -15,6 +15,13 @@ class OrderEditionRepository:
     async def update_state(self,new_state:enums.OrderItemState,orderedition: model.OrderEdition):
         orderedition.state = new_state
         orderedition.last_modify = datetime.utcnow()
+
+    async def many_update_state(self, order_edition_ids: list[int], new_state: enums.OrderItemState):
+        await self.db.execute(
+            update(model.OrderEdition)
+            .where(model.OrderEdition.id.in_(order_edition_ids))
+            .values(state=new_state, last_modify=datetime.utcnow())
+        )
     
     async def get_by_order_id(self,order_id:int):
         result = await self.db.execute(select(model.OrderEdition).where(model.OrderEdition.order_id == order_id))

@@ -23,6 +23,11 @@ class BookAuthorRepository:
     async def get_by_book_id(self,book_id:int):
         result = await self.db.execute(select(model.BookAuthor).where(model.BookAuthor.book_id == book_id))
         return result.scalars().all()
+    
+    async def get_by_book_ids(self, book_ids: list[int]):
+        result = await self.db.execute(select(model.BookAuthor).where(model.BookAuthor.book_id.in_(book_ids)))
+        return result.scalars().all()
+
     async def count_of_author(self,book_id:int):
         result = await self.db.execute(select(func.count(model.BookAuthor.author_id)).where(model.BookAuthor.book_id == book_id))
         return result.scalar_one()

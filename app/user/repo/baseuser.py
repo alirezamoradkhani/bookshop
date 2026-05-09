@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import case, select,update, func
 from app.user.models import model
 
 
@@ -47,6 +47,21 @@ class BaseUserRepository:
     
     async def increase_wallet_amount(self,user:model.BaseUser,change:int):
         user.wallet_amount += change
+
+    async def many_increase_wallet(self, wallet_updates: list[tuple[int, int]]):
+
+        stmt = (
+            update(model.BaseUser)
+            .where(model.BaseUser.id.in_([u[0] for u in wallet_updates]))
+            .values(
+                wallet_amount=model.BaseUser.wallet_amount + case(
+                    {user_id: change for user_id, change in wallet_updates},
+                    value=model.BaseUser.id
+                )
+            )
+        )
+
+        await self.db.execute(stmt)
 
     async def decrease_wallet_amount(self,user:model.BaseUser,change:int):
         user.wallet_amount -= change
