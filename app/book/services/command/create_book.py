@@ -15,13 +15,19 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
         book = model.Book(title=new_book.title)
         await uow.book.create_book(book)
         await uow.flush()
-        for author_id in new_book.authors_id:
-            if await uow.author.get_by_id(author_id) is None:
-                raise AuthorNotFound
-            book_author = model.BookAuthor(book_id=book.id, author_id = author_id)
-            await uow.bookauthor.create(book_author=book_author)
-        for category in new_book.categorys:
-            book_category = model.BookCategory(book_id = book.id, category = category.lower())
-            await uow.bookcategory.create(book_category=book_category)
+        authors = await uow.author.get_by_ids(new_book.authors_id)
+        found_ids = {a.id for a in authors}
+        missing = set(new_book.authors_id) - found_ids
+
+        if missing:
+            raise AuthorNotFound
+        book_authors = [
+            model.BookAuthor(book_id=book.id,
+                            author_id=author.id)for author in authors]
+        await uow.bookauthor.create_many(book_authors)
+        book_categorys = [
+            model.BookCategory(book_id=book.id, category=category.lower()) for category in new_book.categorys
+        ]
+        await uow.bookcategory.create_many(book_categorys)
         return book
         

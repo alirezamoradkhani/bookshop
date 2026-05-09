@@ -24,6 +24,12 @@ class AuthorRepository:
             select(model.BaseUser).where(model.BaseUser.username.in_(names),model.BaseUser.role == Role.AUTHOR))
         
         return result.scalars().all()
+    
+    async def get_by_ids(self, ids: list[int]):
+        result = await self.db.execute(
+            select(model.BaseUser).where(model.BaseUser.id.in_(ids),model.BaseUser.role == Role.AUTHOR))
+        
+        return result.scalars().all()
         
     async def search(self,id = None,name = None):
         query = select(model.BaseUser).where(model.BaseUser.role == Role.AUTHOR)
