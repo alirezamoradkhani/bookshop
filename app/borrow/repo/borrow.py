@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 from app.borrow.models import model, enums
 from datetime import datetime,timedelta
 
@@ -33,3 +33,11 @@ class Borrowpository:
     
     async def mark_as_owerdue(self,borrow:model.Borrow):
         borrow.is_overdue = True
+
+    async def mark_many_as_overdue(self, borrows: list[model.Borrow]):
+        borrow_ids = [borrow.id for borrow in borrows]
+        await self.db.execute(
+            update(model.Borrow)
+            .where(model.Borrow.id.in_(borrow_ids))
+            .values(is_overdue=True)
+        )
