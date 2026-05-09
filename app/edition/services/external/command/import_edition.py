@@ -24,8 +24,24 @@ async def import_edition(uow:UnitOfWork,provider:OpenLibraryProvider,book_id:int
                 raise UserPermissionDenied
             
         external_editions = await provider.search_by_title(external_edition_title)
+        
         if external_editions == []:
             raise ExternalServiceCanNotFound
+        if internal_book.external_id is not None:
+            external_editions = [
+                e for e in external_editions
+                if e.ext_book_id == internal_book.external_id
+            ]
+            if not external_editions:
+                raise ExternalServiceCanNotFound
+        else:
+            external_editions = [
+                e for e in external_editions
+                if e.title == external_edition_title
+            ]
+            if not external_editions:
+                raise UserPermissionDenied
+
         external_edition = external_editions[0]
         if current_user.username not in external_edition.authors:
             raise UserPermissionDenied
