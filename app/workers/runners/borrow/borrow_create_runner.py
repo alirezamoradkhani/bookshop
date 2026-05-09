@@ -4,4 +4,5 @@ async def run_borrow_create_consumer(broker,uow_factory):
 
     consumer = BorrowCreatedConsumer()
     event_type = "BorrowCreated"
+    print("borrow create")
     await base_runner(broker, uow_factory, consumer, event_type)

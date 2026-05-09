@@ -6,6 +6,7 @@ async def run_borrow_return_consumer(broker, uow_factory):
 
     consumer = BorrowReturnedConsumer()
     event_type = "BorrowReturned"
+    print("borrow return")
     await base_runner(broker, uow_factory, consumer, event_type)
 
 #ایونت های پابلیش شده با تایپ مشخص رو میگیره و کارهای مورد نیاز اونو انجام میده
