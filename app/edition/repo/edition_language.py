@@ -9,3 +9,6 @@ class EditionLanguageRepository:
 
     async def create(self,edition_language:EditionLanguage):
         self.db.add(edition_language)
+
+    async def create_many(self, items: list[EditionLanguage]):
+        self.db.add_all(items)
