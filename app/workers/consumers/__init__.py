@@ -6,7 +6,7 @@ from app.workers.consumers.order.order_item_accept_consumer import OrderItemAcce
 from app.workers.consumers.order.order_item_reject_consumer import OrderItemRejectConsumer
 from app.workers.consumers.order.order_create_consumer import OrderCreateConsumer
 from app.workers.consumers.user.user_create_consumer import UserCreateConsumer
-from app.workers.consumers.waitlist.waitlist_create_consumer import WaitlistCreate
+from app.workers.consumers.waitlist.waitlist_create_consumer import WaitlistCreateConsumer
 from app.workers.consumers.borrow.borrow_create_consumer import BorrowCreatedConsumer
 from app.workers.consumers.borrow.borrow_return_consumer import BorrowReturnedConsumer
 from app.workers.consumers.borrow.borrow_overdue_consomer import BorrowOverdueConsumer

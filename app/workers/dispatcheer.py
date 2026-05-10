@@ -28,6 +28,7 @@ async def dispatch_message(message, broker, uow_factory):
             await consumer.handle(event, uow)
 
         await message.ack()
+        print(f"[consumer] processed event {event_type}", flush=True)
 
     except Exception as e:
 
