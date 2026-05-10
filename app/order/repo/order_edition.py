@@ -22,7 +22,7 @@ class OrderEditionRepository:
     async def many_update_state(self, order_edition_ids: list[int], new_state: enums.OrderItemState):
         await self.db.execute(
             update(model.OrderEdition)
-            .where(model.OrderEdition.id.in_(order_edition_ids))
+            .where(model.OrderEdition.order_edition_id.in_(order_edition_ids))
             .values(state=new_state, last_modify=datetime.utcnow())
         )
     
