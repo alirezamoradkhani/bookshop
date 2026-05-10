@@ -1,21 +1,34 @@
+# app/workers/outbox_worker.py
+
 import asyncio
+
+from app.broker.rabit_broker import RabbitMQBroker
+from app.database import SessionLocal
+from app.unit_of_work import UnitOfWork
+from app.core.setting import settings
 from app.outbox.publisher import publish_outbox_events
 
-async def run_outbox_worker(uow_factory, broker):
+
+rabbit = RabbitMQBroker(settings.rabbitmq_url)
+
+
+def uow_factory():
+    return UnitOfWork(SessionLocal())
+
+
+async def main():
 
     while True:
+
         try:
             async with uow_factory() as uow:
-                processed_count = await publish_outbox_events(uow, broker)
-
-                if processed_count == 0:
-                    await asyncio.sleep(5)
-                else:
-                    await asyncio.sleep(0.5)
+                await publish_outbox_events(uow, rabbit)
 
         except Exception as e:
-            print(f"outbox worker error: {e}")
-            await asyncio.sleep(2)
+            print(f"[outbox] error: {e}", flush=True)
 
-#هر 3 ثانیه تابع پابلیش کردن ایونت هارو کال میکنه 
-#پابلیش کردن:روی چنل با نام ایونت تایپ مسیچ که اطلاعات ایونت هس رو ارسال میکنه
+        await asyncio.sleep(2)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

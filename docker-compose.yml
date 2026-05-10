@@ -46,9 +46,9 @@ services:
 
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
   
-  worker:
+  consumer-worker:
     build: .
-    container_name: fastapi-worker
+    container_name: fastapi-consumer-worker
     restart: always
     depends_on:
       - postgres
@@ -58,7 +58,21 @@ services:
       - .env
     volumes:
       - .:/app
-    command: python -m app.workers.main
+    command: python -m app.workers.start_consumers
+
+  outbox-worker:
+    build: .
+    container_name: fastapi-outbox-worker
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: python -m app.workers.outbox_worker
 
 volumes:
   pgdata:
