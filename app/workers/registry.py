@@ -6,22 +6,24 @@ from app.workers.consumers.order.order_item_accept_consumer import OrderItemAcce
 from app.workers.consumers.order.order_item_reject_consumer import OrderItemRejectConsumer
 from app.workers.consumers.order.order_create_consumer import OrderCreateConsumer
 from app.workers.consumers.user.user_create_consumer import UserCreateConsumer
-from app.workers.consumers.waitlist.waitlist_create_consumer import WaitlistCreate
+from app.workers.consumers.waitlist.waitlist_create_consumer import WaitlistCreateConsumer
 from app.workers.consumers.borrow.borrow_create_consumer import BorrowCreatedConsumer
 from app.workers.consumers.borrow.borrow_return_consumer import BorrowReturnedConsumer
 from app.workers.consumers.borrow.borrow_overdue_consomer import BorrowOverdueConsumer
 
+from app.events.types import EventTypes
 CONSUMER_REGISTRY = {
-    BookCreateConsumer.event_type: BookCreateConsumer,
-    BookUpdateConsumer.event_type: BookUpdateConsumer,
-    BookDeleteConsumer.event_type: BookDeleteConsumer,
-    OrderCancelConsumer.event_type: OrderCancelConsumer,
-    OrderItemAcceptConsumer.event_type: OrderItemAcceptConsumer,
-    OrderItemRejectConsumer.event_type: OrderItemRejectConsumer,
-    OrderCreateConsumer.event_type: OrderCreateConsumer,
-    UserCreateConsumer.event_type: UserCreateConsumer,
-    WaitlistCreate.event_type: WaitlistCreate,
-    BorrowCreatedConsumer.event_type: BorrowCreatedConsumer,
-    BorrowReturnedConsumer.event_type: BorrowReturnedConsumer,
-    BorrowOverdueConsumer.event_type: BorrowOverdueConsumer,
+    EventTypes.USER_CREATED: UserCreateConsumer,
+    EventTypes.BOOK_CREATED: BookCreateConsumer,
+    EventTypes.BOOK_UPDATED: BookUpdateConsumer,
+    EventTypes.BOOK_DELETED: BookDeleteConsumer,
+    EventTypes.ORDER_CANCELED: OrderCancelConsumer,
+    EventTypes.ORDER_ITEM_ACCEPTED: OrderItemAcceptConsumer,
+    EventTypes.ORDER_ITEM_REJECTED: OrderItemRejectConsumer,
+    EventTypes.ORDER_CREATED: OrderCreateConsumer,
+    EventTypes.USER_CREATED: UserCreateConsumer,
+    EventTypes.WAITLIST_CREATED: WaitlistCreateConsumer,
+    EventTypes.BORROW_CREATED: BorrowCreatedConsumer,
+    EventTypes.BORROW_RETURNED: BorrowReturnedConsumer,
+    EventTypes.BORROW_OVERDUE: BorrowOverdueConsumer,
 }
