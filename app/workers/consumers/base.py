@@ -6,13 +6,6 @@ class BaseConsumer:
 
     event_type: str
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        print("REGISTERING:", cls.__name__, getattr(cls, "event_type", None), flush=True)
-
-        if getattr(cls, "event_type", None):
-            BaseConsumer.registry.append(cls)
-
     async def handle(self, event: dict, uow):
 
         try:
