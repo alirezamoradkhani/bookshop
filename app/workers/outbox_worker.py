@@ -23,7 +23,7 @@ async def main():
         try:
             async with uow_factory() as uow:
                 await publish_outbox_events(uow, rabbit)
-                print(f"[outbox] published events", flush=True)
+                
 
         except Exception as e:
             print(f"[outbox] error: {e}", flush=True)
