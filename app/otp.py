@@ -1,11 +1,15 @@
 import redis.asyncio as redis
 import random
 from app.core.setting import settings
+from app.dependency_injection.container import Container
+# redis_client = redis.Redis.from_url(
+#     settings.redis_url,
+#     decode_responses=True
+# )
 
-redis_client = redis.Redis.from_url(
-    settings.redis_url,
-    decode_responses=True
-)
+container = Container()
+
+redis_client = container.redis()
 
 async def send_otp(otp):
     print("otp: ", otp)

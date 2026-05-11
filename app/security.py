@@ -6,6 +6,11 @@ from app.exceptions.models.user import InvalidTokenUser
 from passlib.context import CryptContext
 from app.core.setting import settings
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.dependency_injection.container import Container
+
+container = Container()
+
+redis_client = container.redis()
 
 bearer_scheme = HTTPBearer()
 
@@ -13,10 +18,10 @@ SECRET_KEY = settings.jwt_secret
 ALGORITHM = settings.jwt_algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
-redis_client = redis.Redis.from_url(
-    settings.redis_url,
-    decode_responses=True
-)
+# redis_client = redis.Redis.from_url(
+#     settings.redis_url,
+#     decode_responses=True
+# )
 
 def create_access_token(data: dict):
     to_encode = data.copy()
