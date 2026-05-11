@@ -6,3 +6,5 @@ class EditionCreate(BaseModel):
     amount: int | None
     language: list[str]
     specefic_edition_title: str | None = None
+    isbn: str | None = None
+    description: str | None = None
