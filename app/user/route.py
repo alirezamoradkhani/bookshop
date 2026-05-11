@@ -5,7 +5,6 @@ from app.user.services.command.create_baseuser import create_user, email_registe
 from app.user.services.command.delete_account import delete_account
 from app.user.services.command.upgrade_user_plan import upgrade_plan
 from app.user.services.querys.search_author import search_author
-from app.get_unit_of_work import get_uow
 from app.user.schemas import inputs, outputs
 from app.ratelimiter.limiter import limiter
 from dependency_injector.wiring import inject, Provide

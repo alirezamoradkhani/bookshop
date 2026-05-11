@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, Request
 from app.security import get_current_user
-from app.get_unit_of_work import get_uow
 from app.borrow.schemas.outputs import WaitlistResponse
 from app.borrow.services.borrow.borrow_edition import borrow_edition
 from app.borrow.services.borrow.return_borrow import return_borrow

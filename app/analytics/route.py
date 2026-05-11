@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Request
-from app.get_unit_of_work import get_uow
 from app.analytics.service.author.best_author_in_sell import best_author_in_sell
 from app.analytics.service.author.best_author_in_income import best_author_in_income
 from app.analytics.service.edition.best_edition_in_sell import best_edition_in_sell

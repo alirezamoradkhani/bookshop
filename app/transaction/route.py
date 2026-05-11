@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, Request
 from app.security import get_current_user
-from app.get_unit_of_work import get_uow
 from app.transaction.services.command.deposit import deposit
 from app.transaction.services.command.transfer import transfer
 from app.transaction.services.querys.wallet_info import walletinfo
