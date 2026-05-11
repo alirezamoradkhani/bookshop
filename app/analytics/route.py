@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from app.get_unit_of_work import get_uow
 from app.analytics.service.author.best_author_in_sell import best_author_in_sell
 from app.analytics.service.author.best_author_in_income import best_author_in_income
@@ -18,35 +18,35 @@ router = APIRouter(prefix="/records", tags=["records"])
 @router.get("/author/best_in_sell")
 @limiter.limit("5/minute")
 @inject
-async def author_in_sell(uow=Depends(Provide[Container.uow])):
+async def author_in_sell(request: Request,uow=Depends(Provide[Container.uow])):
     return await best_author_in_sell(uow=uow)
 
 @router.get("/author/best_in_total_income")
 @limiter.limit("5/minute")
 @inject
-async def author_in_income(uow=Depends(Provide[Container.uow])):
+async def author_in_income(request: Request,uow=Depends(Provide[Container.uow])):
     return await best_author_in_income(uow=uow)
 
 @router.get("/edition/best_in_number_of_sell")
 @limiter.limit("5/minute")
 @inject
-async def edition_in_sell(uow=Depends(Provide[Container.uow])):
+async def edition_in_sell(request: Request,uow=Depends(Provide[Container.uow])):
     return await best_edition_in_sell(uow=uow)
 
 @router.get("/edition/best_in_borrow",response_model=list[Best_edition_in_borrow])
 @limiter.limit("5/minute")
 @inject
-async def edition_in_borrow(uow=Depends(Provide[Container.uow])):
+async def edition_in_borrow(request: Request,uow=Depends(Provide[Container.uow])):
     return await best_edition_in_borrow(uow=uow)
 
 @router.get("/category/best_in_sales")
 @limiter.limit("5/minute")
 @inject
-async def category_in_borrow(uow=Depends(Provide[Container.uow])):
+async def category_in_borrow(request: Request,uow=Depends(Provide[Container.uow])):
     return await best_category_in_sell(uow=uow)
 
 @router.get("/user/best_in_buy")
 @limiter.limit("5/minute")
 @inject
-async def user_in_buy(uow=Depends(Provide[Container.uow])):
+async def user_in_buy(request: Request,uow=Depends(Provide[Container.uow])):
     return await best_user_in_buy(uow=uow)
