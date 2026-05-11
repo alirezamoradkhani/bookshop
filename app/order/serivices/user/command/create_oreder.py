@@ -14,6 +14,7 @@ from app.exceptions.models.edition import (
 )
 
 from app.exceptions.models.transaction import InsufficientFunds
+from app.order.schemas.outputs import OrderResponse
 
 
 async def create_order(
@@ -85,4 +86,4 @@ async def create_order(
 
         await uow.orderedition.create_many(order_editions)
 
-        return new_order
+        return OrderResponse.model_validate(new_order)

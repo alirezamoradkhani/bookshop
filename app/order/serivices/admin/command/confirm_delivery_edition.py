@@ -15,4 +15,5 @@ async def confirm_delivery_to_courier(uow: UnitOfWork,order_edition_id: int,toke
         order_edition = await uow.orderedition.get_by_order_edition_id(order_edition_id)
         if order_edition is None:
             raise OrderEditionNotFound
-        await uow.orderedition.update_state(orderedition=order_edition,new_state=enums.OrderItemState.PREPARING) 
+        await uow.orderedition.update_state(orderedition=order_edition,new_state=enums.OrderItemState.PREPARING)
+        return order_edition
