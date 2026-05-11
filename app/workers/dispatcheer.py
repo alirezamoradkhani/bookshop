@@ -8,13 +8,16 @@ MAX_RETRY = 3
 
 
 async def dispatch_message(message, broker, uow_factory):
+    print("[dispatcher] started", flush=True)
 
     retry = int((message.headers or {}).get("retry", 0))
+    print(f"[dispatcher] retry={retry}", flush=True)
 
     try:
         event = json.loads(message.body)
 
-        event_type = event.get("type")
+        event_type = event.get("event_type")
+        print(f"[dispatcher] event={event_type}", flush=True)
 
         consumer_cls = CONSUMER_REGISTRY.get(event_type)
 
@@ -23,12 +26,14 @@ async def dispatch_message(message, broker, uow_factory):
             return
 
         consumer = consumer_cls()
+        print("[dispatcher] before uow", flush=True)
 
         async with uow_factory() as uow:
             await consumer.handle(event, uow)
 
+        print("[dispatcher] after uow", flush=True)
         await message.ack()
-        print(f"[consumer] processed event {event_type}", flush=True)
+        
 
     except Exception as e:
 

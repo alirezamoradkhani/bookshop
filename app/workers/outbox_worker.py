@@ -7,9 +7,11 @@ from app.database import SessionLocal
 from app.unit_of_work import UnitOfWork
 from app.core.setting import settings
 from app.outbox.publisher import publish_outbox_events
+from app.dependency_injection.container import Container
 
 
-rabbit = RabbitMQBroker(settings.rabbitmq_url)
+container = Container()
+# rabbit = RabbitMQBroker(settings.rabbitmq_url)
 
 
 def uow_factory():
@@ -17,6 +19,10 @@ def uow_factory():
 
 
 async def main():
+    await container.init_resources()
+
+    rabbit = await container.rabbitmq()
+    # uow_factory = container.uow
 
     while True:
 
