@@ -14,15 +14,15 @@ container = Container()
 # rabbit = RabbitMQBroker(settings.rabbitmq_url)
 
 
-def uow_factory():
-    return UnitOfWork(SessionLocal())
+# def uow_factory():
+#     return UnitOfWork(SessionLocal())
 
 
 async def main():
     await container.init_resources()
 
     rabbit = await container.rabbitmq()
-    # uow_factory = container.uow
+    uow_factory = container.uow
 
     while True:
 
