@@ -1,6 +1,8 @@
 import aio_pika
 from app.core.setting import settings
+from app.broker.rabit_broker import RabbitMQBroker
 
 
 async def get_rabbitmq_connection():
-    return await aio_pika.connect_robust(settings.rabbitmq_url)
+    broker = RabbitMQBroker(settings.rabbitmq_url)
+    return broker
