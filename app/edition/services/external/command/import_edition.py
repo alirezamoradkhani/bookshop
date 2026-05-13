@@ -46,11 +46,15 @@ async def import_edition(uow:UnitOfWork,provider:OpenLibraryProvider,book_id:int
         if current_user.username not in external_edition.authors:
             raise UserPermissionDenied
         
+        ext_book = await provider.get_work(work_id=external_edition.ext_book_id)
+        
         new_edition = model.Edition(
             book_id=internal_book.id
             ,price=0
             ,amount = 0
             ,specefic_edition_title = "imported"
+            ,isbn = external_edition.isbn
+            ,description = ext_book.description
             )
         await uow.edition.create_edition(new_edition)
         await uow.flush()
