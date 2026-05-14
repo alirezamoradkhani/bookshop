@@ -28,6 +28,7 @@ container.wire(
         "app.edition.route",
         "app.borrow.route",
         "app.analytics.route",
+        "app.transaction.route",
     ]
 )
 
