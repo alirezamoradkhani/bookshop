@@ -1,3 +1,4 @@
+from app.transaction.schemas.outputs import BaseUserResponse
 from app.unit_of_work import UnitOfWork
 from app.transaction.models.model import Transaction
 from app.transaction.models.enums import TransactionType
@@ -25,4 +26,4 @@ async def transfer(uow:UnitOfWork,amount:int,token_data: dict,reciver_id :int):
         await uow.baseusers.decrease_wallet_amount(user=current_user,change=amount)
         await uow.baseusers.increase_wallet_amount(user=reciver,change=amount)
 
-        return current_user
+        return BaseUserResponse.model_validate(current_user).model_dump()

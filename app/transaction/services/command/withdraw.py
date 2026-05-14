@@ -4,6 +4,7 @@ from app.transaction.models.enums import TransactionType
 from datetime import datetime
 from app.exceptions.models.user import InvalidTokenUser
 from app.exceptions.models.transaction import InsufficientFunds
+from app.user.schemas.outputs import BaseUserResponse
 
 async def withdraw(uow:UnitOfWork,amount:int,token_data: dict):
     async with uow:
@@ -15,4 +16,4 @@ async def withdraw(uow:UnitOfWork,amount:int,token_data: dict):
         new_transaction = Transaction(user_id=current_user.id,amount=amount,date=datetime.utcnow(),type=TransactionType.WITHDRAWAL)
         await uow.transaction.create(new_transaction)
         await uow.baseusers.decrease_wallet_amount(user= current_user,change=amount)
-        return current_user
+        return BaseUserResponse.model_validate(current_user).model_dump()
