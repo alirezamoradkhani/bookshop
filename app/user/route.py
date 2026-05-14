@@ -42,7 +42,7 @@ async def login_step_one(request: Request, user: inputs.UserLogin,uow = Depends(
 async def Delete_account(request: Request, token_data: dict = Depends(get_current_user), uow = Depends(Provide[Container.uow])):
     return await delete_account(uow=uow,token_data=token_data)
 
-@router.patch("/plan",response_model= outputs.UserResponse)
+@router.patch("/plan")
 @limiter.limit("5/minute")
 @inject
 async def Upgrade_plan(request: Request, new_plan:inputs.UserPlanUpgrade,token_data: dict = Depends(get_current_user),uow = Depends(Provide[Container.uow])):
