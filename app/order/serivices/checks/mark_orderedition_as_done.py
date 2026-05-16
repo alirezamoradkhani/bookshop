@@ -31,7 +31,7 @@ async def mark_orderedition_as_done(uow: UnitOfWork):
             grouped_authors.setdefault(ba.book_id, []).append(ba)
 
         # update order editions batch
-        order_edition_ids = [oe.id for oe in order_editions]
+        order_edition_ids = [oe.order_edition_id for oe in order_editions]
 
         await uow.orderedition.many_update_state(
             order_edition_ids=order_edition_ids,
