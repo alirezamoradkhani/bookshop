@@ -5,7 +5,7 @@ from app import schemas, crud
 from app.security import  get_current_user
 
 from app.api.router import api_router
-from app.workers.scheduler import scheduler
+
 from app.exceptions.base import DomainException
 from app.exceptions.exception_handler import domain_exception_handler
 
@@ -45,10 +45,6 @@ app.add_exception_handler(RateLimitExceeded,_rate_limit_exceeded_handler) # type
 app.state.limiter = limiter
 
 app.add_middleware(SlowAPIMiddleware)
-
-@app.on_event("startup")
-async def startup():
-    scheduler.start()
 
 
 @app.get("/")

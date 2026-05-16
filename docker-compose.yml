@@ -74,5 +74,21 @@ services:
       - .:/app
     command: python -m app.workers.outbox_worker
 
+  scheduler-worker:
+    build: .
+    container_name: fastapi-scheduler-worker
+    restart: always
+
+    depends_on:
+      - postgres
+
+    env_file:
+      - .env
+
+    volumes:
+      - .:/app
+
+    command: python -m app.workers.scheduler_worker
+
 volumes:
   pgdata:

@@ -7,6 +7,7 @@ from app.user.services.checks.dowgrade_expired_plan import downgrade_expired_pla
 
 from app.borrow.services.checks.mark_borrow_as_overdue import mark_borrow_as_overdue
 from app.dependency_injection.container import Container
+from asyncio import gather
 
 container = Container()
 
@@ -14,12 +15,13 @@ async def order_tasks():
     await container.init_resources()
     uow_factory = container.uow
     async with uow_factory() as uow:
-        await mark_orderedition_as_done(uow)
-        await mark_orderedition_as_rejected(uow)
-        await mark_orderedition_as_forcereject(uow)
-        await mark_ordere_as_done(uow)
-        await mark_ordere_as_inprogres(uow)
-    
+        await gather(
+        await mark_orderedition_as_done(uow),
+        await mark_orderedition_as_rejected(uow),
+        await mark_orderedition_as_forcereject(uow),
+        await mark_ordere_as_done(uow),
+        await mark_ordere_as_inprogres(uow),
+        )
 
 async def borrow_task():
     await container.init_resources()
