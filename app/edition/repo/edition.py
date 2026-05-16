@@ -1,3 +1,5 @@
+from unittest import result
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.edition.models.model import Edition
@@ -13,6 +15,10 @@ class EditionRepository:
     async def get_by_id(self,edition_id:int):
         result = await self.db.execute(select(Edition).where(Edition.id == edition_id, Edition.is_deleted == False))
         return result.scalar_one_or_none()
+    
+    async def get_by_ids(self,edition_ids:list[int]):
+        result = await self.db.execute(select(Edition).where(Edition.id.in_(edition_ids), Edition.is_deleted == False))
+        return result.scalars().all()
 
     async def update_amount(self,edition:Edition ,new_amount:int):
         edition.amount = new_amount
@@ -25,4 +31,10 @@ class EditionRepository:
     
     async def get_by_book_id(self,book_id:int):
         result = await self.db.execute(select(Edition).where(Edition.book_id == book_id))
+        return result.scalars().all()
+    
+    async def get_by_book_ids(self, book_ids: list[int]):
+        result = await self.db.execute(
+            select(Edition).where(Edition.book_id.in_(book_ids))
+        )
         return result.scalars().all()

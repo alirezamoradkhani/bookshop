@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 from app.user.models import model, enums
 from datetime import datetime,timedelta
 
@@ -25,6 +25,13 @@ class UserRepository:
     async def change_user_plan(self,user:model.User,new_plan:enums.UserPlan):
         user.plan = new_plan
         return user
+    
+    async def many_update_plan(self, user_ids: list[int], new_plan: enums.UserPlan):
+        await self.db.execute(
+            update(model.User)
+            .where(model.User.id.in_(user_ids))
+            .values(plan=new_plan)
+        )
     
     async def get_plan_by_id(self,user_id:int):
         result = await self.db.execute(select(model.User.plan).where(model.User.id == user_id))

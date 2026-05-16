@@ -34,8 +34,14 @@ async def create_edition(uow:UnitOfWork,edition:EditionCreate,token_data:dict):
             book_id=edition.book_id
             ,price=edition.price
             ,amount = edition.amount
-            ,language=edition.language
-            ,specefic_edition_title = edition.specefic_edition_title)
+            ,specefic_edition_title = edition.specefic_edition_title
+            ,isbn = edition.isbn
+            ,description = edition.description
+            )
         await uow.edition.create_edition(new_edition)
         await uow.flush()
+        edition_languages = [
+            model.EditionLanguage(edition_id=new_edition.id,language=language.lower()) for language in edition.language
+        ]
+        await uow.editionlanguage.create_many(edition_languages)
         return new_edition

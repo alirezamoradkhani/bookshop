@@ -1,5 +1,3 @@
-from app.book.models.enums import Category
-
 from app.unit_of_work import UnitOfWork
 
 async def search_books(uow: UnitOfWork

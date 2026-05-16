@@ -1,15 +1,21 @@
-from sqlalchemy import ForeignKey, Integer, String, Boolean
+from sqlalchemy import ForeignKey, Integer, String, Boolean, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.types import Enum
 from app.database import Base
-from app.book.models.enums import Category
 
 class Book(Base):
     __tablename__ = "books"
+    __table_args__ = (
+        UniqueConstraint(
+            "external_provider",
+            "external_id"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    external_provider: Mapped[str] = mapped_column(String, nullable=True)
+    external_id: Mapped[str] = mapped_column(String, nullable=True)
 
 class BookAuthor(Base):
     __tablename__ = "book_authors"

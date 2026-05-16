@@ -2,8 +2,10 @@ from datetime import datetime, timedelta
 from app.user.models.enums import UserPlan
 from app.borrow.models.model import Borrow,Waitlist
 from app.unit_of_work import UnitOfWork
+from app.workers.consumers.base import BaseConsumer
 
-class BorrowReturnedConsumer:
+class BorrowReturnedConsumer(BaseConsumer):
+    event_type = "BorrowReturned"
 
     async def get_qualified_waitlist(self, uow:UnitOfWork, edition_id):
 
@@ -56,7 +58,7 @@ class BorrowReturnedConsumer:
         await uow.waitlist.delete(waitlist)
 
 
-    async def handle(self, event: dict, uow:UnitOfWork):
+    async def process(self, event: dict, uow:UnitOfWork):
 
         async with uow:
 

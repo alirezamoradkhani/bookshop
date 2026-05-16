@@ -13,6 +13,14 @@ class Edition(Base):
     book_id: Mapped[int] = mapped_column(ForeignKey("books.id"))
     price: Mapped[int] = mapped_column(Integer)
     amount: Mapped[int] = mapped_column(Integer, default=0)
-    language : Mapped[Language] = mapped_column(Enum(Language, name = "language_enm"))
+    isbn: Mapped[str] = mapped_column(String, nullable=True)
+    description: Mapped[str] = mapped_column(String, nullable=True)
     specefic_edition_title : Mapped[str] = mapped_column(String, default= None)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class EditionLanguage(Base):
+    __tablename__ = "editionlanguage"
+
+    edition_id: Mapped[int] = mapped_column(Integer,ForeignKey("editions.id"),primary_key=True)
+    language: Mapped[str] = mapped_column(String,primary_key=True)

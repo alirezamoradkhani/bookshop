@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
-from sqlalchemy import select,func,desc
+from sqlalchemy import select,func
 from app.models import *
 
 

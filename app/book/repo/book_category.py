@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select
 from app.book.models import model
 
 class BookCategoryRepository:
@@ -8,6 +8,9 @@ class BookCategoryRepository:
     
     async def create(self, book_category:model.BookCategory):
         self.db.add(book_category)
+
+    async def create_many(self, items: list[model.BookCategory]):
+        self.db.add_all(items)
 
     async def delete(self, book_category:model.BookCategory):
         await self.db.delete(book_category)

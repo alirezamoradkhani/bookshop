@@ -3,7 +3,7 @@ from app.events.base import BaseEvent
 
 
 @dataclass
-class WaitlistCreate(BaseEvent):
+class WaitlistCreateEvent(BaseEvent):
     edition_id: int 
     user_id: int 
 

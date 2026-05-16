@@ -1,6 +1,6 @@
 from app.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, Integer, String, Boolean,DateTime
+from sqlalchemy import ForeignKey, Integer,DateTime
 from sqlalchemy.types import Enum
 from app.order.models.enums import OrderState, OrderItemState
 from datetime import datetime

@@ -10,6 +10,6 @@ class BookDetails(BaseModel):
     id: int
     title: str
     categorys: list[str]
-    authors : list[str]
+    authors_id : list[int]
     class Config:
         from_attributes = True

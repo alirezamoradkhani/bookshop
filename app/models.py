@@ -11,7 +11,7 @@ from app.user.models.enums import Role, UserPlan
 from app.book.models.enums import Category
 from app.book.models.model import Book, BookAuthor,BookCategory
 from app.edition.models.enums import Language
-from app.edition.models.model import Edition
+from app.edition.models.model import Edition,EditionLanguage
 from app.order.models.enums import OrderState, OrderItemState
 from app.order.models.model import Order, OrderEdition
 from app.transaction.models.enums import TransactionType

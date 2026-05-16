@@ -1,5 +1,7 @@
 from app.unit_of_work import UnitOfWork
+from app.workers.consumers.base import BaseConsumer
 
-class WaitlistCreate:
-    async def handle(self, event: dict, uow:UnitOfWork):
+class WaitlistCreateConsumer(BaseConsumer):
+    event_type = "WaitlistCreated"
+    async def process(self, event: dict, uow:UnitOfWork):
         pass

@@ -12,5 +12,9 @@ class EventTypes:
 
     BORROW_CREATED = "BorrowCreated"
     BORROW_RETURNED = "BorrowReturned"
+    BORROW_OVERDUE = "BorrowOverdue"
 
+    ORDER_ITEM_ACCEPTED = "OrderItemAccepted"
+    ORDER_ITEM_REJECTED = "OrderItemRejected"
+    WAITLIST_CREATED = "WaitlistCreated"
     WAITLIST_PROMOTED = "WaitlistPromoted"

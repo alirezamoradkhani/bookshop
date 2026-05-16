@@ -22,17 +22,21 @@ async def create_user(uow:UnitOfWork,user: inputs.UserCreate,otp: str):
             raise UsernameAlreadyExists
         if not await verify_otp(otp=otp,email=user.email):
                 raise InvalidOTP
-        new_user = model.BaseUser(
-                username=user.username,
-                email=user.email,
-                password=hash_password(password=user.password),
-                role=user.role
-            )
+        if user.role == enums.Role.USER:
+            new_user = model.User(
+                    username=user.username,
+                    email=user.email,
+                    password=hash_password(password=user.password),
+                    role=user.role
+                )
+            
+        elif user.role == enums.Role.AUTHOR:
+             new_user = model.Author(
+                    username=user.username,
+                    email=user.email,
+                    password=hash_password(password=user.password),
+                    role=user.role
+                )
         await uow.baseusers.create(new_user)
-        await uow.flush()
-        if new_user.role == enums.Role.USER:
-            await uow.user.create(new_user.id)
-        elif new_user.role == enums.Role.AUTHOR:
-            await uow.author.create(new_user.id)
         return new_user
 
