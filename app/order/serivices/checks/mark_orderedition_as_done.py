@@ -3,11 +3,11 @@ from app.order.models import enums
 from datetime import datetime, timedelta
 
 
-async def mark_orderedition_as_done(uow: UnitOfWork):
+async def mark_orderedition_as_done(uow_factory):
     now = datetime.utcnow()
     date = now - timedelta(days=5)
 
-    async with uow:
+    async with uow_factory() as uow:
         order_editions = await uow.orderedition.get_by_last_modify_and_state(
             state=enums.OrderItemState.PREPARING,
             date=date

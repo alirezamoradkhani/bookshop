@@ -2,8 +2,8 @@ from app.unit_of_work import UnitOfWork
 from app.order.models import enums, model
 
 
-async def mark_ordere_as_done(uow: UnitOfWork):
-    async with uow:
+async def mark_ordere_as_done(uow_factory):
+    async with uow_factory() as uow:
         orders = await uow.order.get_by_state(enums.OrderState.IN_PROCCESE)
 
         if not orders:

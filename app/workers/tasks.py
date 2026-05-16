@@ -14,24 +14,22 @@ container = Container()
 async def order_tasks():
     await container.init_resources()
     uow_factory = container.uow
-    async with uow_factory() as uow:
-        await gather(
-        await mark_orderedition_as_done(uow),
-        await mark_orderedition_as_rejected(uow),
-        await mark_orderedition_as_forcereject(uow),
-        await mark_ordere_as_done(uow),
-        await mark_ordere_as_inprogres(uow),
-        )
+
+    await gather(
+        mark_orderedition_as_done(uow_factory),
+        mark_orderedition_as_rejected(uow_factory),
+        mark_orderedition_as_forcereject(uow_factory),
+        mark_ordere_as_done(uow_factory),
+        mark_ordere_as_inprogres(uow_factory),
+    )
 
 async def borrow_task():
     await container.init_resources()
-    uow_factory = container.uow
-    async with uow_factory() as uow:
-        await mark_borrow_as_overdue(uow)
+    uow = container.uow
+    await mark_borrow_as_overdue(uow)
 
 
 async def plan_task():
     await container.init_resources()
-    uow_factory = container.uow
-    async with uow_factory() as uow:
-        await downgrade_expired_plan(uow)
+    uow = container.uow
+    await downgrade_expired_plan(uow)
