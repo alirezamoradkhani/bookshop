@@ -12,5 +12,4 @@ async def upgrade_plan(uow:UnitOfWork,new_plan:UserPlanUpgrade,token_data: dict)
             raise InvalidOTP
         exp = datetime.utcnow() + timedelta(days=30)
         user = await uow.user.update_plan(new_plan=new_plan,id=current_user.id,ex=exp)
-        print(user.plan,user.plan_expire)
         return UserResponse.model_validate(user).model_dump()

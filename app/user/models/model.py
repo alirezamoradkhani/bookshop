@@ -15,13 +15,17 @@ class BaseUser(Base):
     email: Mapped[str] = mapped_column(String, unique=True)
     password: Mapped[str] = mapped_column(String)
 
-    role: Mapped[enum.Role] = mapped_column(sqlEnum(enum.Role))
+    role: Mapped[enum.Role] = mapped_column(sqlEnum(enum.Role),nullable= False)
     wallet_amount: Mapped[int] = mapped_column(Integer, default=0)
 
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    __mapper_args__ = {
+        "polymorphic_on": role,
+        "polymorphic_identity": "base_user",
+    }
 
 
-class User(Base):
+class User(BaseUser):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
     plan: Mapped[enum.UserPlan] = mapped_column(
@@ -30,14 +34,23 @@ class User(Base):
         nullable=False
     )
     plan_expire : Mapped[datetime] = mapped_column(DateTime(timezone=True),nullable=True)
+    __mapper_args__ = {
+        "polymorphic_identity": enum.Role.USER,
+    }
     
 
 
-class Author(Base):
+class Author(BaseUser):
     __tablename__ = "authors"
     id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
+    __mapper_args__ = {
+        "polymorphic_identity": enum.Role.AUTHOR,
+    }
 
 
-class Admin(Base):
+class Admin(BaseUser):
     __tablename__ = "admins"
     id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
+    __mapper_args__ = {
+        "polymorphic_identity": enum.Role.ADMIN,
+    }
