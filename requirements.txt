@@ -37,3 +37,4 @@ httpx
 tenacity
 slowapi
 dependency_injector
+meilisearch

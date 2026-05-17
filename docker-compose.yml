@@ -27,6 +27,17 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  meilisearch:
+    image: getmeili/meilisearch
+    container_name: fastapi-meilisearch
+    restart: always
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: masterKey
+    volumes:
+      - meili_data:/meili_data
+
   app:
     build: .
     container_name: fastapi-app
@@ -37,7 +48,7 @@ services:
       - postgres
       - redis
       - rabbitmq
-
+      - meilisearch
     env_file:
       - .env
 
@@ -92,3 +103,4 @@ services:
 
 volumes:
   pgdata:
+  meili_data:
