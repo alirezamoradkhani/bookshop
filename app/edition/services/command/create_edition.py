@@ -4,6 +4,9 @@ from app.user.models.enums import Role
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.book import BookNotFound
 from app.exceptions.models.edition import InvalidPrice, InvalidAmount
+from app.events.edition.edition_events import EditionCreatedEvent
+from app.events.base import event_to_payload
+from app.outbox.model import OutboxEvent
 
 from app.unit_of_work import UnitOfWork
 
@@ -44,4 +47,12 @@ async def create_edition(uow:UnitOfWork,edition:EditionCreate,token_data:dict):
             model.EditionLanguage(edition_id=new_edition.id,language=language.lower()) for language in edition.language
         ]
         await uow.editionlanguage.create_many(edition_languages)
+
+        await uow.flush()
+        event = EditionCreatedEvent(edition_id=new_edition.id)
+        outbox_event = OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event=event)
+        )
+        await uow.outbox.add(event=outbox_event)
         return new_edition

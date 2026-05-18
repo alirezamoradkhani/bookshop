@@ -1,6 +1,9 @@
 from app.workers.consumers.book.book_create_consumer import BookCreateConsumer
 from app.workers.consumers.book.book_update_consumer import BookUpdateConsumer
 from app.workers.consumers.book.book_delete_consumer import BookDeleteConsumer
+from app.workers.consumers.edition.edition_create_consumer import EditionCreateConsumer
+from app.workers.consumers.edition.edition_update_consumer import EditionUpdateConsumer
+from app.workers.consumers.edition.edition_delete_consumer import EditionDeleteConsumer
 from app.workers.consumers.order.order_Cancel_consumer import OrderCancelConsumer
 from app.workers.consumers.order.order_item_accept_consumer import OrderItemAcceptConsumer
 from app.workers.consumers.order.order_item_reject_consumer import OrderItemRejectConsumer
@@ -17,6 +20,9 @@ CONSUMER_REGISTRY = {
     EventTypes.BOOK_CREATED: BookCreateConsumer,
     EventTypes.BOOK_UPDATED: BookUpdateConsumer,
     EventTypes.BOOK_DELETED: BookDeleteConsumer,
+    EventTypes.EDITION_Create: EditionCreateConsumer,
+    EventTypes.EDITION_UPDATED: EditionUpdateConsumer,
+    EventTypes.EDITION_DELETED: EditionDeleteConsumer,
     EventTypes.ORDER_CANCELED: OrderCancelConsumer,
     EventTypes.ORDER_ITEM_ACCEPTED: OrderItemAcceptConsumer,
     EventTypes.ORDER_ITEM_REJECTED: OrderItemRejectConsumer,
