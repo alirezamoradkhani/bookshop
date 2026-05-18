@@ -30,7 +30,7 @@ async def update_price(uow:UnitOfWork, token_data:dict,edition_id:int, new_price
                 raise UserPermissionDenied
         if new_price < 0:
             raise InvalidPrice
-        edition.price = new_price
+        await uow.edition.update_price(edition=edition,new_price=new_price)
 
         event = EditionUpdatedEvent(edition_id=edition_id)
         outbox_event = OutboxEvent(

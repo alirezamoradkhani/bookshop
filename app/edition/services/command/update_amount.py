@@ -28,7 +28,7 @@ async def update_amount(uow:UnitOfWork,token_data:dict, new_amount:int,edition_i
                 raise UserPermissionDenied
         if new_amount < 0:
             raise InvalidAmount
-        edition.amount = new_amount
+        await uow.edition.update_amount(edition=edition,new_amount=new_amount)
 
         event = EditionUpdatedEvent(edition_id=edition_id)
         outbox_event = OutboxEvent(

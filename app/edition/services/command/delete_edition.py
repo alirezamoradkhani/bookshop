@@ -26,7 +26,7 @@ async def remove_edition(uow:UnitOfWork, token_data:dict,edition_id:int):
             )
             if bookauthor is None:
                 raise UserPermissionDenied
-        edition.is_deleted = True
+        await uow.edition.soft_delete(edition=edition)
 
         event = EditionDeletedEvent(edition_id=edition_id)
         outbox_event = OutboxEvent(
