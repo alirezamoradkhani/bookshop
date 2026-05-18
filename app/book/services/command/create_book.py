@@ -6,7 +6,7 @@ from app.events.base import event_to_payload
 from app.outbox.model import OutboxEvent
 from app.exceptions.models.user import InvalidOTP, AuthorNotFound, OnlyAuthorPrimition
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict):
     async with uow:

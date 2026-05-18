@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.workers.consumers.base import BaseConsumer
 from app.workers.consumers.base import container
 from app.search.indexer.book_indexer import BookIndexer

@@ -1,4 +1,4 @@
-from app.database import Base
+from app.core.database import Base
 from app.transaction.models.enums import TransactionType
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, Integer

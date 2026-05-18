@@ -7,7 +7,7 @@ from app.events.base import event_to_payload
 
 
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def update_price(uow:UnitOfWork, token_data:dict,edition_id:int, new_price: int):
     async with uow:

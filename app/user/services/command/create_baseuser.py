@@ -1,11 +1,11 @@
 import app.user.models.model as model
-from app.otp import create_otp, verify_otp
-from app.security import hash_password
+from app.core.otp import create_otp, verify_otp
+from app.core.security import hash_password
 import app.user.schemas.inputs as inputs
 import app.user.models.enums as enums
 from app.exceptions.models.user import EmailAlreadyRegistered,UsernameAlreadyExists,InvalidOTP
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 
 async def email_register(uow:UnitOfWork,email: str):

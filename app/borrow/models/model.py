@@ -1,4 +1,4 @@
-from app.database import Base
+from app.core.database import Base
 from app.borrow.models.enums import BorrowStatus
 from datetime import datetime
 from sqlalchemy.types import Enum

@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.query.fun_record.editions.best_edition_in_sell import best_edition_in_sell as query
 
 from app.analytics.schemas.outputs import Best_edition_in_sell

@@ -21,7 +21,7 @@ from app.exceptions.models.external_service import (
     ExternalServiceCanNotFound
 )
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 
 async def import_book(

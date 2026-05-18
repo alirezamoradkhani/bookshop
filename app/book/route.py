@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from app.security import get_current_user
+from app.core.security import get_current_user
 from app.book.schemas import inputs, outputs
 from app.book.models.enums import Category
 from app.book.services.command.create_book import create_book

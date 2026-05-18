@@ -3,7 +3,7 @@ from app.events.book.book_events import BookDeletedEvent
 from app.events.base import event_to_payload
 from app.outbox.model import OutboxEvent
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.book import BookNotFound
 

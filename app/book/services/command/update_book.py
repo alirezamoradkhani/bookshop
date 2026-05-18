@@ -7,7 +7,7 @@ from app.outbox.model import OutboxEvent
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.book import BookNotFound
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def update_book(uow:UnitOfWork, token_data:dict,book_id:int,book_update:inputs.BookUpdate):
     async with uow:

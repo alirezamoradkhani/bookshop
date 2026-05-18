@@ -5,7 +5,7 @@ from app.events.edition.edition_events import EditionDeletedEvent
 from app.events.base import event_to_payload
 from app.outbox.model import OutboxEvent
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def remove_edition(uow:UnitOfWork, token_data:dict,edition_id:int):
     async with uow:

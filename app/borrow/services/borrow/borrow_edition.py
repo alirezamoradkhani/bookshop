@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from app.exceptions.models.user import InvalidTokenUser,OnlyUserHavePrimition,PlanPermissionDenied
 from app.exceptions.models.edition import EditionNotFound, EditionOutOfStock
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
     async with uow:

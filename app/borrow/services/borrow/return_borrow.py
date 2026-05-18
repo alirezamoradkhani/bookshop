@@ -6,7 +6,7 @@ from app.events.base import event_to_payload
 from app.outbox.model import OutboxEvent
 from app.exceptions.models.user import InvalidTokenUser,OnlyUserHavePrimition,UserPermissionDenied
 from app.exceptions.models.borrow import BorrowNotFound,BorrowAlreadyReturned
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
     async with uow:

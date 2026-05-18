@@ -1,6 +1,6 @@
 from app.exceptions.models.book import BookNotFound 
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def book_detail(uow:UnitOfWork,book_id: int):
     book = await uow.book.get_by_id(book_id)

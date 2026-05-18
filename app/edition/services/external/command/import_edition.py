@@ -5,7 +5,7 @@ from app.exceptions.models.book import BookNotFound
 from app.exceptions.models.external_service import ExternalServiceCanNotFound, LanguageNotSuported
 
 from app.external_API.providers.open_library.service import OpenLibraryProvider
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def import_edition(uow:UnitOfWork,provider:OpenLibraryProvider,book_id:int,external_edition_title:str,token_data:dict):
     async with uow:

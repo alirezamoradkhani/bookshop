@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.query.fun_record.users.best_user_in_buy import best_user_in_buy as query
 from app.analytics.schemas.outputs import Best_user_in_buy
 

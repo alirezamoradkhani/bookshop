@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.user.models.enums import UserPlan
 from app.user.services.checks.get_expired_user_plan import get_expired_user_plan
 async def downgrade_expired_plan(uow_factory):

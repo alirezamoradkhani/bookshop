@@ -1,5 +1,5 @@
 from app.transaction.schemas.outputs import UserResponse
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.user.schemas.inputs import UserPlanUpgrade
 from app.exceptions.models.user import InvalidOTP
 from datetime import datetime, timedelta

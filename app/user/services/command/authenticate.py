@@ -1,8 +1,8 @@
-from app.security import verify_password, create_access_token
+from app.core.security import verify_password, create_access_token
 import app.user.schemas.inputs as inputs
 from app.exceptions.models.user import InvalidCredentials
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 
 async def login_by_user_pass(uow:UnitOfWork,user: inputs.UserLogin):

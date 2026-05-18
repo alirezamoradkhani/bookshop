@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from app.user.models.enums import UserPlan
 from app.borrow.models.model import Borrow,Waitlist
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.workers.consumers.base import BaseConsumer
 
 class BorrowReturnedConsumer(BaseConsumer):

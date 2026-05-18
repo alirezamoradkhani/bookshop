@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, JSON, DateTime, Boolean
 from datetime import datetime
-from app.database import Base
+from app.core.database import Base
 
 class OutboxEvent(Base):
     __tablename__ = "outbox_events"

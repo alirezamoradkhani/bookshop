@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from app.security import get_current_user
+from app.core.security import get_current_user
 from app.external_API.providers.open_library.get_extternal_services import get_openlibrary_provider
 from app.edition.schemas.inputs import EditionCreate
 from app.edition.services.command.create_edition import create_edition

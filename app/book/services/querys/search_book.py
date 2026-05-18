@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def search_books(uow: UnitOfWork
                 ,title: str | None = None
