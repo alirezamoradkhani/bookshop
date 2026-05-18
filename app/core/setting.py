@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     redis_url: str
     rabbitmq_url: str
     jwt_secret: str
+    meili_url: str
+    meili_master_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 

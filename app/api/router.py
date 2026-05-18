@@ -6,6 +6,7 @@ from app.order.route import router as order_router
 from app.transaction.route import router as transaction_router
 from app.borrow.route import router as borrow_router
 from app.analytics.route import router as analytics_router
+from app.search.route import router as search_router
 
 
 api_router = APIRouter()
@@ -17,3 +18,4 @@ api_router.include_router(order_router)
 api_router.include_router(transaction_router)
 api_router.include_router(borrow_router)
 api_router.include_router(analytics_router)
+api_router.include_router(search_router)

@@ -1,4 +1,7 @@
 from app.user.models.enums import Role
+from app.events.book.book_events import BookDeletedEvent
+from app.events.base import event_to_payload
+from app.outbox.model import OutboxEvent
 
 from app.unit_of_work import UnitOfWork
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
@@ -22,4 +25,11 @@ async def delete_book(uow:UnitOfWork,book_id:int, token_data:dict):
             await uow.book.delete_book(book=book)
         if current_user.role == Role.ADMIN:
             await uow.book.delete_book(book=book)
+        
+        event = BookDeletedEvent(book_id=book.id)
+        outbox_event = OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event=event)
+        )
+        await uow.outbox.add(event=outbox_event)
         return book

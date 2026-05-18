@@ -1,4 +1,6 @@
 from typing import Type
+from app.dependency_injection.container import Container
+container = Container()
 
 class BaseConsumer:
 

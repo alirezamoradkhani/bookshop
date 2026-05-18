@@ -29,6 +29,7 @@ container.wire(
         "app.borrow.route",
         "app.analytics.route",
         "app.transaction.route",
+        "app.search.route",
     ]
 )
 

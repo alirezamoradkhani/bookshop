@@ -101,6 +101,13 @@ services:
 
     command: python -m app.workers.scheduler_worker
 
+  meili-init:
+    build: .
+    command: >
+      sh -c "sleep 15 && python -m app.search.index_setup"
+    depends_on:
+      - meilisearch
+
 volumes:
   pgdata:
   meili_data:

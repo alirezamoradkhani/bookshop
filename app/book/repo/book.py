@@ -44,3 +44,7 @@ class BookRepository:
         
         result = await self.db.execute(result)
         return result.scalars().all()
+    
+    async def get_all(self):
+        result = await self.db.execute(select(model.Book).where(model.Book.is_deleted == False))
+        return result.scalars().all()

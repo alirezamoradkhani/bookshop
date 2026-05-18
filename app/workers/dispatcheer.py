@@ -29,7 +29,7 @@ async def dispatch_message(message, broker, uow_factory):
         print("[dispatcher] before uow", flush=True)
 
         async with uow_factory() as uow:
-            await consumer.handle(event, uow)
+            await consumer.process(event, uow)
 
         print("[dispatcher] after uow", flush=True)
         await message.ack()
