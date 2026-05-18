@@ -1,8 +1,6 @@
 from app.database import Base
 from sqlalchemy import ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
-from app.database import Base
-from app.edition.models.enums import Language
 from sqlalchemy.types import Enum as Enum
 
 

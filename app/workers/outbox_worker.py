@@ -2,21 +2,11 @@
 
 import asyncio
 
-from app.broker.rabit_broker import RabbitMQBroker
-from app.database import SessionLocal
-from app.unit_of_work import UnitOfWork
-from app.core.setting import settings
 from app.outbox.publisher import publish_outbox_events
 from app.dependency_injection.container import Container
 
 
 container = Container()
-# rabbit = RabbitMQBroker(settings.rabbitmq_url)
-
-
-# def uow_factory():
-#     return UnitOfWork(SessionLocal())
-
 
 async def main():
     await container.init_resources()

@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from app.core.setting import settings
 POSTGRES_DATABASE_URL = settings.database_url
@@ -10,10 +10,6 @@ SessionLocal = async_sessionmaker(
     bind=engine,
     expire_on_commit= False
 )
-
-async def get_db():
-    async with SessionLocal() as session:
-        yield session
 
 
 Base = declarative_base()
