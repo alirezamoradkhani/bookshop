@@ -1,6 +1,9 @@
 import app.book.schemas.inputs as inputs
 from app.book.models import model
 from app.user.models.enums import Role
+from app.events.book.book_events import BookUpdatedEvent
+from app.events.base import event_to_payload
+from app.outbox.model import OutboxEvent
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.book import BookNotFound
 
@@ -45,4 +48,11 @@ async def update_book(uow:UnitOfWork, token_data:dict,book_id:int,book_update:in
                 for existing_category in existing_categorys:
                     if existing_category not in book_update.categorys:
                         await uow.bookcategory.delete(existing_category)
+
+        event = BookUpdatedEvent(book_id=book.id)
+        outbox_event = OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event=event)
+        )
+        await uow.outbox.add(event=outbox_event)
         return book
