@@ -1,7 +1,7 @@
 from app.search.service.normalize_query import normalize_query
-from app.search.service.build_filters import build_filters
+from app.search.service.book.build_filters import build_filters
 from app.search.service.paginate import paginate
-from app.search.service.rank_results import rank_results
+from app.search.service.book.rank_results import rank_results
 from app.search.provider.base import SearchProvider
 
 
