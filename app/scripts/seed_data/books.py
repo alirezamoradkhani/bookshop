@@ -1,6 +1,6 @@
 from app.book.models.model import Book,BookAuthor
 from app.book.models.enums import Category
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def seed_book(uow:UnitOfWork):
     book1 = Book(title="string", Category=Category.ART)

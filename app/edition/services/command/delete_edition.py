@@ -1,8 +1,11 @@
 from app.user.models.enums import Role
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.edition import EditionNotFound
+from app.events.edition.edition_events import EditionDeletedEvent
+from app.events.base import event_to_payload
+from app.outbox.model import OutboxEvent
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def remove_edition(uow:UnitOfWork, token_data:dict,edition_id:int):
     async with uow:
@@ -23,5 +26,13 @@ async def remove_edition(uow:UnitOfWork, token_data:dict,edition_id:int):
             )
             if bookauthor is None:
                 raise UserPermissionDenied
-        edition.is_deleted = True
+        await uow.edition.soft_delete(edition=edition)
+
+        event = EditionDeletedEvent(edition_id=edition_id)
+        outbox_event = OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event=event)
+        )
+        await uow.outbox.add(event=outbox_event)
+
     return edition

@@ -2,22 +2,11 @@
 
 import asyncio
 
-from app.broker.rabit_broker import RabbitMQBroker
 from app.workers.registry import CONSUMER_REGISTRY
 from app.workers.dispatcheer import dispatch_message
-from app.database import SessionLocal
-from app.unit_of_work import UnitOfWork
-from app.core.setting import settings
 from app.dependency_injection.container import Container
 
 container = Container()
-
-
-# rabbit = RabbitMQBroker(settings.rabbitmq_url)
-
-
-# def uow_factory():
-#     return UnitOfWork(SessionLocal())
 
 print("[consumer] worker starting", flush=True)
 async def start_consumers():

@@ -1,8 +1,11 @@
 from app.user.models.enums import Role
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.edition import EditionNotFound,InvalidAmount
+from app.events.edition.edition_events import EditionUpdatedEvent
+from app.outbox.model import OutboxEvent
+from app.events.base import event_to_payload
 
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def update_amount(uow:UnitOfWork,token_data:dict, new_amount:int,edition_id:int):
     async with uow:
@@ -25,5 +28,12 @@ async def update_amount(uow:UnitOfWork,token_data:dict, new_amount:int,edition_i
                 raise UserPermissionDenied
         if new_amount < 0:
             raise InvalidAmount
-        edition.amount = new_amount
+        await uow.edition.update_amount(edition=edition,new_amount=new_amount)
+
+        event = EditionUpdatedEvent(edition_id=edition_id)
+        outbox_event = OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event=event)
+        )
+        await uow.outbox.add(event=outbox_event)
     return edition

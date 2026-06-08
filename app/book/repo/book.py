@@ -26,8 +26,6 @@ class BookRepository:
     async def update_book_title(self,book:model.Book,title:str):
         book.title = title
 
-    async def update_book_category(self,book:model.Book,category:enums.Category):
-        book.category = category
     
     async def delete_book(self,book:model.Book):
         book.is_deleted = True
@@ -43,4 +41,8 @@ class BookRepository:
             result = result.join(model.BookCategory).where(model.BookCategory.category == category)
         
         result = await self.db.execute(result)
+        return result.scalars().all()
+    
+    async def get_all(self):
+        result = await self.db.execute(select(model.Book).where(model.Book.is_deleted == False))
         return result.scalars().all()

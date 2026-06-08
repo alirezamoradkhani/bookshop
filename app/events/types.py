@@ -7,6 +7,10 @@ class EventTypes:
     BOOK_UPDATED = "BookUpdated"
     BOOK_DELETED = "BookDeleted"
 
+    EDITION_Create = "EditionCreated"
+    EDITION_UPDATED = "EditionUpdated"
+    EDITION_DELETED = "EditionDeleted"
+
     ORDER_CREATED = "OrderCreated"
     ORDER_CANCELED = "OrderCanceled"
 

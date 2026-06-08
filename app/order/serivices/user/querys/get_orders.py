@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.user.models.enums import Role
 from app.exceptions.models.user import InvalidTokenUser,OnlyUserHavePrimition
 

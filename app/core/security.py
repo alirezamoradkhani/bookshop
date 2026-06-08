@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from fastapi import Depends
-import redis.asyncio as redis
 from app.exceptions.models.user import InvalidTokenUser
 from passlib.context import CryptContext
 from app.core.setting import settings

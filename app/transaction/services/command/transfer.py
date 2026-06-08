@@ -1,5 +1,5 @@
 from app.transaction.schemas.outputs import BaseUserResponse
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.transaction.models.model import Transaction
 from app.transaction.models.enums import TransactionType
 from datetime import datetime

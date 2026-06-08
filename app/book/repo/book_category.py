@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from app.book.models import model
 
 class BookCategoryRepository:
@@ -18,3 +18,6 @@ class BookCategoryRepository:
     async def get_by_book_id(self,book_id:int):
         result = await self.db.execute(select(model.BookCategory).where(model.BookCategory.book_id == book_id))
         return result.scalars().all()
+    
+    async def delete_by_book_id(self, book_id: int):
+        await self.db.execute(delete(model.BookCategory).where(model.BookCategory.book_id == book_id))

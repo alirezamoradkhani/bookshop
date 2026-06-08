@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from datetime import datetime
 async def get_expired_user_plan(uow:UnitOfWork):
     now = datetime.utcnow()

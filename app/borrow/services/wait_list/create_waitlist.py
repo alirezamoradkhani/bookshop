@@ -1,6 +1,6 @@
 from app.user.models.enums import Role,UserPlan
 from app.borrow.models.model import Waitlist
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from datetime import datetime
 from app.exceptions.models.user import InvalidTokenUser,OnlyUserHavePrimition,PlanPermissionDenied
 from app.exceptions.models.edition import EditionNotFound,EditionOutOfStock

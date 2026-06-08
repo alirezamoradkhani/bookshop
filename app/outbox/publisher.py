@@ -1,4 +1,4 @@
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 from app.broker.redis_broker import RedisBroker
 from app.broker.rabit_broker import RabbitMQBroker
 

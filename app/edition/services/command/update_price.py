@@ -1,8 +1,13 @@
 from app.user.models.enums import Role
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.edition import EditionNotFound,InvalidPrice
+from app.events.edition.edition_events import EditionUpdatedEvent
+from app.outbox.model import OutboxEvent
+from app.events.base import event_to_payload
 
-from app.unit_of_work import UnitOfWork
+
+
+from app.core.unit_of_work import UnitOfWork
 
 async def update_price(uow:UnitOfWork, token_data:dict,edition_id:int, new_price: int):
     async with uow:
@@ -25,5 +30,12 @@ async def update_price(uow:UnitOfWork, token_data:dict,edition_id:int, new_price
                 raise UserPermissionDenied
         if new_price < 0:
             raise InvalidPrice
-        edition.price = new_price
+        await uow.edition.update_price(edition=edition,new_price=new_price)
+
+        event = EditionUpdatedEvent(edition_id=edition_id)
+        outbox_event = OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event=event)
+        )
+        await uow.outbox.add(event=outbox_event)
     return edition

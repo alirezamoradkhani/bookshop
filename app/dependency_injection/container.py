@@ -5,6 +5,8 @@ import redis.asyncio as redis
 from app.dependency_injection.providers.rabbitmq import get_rabbitmq_connection
 from app.dependency_injection.providers.external import openlibrary_provider, openlibrary_http_client
 from app.dependency_injection.providers.uow import uow_factory
+import meilisearch
+from app.search.provider.meilisearch import MeiliSearchProvider
 
 class Container(containers.DeclarativeContainer):
     config = providers.Object(settings)
@@ -20,3 +22,14 @@ class Container(containers.DeclarativeContainer):
     )
     
     uow = providers.Factory(uow_factory, session=session)
+
+    meili_client = providers.Singleton(
+        meilisearch.Client,
+        settings.meili_url,
+        settings.meili_master_key
+    )
+
+    search_provider = providers.Factory(
+        MeiliSearchProvider,
+        client=meili_client
+    )

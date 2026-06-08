@@ -1,6 +1,6 @@
 from app.user.models.model import BaseUser
 from app.user.models.enums import Role
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 async def seed_user(uow:UnitOfWork):
     user1 = BaseUser(username = "a", email = "a@e.com",passworld="1",role = Role.USER)

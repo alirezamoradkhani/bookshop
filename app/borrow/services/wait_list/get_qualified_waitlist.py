@@ -1,5 +1,5 @@
 from app.user.models.enums import UserPlan
-from app.unit_of_work import UnitOfWork
+from app.core.unit_of_work import UnitOfWork
 
 
 async def get_qualified_waitlist(uow:UnitOfWork,edition_id):
