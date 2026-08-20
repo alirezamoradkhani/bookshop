@@ -1,226 +1,200 @@
-# 📚 Bookshop API
+# Bookshop API
 
-A production-grade, event-driven backend system for a digital bookshop platform built with **FastAPI**, designed using **Clean Architecture**, **async-first execution**, and **distributed event-driven architecture**.
+[![CI](https://github.com/alirezamoradkhani/bookshop/actions/workflows/ci.yml/badge.svg)](https://github.com/alirezamoradkhani/bookshop/actions/workflows/ci.yml)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-async-009688.svg)](https://fastapi.tiangolo.com/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-This project demonstrates a modular monolith evolving toward a scalable distributed system using messaging, outbox patterns, and CQRS-style read models.
+An event-driven FastAPI backend for a digital bookshop. The project explores
+reliability patterns used in real backend systems: transactional outbox,
+idempotent commands, asynchronous consumers, database-backed domain workflows,
+and a dedicated search read model.
 
-# 🚀 Architecture at a Glance
+## Why this project exists
 
-The system is built around **event-driven consistency** and **async processing pipelines**:
+Bookshop is a portfolio project focused on the engineering problems behind a
+non-trivial API—not only CRUD endpoints. It models purchasing, borrowing,
+inventory, wallet transactions, waitlists, search indexing, and asynchronous
+event processing while keeping PostgreSQL as the source of truth.
 
-Client  
-↓  
-FastAPI (API Layer)  
-↓  
-PostgreSQL (Source of Truth)  
-↓  
-Outbox Table (Transactional Events)  
-↓  
-Outbox Worker  
-↓  
-RabbitMQ (Event Bus)  
-↓  
-Consumers  
-- Order Processing  
-- Payment Handling  
-- Analytics Pipeline  
-- Borrowing Workflow  
-- Meilisearch Indexer  
+## Architecture
 
-# ✨ Core Features
+```mermaid
+flowchart LR
+    Client --> API[FastAPI API]
+    API --> DB[(PostgreSQL)]
+    DB --> Outbox[(Outbox table)]
+    Outbox --> Publisher[Outbox worker]
+    Publisher --> RabbitMQ[RabbitMQ]
+    RabbitMQ --> Consumers[Idempotent consumers]
+    Consumers --> Search[(Meilisearch)]
+    API --> Redis[(Redis)]
+```
 
-## 📖 Business Features
-- Book catalog browsing
-- Purchase & order processing
-- Borrowing system (due dates, waitlists, overdue handling)
-- Author & edition management
-- Transaction tracking & auditability
+The application is a modular monolith with background workers. A business
+transaction and its outgoing event are written together. The outbox worker
+then publishes committed events to RabbitMQ, where consumers update downstream
+workflows and the Meilisearch read model.
 
-## ⚙️ System Features
-- Fully async FastAPI backend
-- Event-driven architecture (RabbitMQ)
-- Reliable event delivery (Outbox Pattern)
-- CQRS-style search layer (Meilisearch)
-- Redis caching (OTP, idempotency, rate limiting)
-- Background workers for async workflows
+## Key features
 
-# 🧠 Architecture Principles
+- JWT authentication and role-aware user flows
+- Book, author, category, and edition management
+- Orders with wallet and inventory updates
+- Borrowing, due dates, overdue handling, and waitlists
+- Transactional outbox for reliable event publication
+- RabbitMQ consumers for asynchronous workflows
+- Redis-backed idempotency, OTP storage, and rate limiting
+- Meilisearch full-text search with filtering and typo tolerance
+- Alembic migrations and database integrity constraints
+- Analytics queries for sales, borrowing, users, and authors
 
-## 🧩 Modular Monolith
-- user → authentication & identity  
-- book → catalog domain  
-- order → purchase flow  
-- borrow → borrowing logic  
-- transaction → financial records  
-- analytics → metrics pipeline  
-- search → Meilisearch read model  
+## Technology
 
-## 🔁 Event-Driven Consistency
-
-1. Domain action occurs (e.g. order created)  
-2. Transaction commits in PostgreSQL  
-3. Event stored in outbox table  
-4. Worker publishes event to RabbitMQ  
-5. Consumers react asynchronously  
-
-## 🔎 Search (CQRS Read Model)
-
-Meilisearch is used as a dedicated read model:
-
-Domain Event → Outbox → Worker → Meilisearch → Search API  
-
-Features:
-- Full-text search
-- Typo tolerance
-- Filtering (price, category, availability)
-- Near real-time indexing
-
-# 🛠 Tech Stack
-
-- FastAPI
-- PostgreSQL 16
-- SQLAlchemy (async)
+- Python 3.11 and FastAPI
+- PostgreSQL 16, SQLAlchemy 2, and Alembic
 - Redis 7
-- RabbitMQ
+- RabbitMQ and `aio-pika`
 - Meilisearch
 - APScheduler
-- JWT (python-jose)
-- SlowAPI
+- Docker Compose
 
-# 📦 Project Structure
+## Project structure
 
+```text
 app/
-- api/                    HTTP routes
-- core/                   config & settings
-- database.py            DB session
-- user/                  auth & identity
-- book/                  catalog domain
-- edition/               book editions
-- order/                 order processing
-- borrow/                borrowing system
-- transaction/           payments
-- analytics/             metrics
-- search/                Meilisearch integration
-- broker/                Redis + RabbitMQ adapters
-- workers/               background workers
-- outbox/                event publishing
-- exceptions/           domain errors
-- dependency_injection/  DI container
+├── api/                    API router composition
+├── book/                   Catalog domain
+├── borrow/                 Borrowing and waitlist workflows
+├── edition/                Inventory and edition management
+├── order/                  Order lifecycle
+├── transaction/            Wallet operations and audit records
+├── user/                   Authentication and identity
+├── outbox/                 Transactional event publication
+├── workers/                Consumers and scheduled jobs
+├── search/                 Meilisearch read model
+├── analytics/              Business reports
+├── dependency_injection/   Dependency providers
+└── core/                   Configuration, security, and database
+```
 
-# ⚙️ Getting Started
+## Run with Docker
 
-## 1. Clone repository
-git clone https://github.com/<your-org>/bookshop.git  
-cd bookshop  
+Requirements: Docker with the Compose plugin.
 
-## 2. Environment setup
-cp .env.example .env  
+```bash
+git clone https://github.com/alirezamoradkhani/bookshop.git
+cd bookshop
+cp .env.example .env
+docker compose up --build
+```
 
-Required variables:
-DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/bookshop  
-REDIS_URL=redis://redis:6379/0  
-RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/  
-MEILI_URL=http://meilisearch:7700  
-MEILI_MASTER_KEY=secret  
-JWT_SECRET=super-secret  
-DEBUG=true  
+The stack starts the API, PostgreSQL, Redis, RabbitMQ, Meilisearch, the outbox
+publisher, event consumers, and scheduled jobs.
 
-## 3. Run with Docker
-docker compose up --build -d  
+Useful endpoints:
 
-Includes:
-- FastAPI
-- PostgreSQL
-- Redis
-- RabbitMQ
-- Meilisearch
-- Workers
+| Service | URL |
+| --- | --- |
+| API | <http://localhost:8000> |
+| Swagger UI | <http://localhost:8000/docs> |
+| ReDoc | <http://localhost:8000/redoc> |
+| Health check | <http://localhost:8000/health> |
+| RabbitMQ management | <http://localhost:15672> |
+| Meilisearch | <http://localhost:7700> |
 
-## 3a. Run locally without Docker
+The values in `.env.example` are development-only placeholders. Replace every
+secret before using the application outside a local environment.
 
-Install dependencies into a Python 3.11 virtual environment, then provide reachable PostgreSQL, Redis, RabbitMQ, and Meilisearch URLs in `.env`:
+## Run locally
+
+Use Python 3.11 and provide reachable PostgreSQL, Redis, RabbitMQ, and
+Meilisearch instances in `.env`.
 
 ```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 alembic upgrade head
 python -m uvicorn app.main:app --reload
 ```
 
-The API exposes `GET /health` for a process-level health check. Workers are started separately with `python -m app.workers.outbox_worker`, `python -m app.workers.start_consumers`, and `python -m app.workers.scheduler_worker` when their backing services are available.
+Start workers in separate terminals when their backing services are available:
 
-## 4. Migrations
-alembic upgrade head  
+```powershell
+python -m app.workers.outbox_worker
+python -m app.workers.start_consumers
+python -m app.workers.scheduler_worker
+```
 
-## 5. API
-http://localhost:8000  
-/docs  
-/redoc  
+## Run tests
 
-# 🧵 Workers
+After installing the dependencies and configuring `.env`:
 
-- Outbox Worker → publish events  
-- Consumer Workers → process domain events  
-- Scheduler Worker → periodic tasks  
+```bash
+python -m unittest discover -s tests -v
+```
 
-Goals:
-- idempotent processing
-- retry safety
-- isolation of failures
+The current test suite covers authentication helpers, financial invariants,
+order creation, borrowing rules, inventory mutation, event creation, search
+helpers, and idempotency locking. Database and broker integration coverage is a
+planned next step.
 
-# 🔐 Security
+## Reliability decisions
 
-- JWT authentication
-- Password hashing
-- OTP via Redis
-- Rate limiting
-- Idempotency keys
+### Transactional outbox
 
-# 🔎 Search System (Meilisearch)
+Business changes and outgoing events are persisted in the same PostgreSQL
+transaction. This avoids losing an event after committing domain state.
 
-- Full-text search
-- Typo tolerance
-- Fast filtering
-- Near real-time indexing (<1s)
+### Idempotency
 
-# 📈 Highlights
+Redis-backed locks and cached results protect retryable commands from duplicate
+execution. Lock release verifies ownership so one request cannot release
+another request's lock.
 
-- Event-driven architecture
-- Outbox pattern reliability
-- CQRS-style read model
-- Async-first design
-- Modular monolith structure
+### Database invariants
 
-# 🚀 Future Improvements
+Database constraints protect non-negative wallet balances and inventory.
+Service-level checks provide useful domain errors, while database constraints
+remain the final safety boundary.
 
-- Payment gateway integration
-- OpenTelemetry tracing
-- Prometheus + Grafana
-- Kafka migration
-- Recommendation system
-- Advanced search ranking
+### Search as a read model
 
-# 🤝 Contribution
+PostgreSQL remains the source of truth. Meilisearch is updated asynchronously
+and can be rebuilt from domain data when required.
 
-- Fork repo
-- Create branch
-- Follow conventional commits
-- Add tests
-- Submit PR
+## Current limitations
 
-# 📄 License
+This is an actively developed portfolio system. Before production use it still
+needs broader integration testing, secret management, tracing and metrics,
+backup and recovery procedures, container hardening, and a real deployment
+environment.
 
-MIT or project-defined license
+## Roadmap
 
-# 🧠 Final Note
+- PostgreSQL, Redis, and RabbitMQ integration tests
+- Concurrency tests for inventory and wallet updates
+- OpenTelemetry tracing and Prometheus metrics
+- Production container configuration
+- Load testing with published latency results
+- Payment provider integration
 
-Designed as a real-world backend system focused on:
-- reliability
-- scalability
-- clean architecture
-- event-driven consistency
+## Documentation
 
-## Product documentation
+- [`docs/PRODUCT_BUSINESS_PLAN.md`](docs/PRODUCT_BUSINESS_PLAN.md) — product model and launch plan
+- [`docs/CUSTOMER_JOURNEYS.md`](docs/CUSTOMER_JOURNEYS.md) — end-to-end acceptance criteria
+- [`docs/TESTING.md`](docs/TESTING.md) — testing strategy
+- [`docs/PRODUCTION_REFACTOR_PLAN.md`](docs/PRODUCTION_REFACTOR_PLAN.md) — hardening plan
 
-See `docs/PRODUCT_BUSINESS_PLAN.md` for the business model and launch plan, `docs/CUSTOMER_JOURNEYS.md` for end-to-end acceptance criteria, and `docs/USABILITY_BACKLOG.md` for the prioritized product backlog.
+## Author
+
+**Alireza Moradkhani** — Backend developer focused on Python, FastAPI,
+PostgreSQL, asynchronous systems, and reliability engineering.
+
+GitHub: <https://github.com/alirezamoradkhani>
+
+## License
+
+Released under the [MIT License](LICENSE).
