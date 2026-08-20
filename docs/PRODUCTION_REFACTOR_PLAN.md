@@ -77,3 +77,10 @@
 - Kept remaining distributed-consumer implementation and full integration tests as Phase 2 work because they require service-backed verification.
 
 Product scope and customer acceptance criteria are defined in `docs/PRODUCT_BUSINESS_PLAN.md` and `docs/CUSTOMER_JOURNEYS.md`; the implementation backlog is in `docs/USABILITY_BACKLOG.md`.
+
+## Additional code hardening
+
+- Idempotency keys are scoped by operation/user and Redis lock release verifies ownership.
+- Wallet, checkout, borrowing, and return mutations use row locks; database checks reject negative money and inventory values.
+- Synchronous search SDK calls are moved off the async event loop.
+- Registered event consumers validate referenced records instead of silently acknowledging `pass` handlers, and nested worker transactions were removed.
