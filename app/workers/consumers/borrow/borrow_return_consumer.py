@@ -44,6 +44,10 @@ class BorrowReturnedConsumer(BaseConsumer):
         else:
             days = 30
 
+        edition = await uow.edition.get_by_id(waitlist.edition_id)
+        if edition is None or edition.amount < 1:
+            return
+
         due_at = now + timedelta(days=days)
 
         borrow = Borrow(
@@ -54,19 +58,14 @@ class BorrowReturnedConsumer(BaseConsumer):
         )
 
         await uow.borrow.create(new_borrow=borrow)
+        await uow.edition.update_amount(edition, edition.amount - 1)
 
         await uow.waitlist.delete(waitlist)
 
 
     async def process(self, event: dict, uow:UnitOfWork):
-
-        async with uow:
-
-            edition_id = event["edition_id"]
-
-            waitlist = await self.get_qualified_waitlist(uow, edition_id)
-
-            if not waitlist:
-                return
-
-            await self.give_book(uow, waitlist)
+        edition_id = event["edition_id"]
+        waitlist = await self.get_qualified_waitlist(uow, edition_id)
+        if not waitlist:
+            return
+        await self.give_book(uow, waitlist)

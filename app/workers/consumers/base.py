@@ -1,6 +1,8 @@
 from typing import Type
+import logging
 from app.dependency_injection.container import Container
 container = Container()
+logger = logging.getLogger(__name__)
 
 class BaseConsumer:
 
@@ -27,4 +29,8 @@ class BaseConsumer:
         event: dict,
         error: Exception,
     ):
-        print(f"consumer error: {error}", flush=True)
+        logger.error(
+            "Consumer failed for event %s",
+            event.get("event_type"),
+            exc_info=(type(error), error, error.__traceback__),
+        )

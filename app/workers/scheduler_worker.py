@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler # type: ignore
 
@@ -9,6 +10,7 @@ from app.workers.tasks import (
 )
 
 scheduler = AsyncIOScheduler()
+logger = logging.getLogger(__name__)
 
 
 async def main():
@@ -33,12 +35,12 @@ async def main():
         minutes=2,
         misfire_grace_time=30,
     )
-    print("Schaduler created.",flush=True)
+    logger.info("Scheduler created")
 
 
     scheduler.start()
 
-    print("Scheduler started...",flush=True)
+    logger.info("Scheduler started")
 
     await asyncio.Event().wait()
 
