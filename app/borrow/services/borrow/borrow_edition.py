@@ -5,6 +5,9 @@ from app.exceptions.models.user import InvalidTokenUser,OnlyUserHavePrimition,Pl
 from app.exceptions.models.edition import EditionNotFound, EditionOutOfStock
 
 from app.core.unit_of_work import UnitOfWork
+from app.events.borrow.borrow_events import BorrowCreatedEvent
+from app.events.base import event_to_payload
+from app.outbox.model import OutboxEvent
 
 async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
     async with uow:
@@ -31,7 +34,16 @@ async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
         due_at = now + timedelta(days=day)
         new_borrow = model.Borrow(user_id=current_user.id,edition_id=edition.id,borrowed_at=now,due_at=due_at)
         await uow.borrow.create(new_borrow=new_borrow)
+        await uow.flush()
         amount = edition.amount
         await uow.edition.update_amount(edition=edition,new_amount=amount-1)
+        event = BorrowCreatedEvent(
+            borrow_id=new_borrow.id,
+            edition_id=edition.id,
+            user_id=current_user.id,
+        )
+        await uow.outbox.add(OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event),
+        ))
         return new_borrow
-        

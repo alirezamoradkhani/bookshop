@@ -48,10 +48,10 @@ async def mark_orderedition_as_done(uow_factory):
             if not authors:
                 continue
 
-            take = oe.price / len(authors)
+            base, remainder = divmod(oe.price, len(authors))
 
-            for author in authors:
-                wallet_updates.append((author.author_id, take))
+            for index, author in enumerate(authors):
+                wallet_updates.append((author.author_id, base + (1 if index < remainder else 0)))
 
         await uow.baseusers.many_increase_wallet(
             wallet_updates=wallet_updates

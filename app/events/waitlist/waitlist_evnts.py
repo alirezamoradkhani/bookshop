@@ -8,4 +8,4 @@ class WaitlistCreateEvent(BaseEvent):
     user_id: int 
 
     def __post_init__(self):
-        self.event_type = "WaitlistCreate"
+        self.event_type = "WaitlistCreated"

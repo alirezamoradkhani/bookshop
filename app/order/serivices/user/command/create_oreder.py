@@ -15,6 +15,10 @@ from app.exceptions.models.edition import (
 
 from app.exceptions.models.transaction import InsufficientFunds
 from app.order.schemas.outputs import OrderResponse
+from app.exceptions.models.order import DuplicateOrderEdition
+from app.events.order.order_events import OrderCreatedEvent
+from app.events.base import event_to_payload
+from app.outbox.model import OutboxEvent
 
 
 async def create_order(
@@ -24,8 +28,12 @@ async def create_order(
 ):
     async with uow:
 
+        if not edition_ids or len(edition_ids) != len(set(edition_ids)):
+            raise DuplicateOrderEdition
+
         current_user = await uow.baseusers.get_by_id(
-            user_id=token_data["user_id"]
+            user_id=token_data["user_id"],
+            for_update=True,
         )
 
         if current_user is None:
@@ -34,7 +42,7 @@ async def create_order(
         if current_user.role != Role.USER:
             raise OnlyUserHavePrimition
 
-        editions = await uow.edition.get_by_ids(edition_ids)
+        editions = await uow.edition.get_by_ids(edition_ids, for_update=True)
 
         edition_map = {e.id: e for e in editions}
 
@@ -85,5 +93,10 @@ async def create_order(
         ]
 
         await uow.orderedition.create_many(order_editions)
+        event = OrderCreatedEvent(order_id=new_order.id)
+        await uow.outbox.add(OutboxEvent(
+            event_type=event.event_type,
+            payload=event_to_payload(event),
+        ))
 
         return OrderResponse.model_validate(new_order)

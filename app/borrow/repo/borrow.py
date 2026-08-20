@@ -21,13 +21,11 @@ class Borrowpository:
         borrow.returned_at = return_time
 
     async def get_owerdue_by_date(self,now:datetime):
-        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = start + timedelta(days=1)
         result = await self.db.execute(
             select(model.Borrow)
-            .where(model.Borrow.due_at >= start
-                   ,model.Borrow.due_at < end
-                   ,model.Borrow.status == enums.BorrowStatus.ACTIVE)
+            .where(model.Borrow.due_at < now,
+                   model.Borrow.status == enums.BorrowStatus.ACTIVE,
+                   model.Borrow.is_overdue == False)
                    )
         return result.scalars().all()
     

@@ -6,25 +6,21 @@ async def publish_outbox_events(uow:UnitOfWork, broker:RedisBroker | RabbitMQBro
 
     processed_count = 0
 
-    async with uow:
+    events = await uow.outbox.get_unprocessed(limit=50)
 
-        events = await uow.outbox.get_unprocessed(limit=50)
+    for event in events:
+        try:
+            await broker.publish(
+                topic=event.event_type,
+                message=event.payload
+            )
 
-        for event in events:
-            try:
-                await broker.publish(
-                    topic=event.event_type,
-                    message=event.payload
-                )
+            event.processed = True
+            processed_count += 1
 
-                event.processed = True
-                processed_count += 1
-                print(f"published event {event.id} of type {event.event_type}", flush=True)
+        except Exception:
+            continue
 
-            except Exception as e:
-                print(f"publish failed {event.id}: {e}", flush=True)
-                continue
-
-        # await uow.commit()
+    await uow.commit()
 
     return processed_count

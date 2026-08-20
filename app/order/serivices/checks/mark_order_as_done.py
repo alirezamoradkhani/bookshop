@@ -30,9 +30,10 @@ async def mark_ordere_as_done(uow_factory):
                 ]
                 for item in items
             ):
-                to_update.append(order)
+                to_update.append(order.id)
 
-        await uow.order.many_update_state(
-            order_ids=order_ids,
-            new_state=enums.OrderState.DONE
-        )
+        if to_update:
+            await uow.order.many_update_state(
+                order_ids=to_update,
+                new_state=enums.OrderState.DONE
+            )
