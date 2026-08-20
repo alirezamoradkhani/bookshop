@@ -8,7 +8,6 @@ from app.dependency_injection.container import Container
 
 container = Container()
 
-print("[consumer] worker starting", flush=True)
 async def start_consumers():
 
     await container.init_resources()

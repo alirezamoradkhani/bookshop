@@ -104,3 +104,11 @@ class OnlyAdminPrimition(DomainException):
             message="Only Admins have primition",
             code="ONLY_ADMIN_HAVE_PRIMITION"
         )
+
+class InvalidRegistrationRole(DomainException):
+    status_code = 400
+    def __init__(self):
+        super().__init__(
+            message="Only user and author accounts can be registered",
+            code="INVALID_REGISTRATION_ROLE"
+        )

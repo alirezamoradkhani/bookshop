@@ -11,7 +11,7 @@ class BookRepository:
         return new_book
     
     async def get_by_id(self,id:int):
-        result = await self.db.execute(select(model.Book).where(model.Book.id == id))
+        result = await self.db.execute(select(model.Book).where(model.Book.id == id, model.Book.is_deleted == False))
         return result.scalar_one_or_none()
     
     async def get_by_external_id(self, external_provider: str, external_id: str):

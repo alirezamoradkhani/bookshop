@@ -7,13 +7,14 @@ class BaseUserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_id(self, user_id: int):
-        result = await self.db.execute(
-            select(model.BaseUser).where(
+    async def get_by_id(self, user_id: int, for_update: bool = False):
+        query = select(model.BaseUser).where(
                 model.BaseUser.id == user_id,
                 model.BaseUser.is_deleted == False
             )
-        )
+        if for_update:
+            query = query.with_for_update()
+        result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
     async def get_by_username(self, user_name: str):
@@ -65,7 +66,3 @@ class BaseUserRepository:
 
     async def decrease_wallet_amount(self,user:model.BaseUser,change:int):
         user.wallet_amount -= change
-
-    async def get_by_username(self,name:str):
-        result = await self.db.execute(select(model.BaseUser).where(model.BaseUser.username == name))
-        return result.scalar_one_or_none()
