@@ -6,8 +6,8 @@ from app.order.serivices.author.querys.get_orderedition import get_order_edition
 from app.order.serivices.author.command.accept_order_edition import accept_order_edition
 from app.order.serivices.author.command.reject_order_edition import reject_order_edition
 from app.order.serivices.admin.command.confirm_delivery_edition import confirm_delivery_to_courier
-from app.order.serivices.user.querys.get_orders import get_user_orders
-from app.order.schemas.outputs import OrderResponse
+from app.order.serivices.user.querys.get_orders import get_user_orders, get_order_details
+from app.order.schemas.outputs import OrderResponse, OrderDetailsResponse
 from app.Idempotency.dependency import get_idempotency_handler
 from app.Idempotency.get_idempotency_key import get_idempotency_key
 from app.ratelimiter.limiter import limiter
@@ -32,11 +32,17 @@ async def buy(request: Request, edition_ids: list[int] ,handeler = Depends(get_i
 async def Cancel_order(request: Request, order_id:int ,uow = Depends(Provide[Container.uow]),token_data = Depends(get_current_user)):
     return await cancel_order(uow=uow,token_data=token_data,order_id=order_id)
 
-@router.get("/user/")
+@router.get("/user/", response_model=list[OrderResponse])
 @limiter.limit("5/minute")
 @inject
 async def Get_order(request: Request, uow = Depends(Provide[Container.uow]),token_data = Depends(get_current_user)):
     return await get_user_orders(uow=uow,token_data=token_data)
+
+@router.get("/user/{order_id}", response_model=OrderDetailsResponse)
+@limiter.limit("5/minute")
+@inject
+async def Get_order_details(request: Request, order_id: int, uow = Depends(Provide[Container.uow]), token_data = Depends(get_current_user)):
+    return await get_order_details(uow=uow, token_data=token_data, order_id=order_id)
 
 @router.get("/author/")
 @limiter.limit("5/minute")

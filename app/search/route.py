@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter, Depends, Query
 from app.search.service.book.search_book import search_books
 from app.search.service.edition.search_edition import search_editions
 from dependency_injector.wiring import inject, Provide
@@ -11,11 +11,11 @@ router = APIRouter(prefix="/search", tags=["Search"])
 @router.get("/book")
 @inject
 async def search_book(
-    q: str,
+    q: str = Query(min_length=1, max_length=200),
     author_id: int | None = None,
     category: str | None = None,
-    page: int = 1,
-    size: int = 20,
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=20, ge=1, le=100),
     search_provider = Depends(Provide[Container.search_provider])
 ):
     return await search_books(
@@ -28,16 +28,16 @@ async def search_book(
 
 @router.get("/edition")
 @inject
-async def search_edition(q: str,
-    book_id=None,
-    category=None,
+async def search_edition(q: str = Query(min_length=1, max_length=200),
+    book_id: int | None = None,
+    category: str | None = None,
     available:bool | None=None,
     purchasable:bool | None=None,
-    min_price=None,
-    max_price=None,
+    min_price: int | None = Query(default=None, ge=0),
+    max_price: int | None = Query(default=None, ge=0),
     search_provider = Depends(Provide[Container.search_provider]),
-    page: int = 1,
-    size: int = 20
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=20, ge=1, le=100)
 ):
     return await search_editions(
         available=available,

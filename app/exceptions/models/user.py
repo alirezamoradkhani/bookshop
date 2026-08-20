@@ -105,6 +105,14 @@ class OnlyAdminPrimition(DomainException):
             code="ONLY_ADMIN_HAVE_PRIMITION"
         )
 
+class InvalidPlanChange(DomainException):
+    status_code = 400
+    def __init__(self):
+        super().__init__(
+            message="The selected plan must be higher than the current plan",
+            code="INVALID_PLAN_CHANGE"
+        )
+
 class InvalidRegistrationRole(DomainException):
     status_code = 400
     def __init__(self):
