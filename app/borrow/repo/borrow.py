@@ -10,8 +10,11 @@ class Borrowpository:
     async def create(self,new_borrow:model.Borrow):
         self.db.add(new_borrow)
 
-    async def get_by_id(self,borrow_id:int):
-        result = await self.db.execute(select(model.Borrow).where(model.Borrow.id == borrow_id))
+    async def get_by_id(self,borrow_id:int, for_update: bool = False):
+        query = select(model.Borrow).where(model.Borrow.id == borrow_id)
+        if for_update:
+            query = query.with_for_update()
+        result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
     async def get_by_user_id(self, user_id: int):

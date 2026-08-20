@@ -30,7 +30,7 @@ async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
             now = datetime.now(current_user.plan_expire.tzinfo or timezone.utc)
             if current_user.plan_expire <= now:
                 raise PlanPermissionDenied
-        edition = await uow.edition.get_by_id(edition_id=edition_id)
+        edition = await uow.edition.get_by_id(edition_id=edition_id, for_update=True)
         if edition is None:
             raise EditionNotFound
         if await uow.borrow.get_active_by_user_and_edition(current_user.id, edition.id):

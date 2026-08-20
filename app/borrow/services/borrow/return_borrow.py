@@ -17,7 +17,7 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
         if current_user.role != Role.USER:
             raise OnlyUserHavePrimition
         
-        borrow = await uow.borrow.get_by_id(borrow_id=borrow_id)
+        borrow = await uow.borrow.get_by_id(borrow_id=borrow_id, for_update=True)
         if borrow is None:
             raise BorrowNotFound
         if borrow.user_id != current_user.id:

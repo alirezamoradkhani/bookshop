@@ -11,7 +11,12 @@ class OutboxRepository:
         self.db.add(event)
 
     async def get_unprocessed(self,limit:int):
-        result = await self.db.execute(
-            select(OutboxEvent).where(OutboxEvent.processed == False).limit(limit=limit)
+        query = (
+            select(OutboxEvent)
+            .where(OutboxEvent.processed == False)
+            .order_by(OutboxEvent.id)
+            .limit(limit)
+            .with_for_update(skip_locked=True)
         )
+        result = await self.db.execute(query)
         return result.scalars().all()

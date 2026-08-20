@@ -11,7 +11,7 @@ async def withdraw(uow:UnitOfWork,amount:int,token_data: dict):
     if amount <= 0:
         raise InvalidAmount
     async with uow:
-        current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
+        current_user = await uow.baseusers.get_by_id(user_id=token_data["user_id"], for_update=True)
         if current_user is None:
             raise InvalidTokenUser
         if current_user.wallet_amount < amount:

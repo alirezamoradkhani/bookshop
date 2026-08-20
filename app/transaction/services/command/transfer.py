@@ -12,10 +12,13 @@ async def transfer(uow:UnitOfWork,amount:int,token_data: dict,reciver_id :int):
     if amount <= 0:
         raise InvalidAmount
     async with uow:
-        current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
+        user_ids = sorted({token_data["user_id"], reciver_id})
+        users = await uow.baseusers.get_by_ids(user_ids, for_update=True)
+        users_by_id = {user.id: user for user in users}
+        current_user = users_by_id.get(token_data["user_id"])
         if current_user is None:
             raise InvalidTokenUser
-        reciver = await uow.baseusers.get_by_id(user_id= reciver_id)
+        reciver = users_by_id.get(reciver_id)
         if reciver is None:
             raise ReciverNotFound
         if current_user.id == reciver.id or current_user.wallet_amount < amount:

@@ -17,6 +17,16 @@ class BaseUserRepository:
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
+    async def get_by_ids(self, user_ids: list[int], for_update: bool = False):
+        query = select(model.BaseUser).where(
+            model.BaseUser.id.in_(user_ids),
+            model.BaseUser.is_deleted == False,
+        )
+        if for_update:
+            query = query.with_for_update()
+        result = await self.db.execute(query)
+        return result.scalars().all()
+
     async def get_by_username(self, user_name: str):
         result = await self.db.execute(
             select(model.BaseUser).where(
