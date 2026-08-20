@@ -2,7 +2,7 @@ from app.core.unit_of_work import UnitOfWork
 from app.user.models.enums import Role
 from app.order.models import enums
 from app.exceptions.models.user import InvalidTokenUser,OnlyAdminPrimition
-from app.exceptions.models.order_edition import OrderEditionNotFound
+from app.exceptions.models.order_edition import OrderEditionNotFound, InvalidChangeStatus
 
 
 async def confirm_delivery_to_courier(uow: UnitOfWork,order_edition_id: int,token_data: dict):
@@ -15,5 +15,7 @@ async def confirm_delivery_to_courier(uow: UnitOfWork,order_edition_id: int,toke
         order_edition = await uow.orderedition.get_by_order_edition_id(order_edition_id)
         if order_edition is None:
             raise OrderEditionNotFound
+        if order_edition.state != enums.OrderItemState.ACCEPTED:
+            raise InvalidChangeStatus
         await uow.orderedition.update_state(orderedition=order_edition,new_state=enums.OrderItemState.PREPARING)
         return order_edition

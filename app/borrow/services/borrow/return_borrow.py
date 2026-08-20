@@ -29,7 +29,8 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
         await uow.borrow.set_Return_time(borrow=borrow,return_time=now)
         edition = await uow.edition.get_by_id(edition_id=borrow.edition_id)
     
-        await uow.edition.update_amount(edition=edition,new_amount=edition.amount+1)
+        if edition is not None:
+            await uow.edition.update_amount(edition=edition,new_amount=edition.amount+1)
         event = BorrowReturnedEvent(
             edition_id=borrow.edition_id,
             returned_by=current_user.id

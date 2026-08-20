@@ -1,7 +1,7 @@
 from app.user.models.enums import Role,UserPlan
 from app.borrow.models.model import Waitlist
 from app.core.unit_of_work import UnitOfWork
-from datetime import datetime
+from datetime import datetime, timezone
 from app.exceptions.models.user import InvalidTokenUser,OnlyUserHavePrimition,PlanPermissionDenied
 from app.exceptions.models.edition import EditionNotFound,EditionOutOfStock
 from app.exceptions.models.wait_list import AlreadyInWaitList
@@ -17,6 +17,10 @@ async def add_to_wait_list(uow:UnitOfWork,token_data:dict,edition_id):
             raise InvalidTokenUser
         if current_user.role != Role.USER:
             raise OnlyUserHavePrimition
+        if current_user.plan_expire is not None:
+            now = datetime.now(current_user.plan_expire.tzinfo or timezone.utc)
+            if current_user.plan_expire <= now:
+                raise PlanPermissionDenied
         edition = await uow.edition.get_by_id(edition_id=edition_id)
         if edition is None:
             raise EditionNotFound

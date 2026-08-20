@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from app.borrow.models import model, enums
-from datetime import datetime,timedelta
+from datetime import datetime
 
 class Borrowpository:
     def __init__(self, db: AsyncSession):
@@ -12,6 +12,24 @@ class Borrowpository:
 
     async def get_by_id(self,borrow_id:int):
         result = await self.db.execute(select(model.Borrow).where(model.Borrow.id == borrow_id))
+        return result.scalar_one_or_none()
+
+    async def get_by_user_id(self, user_id: int):
+        result = await self.db.execute(
+            select(model.Borrow)
+            .where(model.Borrow.user_id == user_id)
+            .order_by(model.Borrow.borrowed_at.desc())
+        )
+        return result.scalars().all()
+
+    async def get_active_by_user_and_edition(self, user_id: int, edition_id: int):
+        result = await self.db.execute(
+            select(model.Borrow).where(
+                model.Borrow.user_id == user_id,
+                model.Borrow.edition_id == edition_id,
+                model.Borrow.status == enums.BorrowStatus.ACTIVE,
+            )
+        )
         return result.scalar_one_or_none()
 
     async def update_status(self,borrow:model.Borrow,new_status:enums.BorrowStatus):

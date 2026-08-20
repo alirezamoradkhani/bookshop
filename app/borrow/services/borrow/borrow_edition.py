@@ -1,13 +1,23 @@
 import app.borrow.models.model as model
 from app.user.models.enums import Role,UserPlan
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.exceptions.models.user import InvalidTokenUser,OnlyUserHavePrimition,PlanPermissionDenied
+from app.exceptions.models.borrow import ActiveBorrowExists
 from app.exceptions.models.edition import EditionNotFound, EditionOutOfStock
 
 from app.core.unit_of_work import UnitOfWork
 from app.events.borrow.borrow_events import BorrowCreatedEvent
 from app.events.base import event_to_payload
 from app.outbox.model import OutboxEvent
+
+async def get_user_borrows(uow: UnitOfWork, token_data: dict):
+    async with uow:
+        current_user = await uow.baseusers.get_by_id(user_id=token_data["user_id"])
+        if current_user is None:
+            raise InvalidTokenUser
+        if current_user.role != Role.USER:
+            raise OnlyUserHavePrimition
+        return await uow.borrow.get_by_user_id(current_user.id)
 
 async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
     async with uow:
@@ -16,9 +26,15 @@ async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
             raise InvalidTokenUser
         if current_user.role != Role.USER:
             raise OnlyUserHavePrimition
+        if current_user.plan_expire is not None:
+            now = datetime.now(current_user.plan_expire.tzinfo or timezone.utc)
+            if current_user.plan_expire <= now:
+                raise PlanPermissionDenied
         edition = await uow.edition.get_by_id(edition_id=edition_id)
         if edition is None:
             raise EditionNotFound
+        if await uow.borrow.get_active_by_user_and_edition(current_user.id, edition.id):
+            raise ActiveBorrowExists
         if edition.amount < 1:
             raise EditionOutOfStock
         plan = await uow.user.get_plan_by_id(current_user.id)

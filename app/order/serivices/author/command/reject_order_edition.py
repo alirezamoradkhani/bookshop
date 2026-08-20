@@ -22,6 +22,8 @@ async def reject_order_edition(uow:UnitOfWork,order_edition_id: int, token_data:
             raise InvalidChangeStatus
         if current_user.role == Role.AUTHOR:
             edition = await uow.edition.get_by_id(order_edition.edition_id)
+            if edition is None:
+                raise OrderEditionNotFound
             book_author = await uow.bookauthor.get_by_authorid_and_bookid(author_id=current_user.id,book_id=edition.book_id)
             if book_author is None:
                 raise UserPermissionDenied
