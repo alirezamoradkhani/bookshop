@@ -136,6 +136,20 @@ Includes:
 - Meilisearch
 - Workers
 
+## 3a. Run locally without Docker
+
+Install dependencies into a Python 3.11 virtual environment, then provide reachable PostgreSQL, Redis, RabbitMQ, and Meilisearch URLs in `.env`:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+alembic upgrade head
+python -m uvicorn app.main:app --reload
+```
+
+The API exposes `GET /health` for a process-level health check. Workers are started separately with `python -m app.workers.outbox_worker`, `python -m app.workers.start_consumers`, and `python -m app.workers.scheduler_worker` when their backing services are available.
+
 ## 4. Migrations
 alembic upgrade head  
 
