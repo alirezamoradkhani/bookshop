@@ -220,3 +220,7 @@ Designed as a real-world backend system focused on:
 - scalability
 - clean architecture
 - event-driven consistency
+
+## Product documentation
+
+See `docs/PRODUCT_BUSINESS_PLAN.md` for the business model and launch plan, `docs/CUSTOMER_JOURNEYS.md` for end-to-end acceptance criteria, and `docs/USABILITY_BACKLOG.md` for the prioritized product backlog.

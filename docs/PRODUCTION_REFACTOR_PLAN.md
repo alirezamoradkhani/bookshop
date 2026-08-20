@@ -75,3 +75,5 @@
 - Fixed order completion selection and integer author payout distribution.
 - Added waitlist uniqueness migration, safer settings/database pools, `/health`, generic error logging, and removed OTP/consumer import-time prints.
 - Kept remaining distributed-consumer implementation and full integration tests as Phase 2 work because they require service-backed verification.
+
+Product scope and customer acceptance criteria are defined in `docs/PRODUCT_BUSINESS_PLAN.md` and `docs/CUSTOMER_JOURNEYS.md`; the implementation backlog is in `docs/USABILITY_BACKLOG.md`.
