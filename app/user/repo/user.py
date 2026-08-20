@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from app.user.models import model, enums
-from datetime import datetime,timedelta
+from datetime import datetime
 
 class UserRepository:
     def __init__(self, db: AsyncSession):
@@ -38,12 +38,9 @@ class UserRepository:
         return result.scalar_one_or_none()
     
     async def get_plan_by_exp_date(self,now:datetime):
-        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = start + timedelta(days=1)
         result = await self.db.execute(
             select(model.User)
-            .where(model.User.plan_expire >= start
-                   ,model.User.plan_expire < end
-                   ,model.User.plan != enums.UserPlan.BRONZE)
+            .where(model.User.plan_expire < now,
+                   model.User.plan != enums.UserPlan.BRONZE)
                    )
-        return result
+        return result.scalars().all()

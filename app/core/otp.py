@@ -12,7 +12,7 @@ container = Container()
 redis_client = container.redis()
 
 async def send_otp(otp):
-    print("otp: ", otp)
+    return None
 
 async def create_otp(email: str):
     otp = str(random.randint(100000, 999999))

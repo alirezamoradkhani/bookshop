@@ -1,4 +1,5 @@
 from app.search.provider.base import SearchProvider
+import asyncio
 
 
 class MeiliSearchProvider(SearchProvider):
@@ -14,16 +15,18 @@ class MeiliSearchProvider(SearchProvider):
 
         filter_expr = self._build_filters(filters)
 
-        result = index.search(query, {
-        "filter": filter_expr
-    })
+        result = await asyncio.to_thread(
+            index.search,
+            query,
+            {"filter": filter_expr},
+        )
 
         return result["hits"]
 
     async def index(self, index_name: str, doc):
         index = self.client.index(index_name)
-        index.add_documents([doc])
+        await asyncio.to_thread(index.add_documents, [doc])
 
     async def delete(self, index_name: str, doc_id: str):
         index = self.client.index(index_name)
-        index.delete_document(doc_id)
+        await asyncio.to_thread(index.delete_document, doc_id)

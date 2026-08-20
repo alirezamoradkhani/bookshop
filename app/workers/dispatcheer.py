@@ -1,23 +1,22 @@
 # app/workers/dispatcher.py
 
 import json
+import logging
 from app.workers.registry import CONSUMER_REGISTRY
 
 
 MAX_RETRY = 3
+logger = logging.getLogger(__name__)
 
 
 async def dispatch_message(message, broker, uow_factory):
-    print("[dispatcher] started", flush=True)
-
     retry = int((message.headers or {}).get("retry", 0))
-    print(f"[dispatcher] retry={retry}", flush=True)
 
     try:
         event = json.loads(message.body)
 
         event_type = event.get("event_type")
-        print(f"[dispatcher] event={event_type}", flush=True)
+        logger.info("Dispatching event %s", event_type)
 
         consumer_cls = CONSUMER_REGISTRY.get(event_type)
 
@@ -26,19 +25,16 @@ async def dispatch_message(message, broker, uow_factory):
             return
 
         consumer = consumer_cls()
-        print("[dispatcher] before uow", flush=True)
-
         async with uow_factory() as uow:
             await consumer.process(event, uow)
 
-        print("[dispatcher] after uow", flush=True)
         await message.ack()
         
 
-    except Exception as e:
+    except Exception:
 
         retry += 1
-        print(f"[consumer] error={e}, retry={retry}", flush=True)
+        logger.exception("Consumer failed; retry=%s", retry)
 
         try:
             if retry < MAX_RETRY:
@@ -48,6 +44,6 @@ async def dispatch_message(message, broker, uow_factory):
 
             await message.ack()
 
-        except Exception as broker_error:
-            print(f"[broker] error={broker_error}", flush=True)
+        except Exception:
+            logger.exception("Broker retry handling failed")
             await message.nack(requeue=True)

@@ -30,7 +30,7 @@ class UnitOfWork:
         self.editionlanguage = EditionLanguageRepository(db)
         self.order = OrderRepository(db)
         self.orderedition = OrderEditionRepository(db)
-        self.admin = AdminRepository
+        self.admin = AdminRepository(db)
         self.transaction = TransactionRepository(db)
         self.borrow = Borrowpository(db)
         self.waitlist = Waitlistpository(db)

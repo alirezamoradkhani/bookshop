@@ -52,13 +52,10 @@ class OrderEditionRepository:
         return result.scalars().all()
     
     async def get_by_last_modify_and_state(self,date:datetime,state:enums.OrderItemState):
-        start = date.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = start + timedelta(days=1)
         result = await self.db.execute(select(
             model.OrderEdition)
-            .where(model.OrderEdition.last_modify >= start
-                   ,model.OrderEdition.last_modify < end
-                   ,model.OrderEdition.state == state))
+            .where(model.OrderEdition.last_modify < date,
+                   model.OrderEdition.state == state))
         return result.scalars().all()
     
     async def get_orderedition_by_list_of_edition(self,editions:list[Edition]):

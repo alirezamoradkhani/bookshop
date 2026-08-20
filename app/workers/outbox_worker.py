@@ -1,12 +1,14 @@
 # app/workers/outbox_worker.py
 
 import asyncio
+import logging
 
 from app.outbox.publisher import publish_outbox_events
 from app.dependency_injection.container import Container
 
 
 container = Container()
+logger = logging.getLogger(__name__)
 
 async def main():
     await container.init_resources()
@@ -21,8 +23,8 @@ async def main():
                 await publish_outbox_events(uow, rabbit)
                 
 
-        except Exception as e:
-            print(f"[outbox] error: {e}", flush=True)
+        except Exception:
+            logger.exception("Outbox worker iteration failed")
 
         await asyncio.sleep(2)
 

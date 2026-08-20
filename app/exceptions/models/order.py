@@ -35,4 +35,12 @@ class InvalidOrderItemState(DomainException):
             code="INVALID_ORDER_ITEM_STATE"
         )
 
+class DuplicateOrderEdition(DomainException):
+    status_code = 400
+    def __init__(self):
+        super().__init__(
+            message="An edition may only appear once in an order",
+            code="DUPLICATE_ORDER_EDITION"
+        )
+
 

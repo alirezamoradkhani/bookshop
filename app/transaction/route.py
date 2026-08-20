@@ -4,7 +4,7 @@ from app.transaction.services.command.deposit import deposit
 from app.transaction.services.command.transfer import transfer
 from app.transaction.services.querys.wallet_info import walletinfo
 from app.transaction.services.command.withdraw import withdraw
-from app.transaction.schemas.outputs import BaseUserResponse
+from app.transaction.schemas.outputs import BaseUserResponse, WalletResponse
 from app.Idempotency.dependency import get_idempotency_handler
 from app.Idempotency.get_idempotency_key import get_idempotency_key
 from app.ratelimiter.limiter import limiter
@@ -29,7 +29,7 @@ async def Transfer(request: Request, amount:int,reciver_id:int ,handeler = Depen
     # return await transfer(uow=uow,token_data=toke_data,amount=amount,reciver_id=reciver_id)
     return await handeler(key=idempotency_key,usecase=transfer,uow=uow,token_data=toke_data,amount=amount,reciver_id=reciver_id)
 
-@router.get("/info")
+@router.get("/info", response_model=WalletResponse)
 @limiter.limit("5/minute")
 @inject
 async def wallet_info(request: Request, uow = Depends(Provide[Container.uow]),toke_data = Depends(get_current_user)):

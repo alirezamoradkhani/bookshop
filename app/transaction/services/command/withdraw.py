@@ -5,13 +5,16 @@ from datetime import datetime
 from app.exceptions.models.user import InvalidTokenUser
 from app.exceptions.models.transaction import InsufficientFunds
 from app.user.schemas.outputs import BaseUserResponse
+from app.exceptions.models.edition import InvalidAmount
 
 async def withdraw(uow:UnitOfWork,amount:int,token_data: dict):
+    if amount <= 0:
+        raise InvalidAmount
     async with uow:
-        current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
+        current_user = await uow.baseusers.get_by_id(user_id=token_data["user_id"], for_update=True)
         if current_user is None:
             raise InvalidTokenUser
-        if current_user.wallet_amount <= amount:
+        if current_user.wallet_amount < amount:
             raise InsufficientFunds
         new_transaction = Transaction(user_id=current_user.id,amount=amount,date=datetime.utcnow(),type=TransactionType.WITHDRAWAL)
         await uow.transaction.create(new_transaction)

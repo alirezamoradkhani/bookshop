@@ -3,6 +3,9 @@ from app.user.models.enums import Role
 from app.order.models import enums
 from app.exceptions.models.user import InvalidTokenUser,OnlyAuthorPrimition,UserPermissionDenied
 from app.exceptions.models.order_edition import OrderEditionNotFound,InvalidChangeStatus
+from app.events.order.order_events import OrderItemRejectedEvent
+from app.events.base import event_to_payload
+from app.outbox.model import OutboxEvent
 
 
 async def reject_order_edition(uow:UnitOfWork,order_edition_id: int, token_data: dict):
@@ -19,6 +22,8 @@ async def reject_order_edition(uow:UnitOfWork,order_edition_id: int, token_data:
             raise InvalidChangeStatus
         if current_user.role == Role.AUTHOR:
             edition = await uow.edition.get_by_id(order_edition.edition_id)
+            if edition is None:
+                raise OrderEditionNotFound
             book_author = await uow.bookauthor.get_by_authorid_and_bookid(author_id=current_user.id,book_id=edition.book_id)
             if book_author is None:
                 raise UserPermissionDenied
@@ -27,4 +32,10 @@ async def reject_order_edition(uow:UnitOfWork,order_edition_id: int, token_data:
             await uow.order.update_final_price(order=order,change=edition.price)
             customer = await uow.baseusers.get_by_id(order.user_id)
             await uow.baseusers.increase_wallet_amount(user=customer,change=order_edition.price)
+            await uow.edition.update_amount(edition=edition,new_amount=edition.amount + 1)
+            event = OrderItemRejectedEvent(order_item_id=order_edition.order_edition_id)
+            await uow.outbox.add(OutboxEvent(
+                event_type=event.event_type,
+                payload=event_to_payload(event),
+            ))
         return order_edition

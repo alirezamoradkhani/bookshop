@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 class OrderResponse(BaseModel):
@@ -7,5 +7,16 @@ class OrderResponse(BaseModel):
     state: str
     final_price: int
     date: datetime
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderItemResponse(BaseModel):
+    order_edition_id: int
+    order_id: int
+    edition_id: int
+    state: str
+    last_modify: datetime
+    price: int
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderDetailsResponse(OrderResponse):
+    items: list[OrderItemResponse]

@@ -14,19 +14,22 @@ from app.dependency_injection.container import Container
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("/singin")
+@router.post("/signup/request-otp")
+@router.post("/singin", include_in_schema=False)
 @limiter.limit("5/minute")
 @inject
 async def Verify_email(request: Request, email: str,uow = Depends(Provide[Container.uow])):
     return await email_register(email=email,uow=uow)
     
-@router.post("/create", response_model= outputs.BaseUserResponse)
+@router.post("/signup", response_model= outputs.BaseUserResponse)
+@router.post("/create", response_model= outputs.BaseUserResponse, include_in_schema=False)
 @limiter.limit("5/minute")
 @inject
 async def Create_user(request: Request, user: inputs.UserCreate, otp:str, uow = Depends(Provide[Container.uow])):
     return await create_user(uow=uow,user=user,otp=otp)
 
-@router.post("/login")
+@router.post("/auth/login")
+@router.post("/login", include_in_schema=False)
 @limiter.limit("5/minute")
 @inject
 async def login_step_one(request: Request, user: inputs.UserLogin,uow = Depends(Provide[Container.uow])):

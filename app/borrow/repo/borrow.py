@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from app.borrow.models import model, enums
-from datetime import datetime,timedelta
+from datetime import datetime
 
 class Borrowpository:
     def __init__(self, db: AsyncSession):
@@ -10,8 +10,29 @@ class Borrowpository:
     async def create(self,new_borrow:model.Borrow):
         self.db.add(new_borrow)
 
-    async def get_by_id(self,borrow_id:int):
-        result = await self.db.execute(select(model.Borrow).where(model.Borrow.id == borrow_id))
+    async def get_by_id(self,borrow_id:int, for_update: bool = False):
+        query = select(model.Borrow).where(model.Borrow.id == borrow_id)
+        if for_update:
+            query = query.with_for_update()
+        result = await self.db.execute(query)
+        return result.scalar_one_or_none()
+
+    async def get_by_user_id(self, user_id: int):
+        result = await self.db.execute(
+            select(model.Borrow)
+            .where(model.Borrow.user_id == user_id)
+            .order_by(model.Borrow.borrowed_at.desc())
+        )
+        return result.scalars().all()
+
+    async def get_active_by_user_and_edition(self, user_id: int, edition_id: int):
+        result = await self.db.execute(
+            select(model.Borrow).where(
+                model.Borrow.user_id == user_id,
+                model.Borrow.edition_id == edition_id,
+                model.Borrow.status == enums.BorrowStatus.ACTIVE,
+            )
+        )
         return result.scalar_one_or_none()
 
     async def update_status(self,borrow:model.Borrow,new_status:enums.BorrowStatus):
@@ -21,13 +42,11 @@ class Borrowpository:
         borrow.returned_at = return_time
 
     async def get_owerdue_by_date(self,now:datetime):
-        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = start + timedelta(days=1)
         result = await self.db.execute(
             select(model.Borrow)
-            .where(model.Borrow.due_at >= start
-                   ,model.Borrow.due_at < end
-                   ,model.Borrow.status == enums.BorrowStatus.ACTIVE)
+            .where(model.Borrow.due_at < now,
+                   model.Borrow.status == enums.BorrowStatus.ACTIVE,
+                   model.Borrow.is_overdue == False)
                    )
         return result.scalars().all()
     

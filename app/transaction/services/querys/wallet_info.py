@@ -15,6 +15,7 @@ async def walletinfo(uow:UnitOfWork,token_data: dict):
                  ,"type" : t.type
                  ,"amount" : t.amount
                  ,"date" : t.date})
-        return {"walet_amount" : current_user.wallet_amount,
+        return {"wallet_amount": current_user.wallet_amount,
+                "walet_amount" : current_user.wallet_amount,
                 "transactions" : response_trransaction
                 }

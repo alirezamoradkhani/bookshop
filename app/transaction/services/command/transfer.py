@@ -5,17 +5,23 @@ from app.transaction.models.enums import TransactionType
 from datetime import datetime
 from app.exceptions.models.user import InvalidTokenUser
 from app.exceptions.models.transaction import ReciverNotFound, InsufficientFunds
+from app.exceptions.models.edition import InvalidAmount
 
 
 async def transfer(uow:UnitOfWork,amount:int,token_data: dict,reciver_id :int):
+    if amount <= 0:
+        raise InvalidAmount
     async with uow:
-        current_user = await uow.baseusers.get_by_id(user_id= token_data["user_id"])
+        user_ids = sorted({token_data["user_id"], reciver_id})
+        users = await uow.baseusers.get_by_ids(user_ids, for_update=True)
+        users_by_id = {user.id: user for user in users}
+        current_user = users_by_id.get(token_data["user_id"])
         if current_user is None:
             raise InvalidTokenUser
-        reciver = await uow.baseusers.get_by_id(user_id= reciver_id)
+        reciver = users_by_id.get(reciver_id)
         if reciver is None:
             raise ReciverNotFound
-        if current_user.wallet_amount <= amount:
+        if current_user.id == reciver.id or current_user.wallet_amount < amount:
             raise InsufficientFunds
         send_transaction = Transaction(user_id=current_user.id,amount=amount,date=datetime.utcnow(),type=TransactionType.SEND)
         await uow.transaction.create(send_transaction)

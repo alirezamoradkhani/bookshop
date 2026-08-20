@@ -2,7 +2,7 @@ from app.core.database import Base
 from app.borrow.models.enums import BorrowStatus
 from datetime import datetime
 from sqlalchemy.types import Enum
-from sqlalchemy import Integer,ForeignKey, DateTime,Boolean, text
+from sqlalchemy import Integer,ForeignKey, DateTime,Boolean, text, UniqueConstraint
 from sqlalchemy.orm import Mapped,mapped_column
 
 
@@ -24,6 +24,7 @@ class Borrow(Base):
 
 class Waitlist(Base):
     __tablename__ = "waitlist"
+    __table_args__ = (UniqueConstraint("user_id", "edition_id", name="uq_waitlist_user_edition"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 

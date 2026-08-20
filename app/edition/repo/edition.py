@@ -12,12 +12,18 @@ class EditionRepository:
     async def create_edition(self,new_edition: Edition):
         self.db.add(new_edition)
     
-    async def get_by_id(self,edition_id:int):
-        result = await self.db.execute(select(Edition).where(Edition.id == edition_id, Edition.is_deleted == False))
+    async def get_by_id(self,edition_id:int, for_update: bool = False):
+        query = select(Edition).where(Edition.id == edition_id, Edition.is_deleted == False)
+        if for_update:
+            query = query.with_for_update()
+        result = await self.db.execute(query)
         return result.scalar_one_or_none()
     
-    async def get_by_ids(self,edition_ids:list[int]):
-        result = await self.db.execute(select(Edition).where(Edition.id.in_(edition_ids), Edition.is_deleted == False))
+    async def get_by_ids(self,edition_ids:list[int], for_update: bool = False):
+        query = select(Edition).where(Edition.id.in_(edition_ids), Edition.is_deleted == False)
+        if for_update:
+            query = query.with_for_update()
+        result = await self.db.execute(query)
         return result.scalars().all()
 
     async def update_amount(self,edition:Edition ,new_amount:int):

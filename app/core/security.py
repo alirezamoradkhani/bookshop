@@ -5,12 +5,6 @@ from app.exceptions.models.user import InvalidTokenUser
 from passlib.context import CryptContext
 from app.core.setting import settings
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.dependency_injection.container import Container
-
-container = Container()
-
-redis_client = container.redis()
-
 bearer_scheme = HTTPBearer()
 
 SECRET_KEY = settings.jwt_secret

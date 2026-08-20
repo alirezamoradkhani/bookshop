@@ -20,7 +20,7 @@ class EditionIndexer:
             "description": edition.description,
             "price": edition.price,
             "amount": edition.amount,
-            "purchasable": edition.amount>=0 and not edition.is_deleted and not book.is_deleted,
+            "purchasable": edition.amount > 0 and not edition.is_deleted and not book.is_deleted,
             "book_id": book.id,
             "book_title": book.title,
             "book_author_names": [a.username for a in await self.uow.author.get_by_ids([b.author_id for b in await self.uow.bookauthor.get_by_book_id(book.id)])],

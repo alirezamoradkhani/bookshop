@@ -4,4 +4,6 @@ from app.workers.consumers.base import BaseConsumer
 class BorrowOverdueConsumer(BaseConsumer):
     event_type = "BorrowOverdue"
     async def process(self, event: dict, uow:UnitOfWork):
-        pass
+        borrow_id = event.get("borrow_id")
+        if borrow_id is None or await uow.borrow.get_by_id(borrow_id) is None:
+            raise ValueError(f"BorrowOverdue references missing borrow {borrow_id}")

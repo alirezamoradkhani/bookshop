@@ -10,7 +10,6 @@ async def login_by_user_pass(uow:UnitOfWork,user: inputs.UserLogin):
         user_in = await uow.baseusers.get_by_username(user.username)
         if user_in is None or not verify_password(user.password, user_in.password):
             raise InvalidCredentials
-        user_in = await uow.baseusers.get_by_username(name=user.username)
         token_data = {
         "user_id": user_in.id,
     }
