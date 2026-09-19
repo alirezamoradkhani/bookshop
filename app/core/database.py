@@ -1,10 +1,10 @@
 from pymongo import AsyncMongoClient
+from pymongo.asynchronous.database import AsyncDatabase
 
 from app.core.setting import settings
 
-client = AsyncMongoClient(settings.mongo_url)
-database = client[settings.mongo_database]
-
+client: AsyncMongoClient = AsyncMongoClient(settings.mongo_url)
+database: AsyncDatabase = client[settings.mongo_database]
 
 async def init_mongo() -> None:
     await database.command("ping")
