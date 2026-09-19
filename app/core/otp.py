@@ -12,7 +12,9 @@ container = Container()
 redis_client = container.redis()
 
 async def send_otp(otp):
-    return None
+    # Development delivery stub; intentionally independent of the log level.
+    if settings.debug:
+        print(f"[DEV OTP] {otp}", flush=True)
 
 async def create_otp(email: str):
     otp = str(random.randint(100000, 999999))
