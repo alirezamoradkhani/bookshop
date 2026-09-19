@@ -198,3 +198,13 @@ GitHub: <https://github.com/alirezamoradkhani>
 ## License
 
 Released under the [MIT License](LICENSE).
+
+## Console output
+
+Run `docker compose up --build` in the foreground to see application output
+(including development prints) and worker errors. Python output is unbuffered.
+Infrastructure services use `attach: false`, so MongoDB, RabbitMQ, Redis and
+Meilisearch logs are not mixed into that console. This hides their errors there
+too; logs are still stored and available with `docker compose logs --tail=100 mongo`
+(or the relevant service name). Mongo healthchecks run every 30 seconds, with
+5-second checks during startup.

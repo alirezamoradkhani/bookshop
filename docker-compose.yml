@@ -1,5 +1,7 @@
 services:
   mongo:
+    # Keep infrastructure logs available via docker compose logs, outside the app console.
+    attach: false
     image: mongo:8
     container_name: bookshop-mongo
     restart: always
@@ -11,12 +13,15 @@ services:
       - ./mongo.conf:/etc/mongod.conf:ro
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 })"]
-      interval: 30m
+      interval: 30s
       timeout: 5s
       retries: 10
-      start_period: 5s
+      start_period: 20s
+      start_interval: 5s
 
   redis:
+    # Keep infrastructure logs available via docker compose logs, outside the app console.
+    attach: false
     image: redis:7
     container_name: bookshop-redis
     restart: always
@@ -25,6 +30,8 @@ services:
       - "6380:6379"
 
   rabbitmq:
+    # Keep infrastructure logs available via docker compose logs, outside the app console.
+    attach: false
     image: rabbitmq:3-management
     container_name: bookshop-rabbitmq
     restart: always
@@ -35,6 +42,8 @@ services:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
 
   meilisearch:
+    # Keep infrastructure logs available via docker compose logs, outside the app console.
+    attach: false
     image: getmeili/meilisearch
     container_name: bookshop-meilisearch
     restart: always
@@ -66,6 +75,7 @@ services:
     environment:
       MONGO_URL: mongodb://mongo:27017
       MONGO_DATABASE: bookshop
+      PYTHONUNBUFFERED: "1"
     volumes:
       - .:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level error --no-access-log
@@ -86,6 +96,7 @@ services:
     environment:
       MONGO_URL: mongodb://mongo:27017
       MONGO_DATABASE: bookshop
+      PYTHONUNBUFFERED: "1"
     volumes:
       - .:/app
     command: python -m app.workers.start_consumers
@@ -106,6 +117,7 @@ services:
     environment:
       MONGO_URL: mongodb://mongo:27017
       MONGO_DATABASE: bookshop
+      PYTHONUNBUFFERED: "1"
     volumes:
       - .:/app
     command: python -m app.workers.outbox_worker
@@ -122,6 +134,7 @@ services:
     environment:
       MONGO_URL: mongodb://mongo:27017
       MONGO_DATABASE: bookshop
+      PYTHONUNBUFFERED: "1"
     volumes:
       - .:/app
     command: python -m app.workers.scheduler_worker
