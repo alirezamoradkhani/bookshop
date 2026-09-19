@@ -1,15 +1,12 @@
-from sqlalchemy import Column, Integer, String, JSON, DateTime, Boolean
+from dataclasses import dataclass
 from datetime import datetime
-from app.core.database import Base
+from typing import Any
 
-class OutboxEvent(Base):
-    __tablename__ = "outbox_events"
 
-    id = Column(Integer, primary_key=True)
-
-    event_type = Column(String, nullable=False)
-    payload = Column(JSON, nullable=False)
-
-    processed = Column(Boolean, default=False)
-
-    created_at = Column(DateTime, default=datetime.utcnow)
+@dataclass
+class OutboxEvent:
+    id: int | None = None
+    event_type: str = ""
+    payload: dict[str, Any] | None = None
+    processed: bool = False
+    created_at: datetime | None = None

@@ -1,27 +1,28 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: fastapi-postgres
+  mongo:
+    image: mongo:8
+    container_name: bookshop-mongo
     restart: always
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: mydb
     ports:
-      - "5433:5432"
+      - "27018:27017"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 })"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7
-    container_name: fastapi-redis
+    container_name: bookshop-redis
     restart: always
     ports:
       - "6380:6379"
-    
+
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: fastapi-rabbitmq
+    container_name: bookshop-rabbitmq
     restart: always
     ports:
       - "5672:5672"
@@ -29,7 +30,7 @@ services:
 
   meilisearch:
     image: getmeili/meilisearch
-    container_name: fastapi-meilisearch
+    container_name: bookshop-meilisearch
     restart: always
     ports:
       - "7700:7700"
@@ -40,74 +41,92 @@ services:
 
   app:
     build: .
-    container_name: fastapi-app
+    container_name: bookshop-app
     restart: always
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
-      - redis
-      - rabbitmq
-      - meilisearch
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      meilisearch:
+        condition: service_started
     env_file:
       - .env
-
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      MONGO_DATABASE: bookshop
     volumes:
       - .:/app
-
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-  
+
   consumer-worker:
     build: .
-    container_name: fastapi-consumer-worker
+    container_name: bookshop-consumer-worker
     restart: always
     depends_on:
-      - postgres
-      - redis
-      - rabbitmq
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      redis:
+        condition: service_started
     env_file:
       - .env
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      MONGO_DATABASE: bookshop
     volumes:
       - .:/app
     command: python -m app.workers.start_consumers
 
   outbox-worker:
     build: .
-    container_name: fastapi-outbox-worker
+    container_name: bookshop-outbox-worker
     restart: always
     depends_on:
-      - postgres
-      - redis
-      - rabbitmq
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      redis:
+        condition: service_started
     env_file:
       - .env
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      MONGO_DATABASE: bookshop
     volumes:
       - .:/app
     command: python -m app.workers.outbox_worker
 
   scheduler-worker:
     build: .
-    container_name: fastapi-scheduler-worker
+    container_name: bookshop-scheduler-worker
     restart: always
-
     depends_on:
-      - postgres
-
+      mongo:
+        condition: service_healthy
     env_file:
       - .env
-
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      MONGO_DATABASE: bookshop
     volumes:
       - .:/app
-
     command: python -m app.workers.scheduler_worker
 
   meili-init:
     build: .
+    depends_on:
+      meilisearch:
+        condition: service_started
     command: >
       sh -c "sleep 15 && python -m app.search.index_setup"
-    depends_on:
-      - meilisearch
 
 volumes:
-  pgdata:
+  mongo_data:
   meili_data:

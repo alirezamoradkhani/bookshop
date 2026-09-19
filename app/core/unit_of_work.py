@@ -1,25 +1,26 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.user.repo.baseuser import BaseUserRepository
-from app.user.repo.user import UserRepository
-from app.user.repo.author import AuthorRepository
-from app.user.repo.admin import AdminRepository
-from app.book.repo.book import BookRepository
-from app.book.repo.book_author import BookAuthorRepository
-from app.book.repo.book_category import BookCategoryRepository
-from app.edition.repo.edition import EditionRepository
-from app.edition.repo.edition_language import EditionLanguageRepository
-from app.order.repo.order import OrderRepository
-from app.order.repo.order_edition import OrderEditionRepository
-from app.transaction.repo.transaction import TransactionRepository
-from app.borrow.repo.borrow import Borrowpository
-from app.borrow.repo.waitlist import Waitlistpository
+from app.mongo.database import MongoContext
+from app.mongo.repositories import (
+    AdminRepository,
+    AuthorRepository,
+    BaseUserRepository,
+    BookAuthorRepository,
+    BookCategoryRepository,
+    BookRepository,
+    Borrowpository,
+    EditionLanguageRepository,
+    EditionRepository,
+    OrderEditionRepository,
+    OrderRepository,
+    OutboxRepository,
+    TransactionRepository,
+    UserRepository,
+    Waitlistpository,
+)
 
-from app.outbox.repo import OutboxRepository
 
 class UnitOfWork:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: MongoContext):
         self.db = db
-        
         self.baseusers = BaseUserRepository(db)
         self.user = UserRepository(db)
         self.author = AuthorRepository(db)
@@ -37,13 +38,11 @@ class UnitOfWork:
         self.outbox = OutboxRepository(db)
 
     async def __aenter__(self):
+        await self.db.__aenter__()
         return self
 
     async def __aexit__(self, exc_type, exc, tb):
-        if exc:
-            await self.rollback()
-        else:
-            await self.commit()
+        return await self.db.__aexit__(exc_type, exc, tb)
 
     async def commit(self):
         await self.db.commit()
@@ -52,6 +51,7 @@ class UnitOfWork:
         await self.db.rollback()
 
     async def refresh(self, obj):
-        await self.db.refresh(obj)
+        return obj
+
     async def flush(self):
         await self.db.flush()

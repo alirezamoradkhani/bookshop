@@ -1,34 +1,24 @@
-from app.core.database import Base
-from app.borrow.models.enums import BorrowStatus
+from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy.types import Enum
-from sqlalchemy import Integer,ForeignKey, DateTime,Boolean, text, UniqueConstraint
-from sqlalchemy.orm import Mapped,mapped_column
+
+from app.borrow.models.enums import BorrowStatus
 
 
+@dataclass
+class Borrow:
+    id: int | None = None
+    user_id: int = 0
+    edition_id: int = 0
+    status: BorrowStatus = BorrowStatus.ACTIVE
+    borrowed_at: datetime | None = None
+    due_at: datetime | None = None
+    returned_at: datetime | None = None
+    is_overdue: bool = False
 
-class Borrow(Base):
-    __tablename__ = "borrows"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"))
-
-    status: Mapped[BorrowStatus] = mapped_column(Enum(BorrowStatus),default= BorrowStatus.ACTIVE)
-
-    borrowed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    returned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    is_overdue: Mapped[bool] = mapped_column(Boolean,default=False,server_default=text("false"),nullable=False)
-
-class Waitlist(Base):
-    __tablename__ = "waitlist"
-    __table_args__ = (UniqueConstraint("user_id", "edition_id", name="uq_waitlist_user_edition"),)
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    edition_id: Mapped[int] = mapped_column(ForeignKey("editions.id"))
-
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+@dataclass
+class Waitlist:
+    id: int | None = None
+    user_id: int = 0
+    edition_id: int = 0
+    created_at: datetime | None = None

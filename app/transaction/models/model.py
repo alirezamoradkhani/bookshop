@@ -1,17 +1,13 @@
-from app.core.database import Base
-from app.transaction.models.enums import TransactionType
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, Integer
-from sqlalchemy.types import Enum
-from sqlalchemy import DateTime
+from dataclasses import dataclass
 from datetime import datetime
 
+from app.transaction.models.enums import TransactionType
 
-class Transaction(Base):
-    __tablename__ = "transactions"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("base_users.id"))
-    amount: Mapped[int] = mapped_column(Integer)
-    type: Mapped[TransactionType] = mapped_column(Enum(TransactionType))
-    date: Mapped[datetime] = mapped_column(DateTime)
+@dataclass
+class Transaction:
+    id: int | None = None
+    user_id: int = 0
+    amount: int = 0
+    type: TransactionType = TransactionType.DEPOSIT
+    date: datetime | None = None

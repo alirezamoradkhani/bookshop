@@ -1,24 +1,20 @@
-from app.core.database import Base
-from sqlalchemy import ForeignKey, Integer, String, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.types import Enum as Enum
+from dataclasses import dataclass
 
 
-class Edition(Base):
-    __tablename__ = "editions"
+@dataclass
+class Edition:
+    id: int | None = None
+    book_id: int = 0
+    price: int = 0
+    amount: int = 0
+    isbn: str | None = None
+    description: str | None = None
+    specefic_edition_title: str | None = None
+    is_deleted: bool = False
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"))
-    price: Mapped[int] = mapped_column(Integer)
-    amount: Mapped[int] = mapped_column(Integer, default=0)
-    isbn: Mapped[str] = mapped_column(String, nullable=True)
-    description: Mapped[str] = mapped_column(String, nullable=True)
-    specefic_edition_title : Mapped[str] = mapped_column(String, default= None)
-    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
-
-class EditionLanguage(Base):
-    __tablename__ = "editionlanguage"
-
-    edition_id: Mapped[int] = mapped_column(Integer,ForeignKey("editions.id"),primary_key=True)
-    language: Mapped[str] = mapped_column(String,primary_key=True)
+@dataclass
+class EditionLanguage:
+    id: int | None = None
+    edition_id: int = 0
+    language: str = ""

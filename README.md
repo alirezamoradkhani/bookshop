@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 An event-driven FastAPI backend for a digital bookshop. The project explores
-reliability patterns used in real backend systems: transactional outbox,
+reliability patterns used in real backend systems: outbox event publication,
 idempotent commands, asynchronous consumers, database-backed domain workflows,
 and a dedicated search read model.
 
@@ -15,15 +15,15 @@ and a dedicated search read model.
 Bookshop is a portfolio project focused on the engineering problems behind a
 non-trivial API—not only CRUD endpoints. It models purchasing, borrowing,
 inventory, wallet transactions, waitlists, search indexing, and asynchronous
-event processing while keeping PostgreSQL as the source of truth.
+event processing while keeping MongoDB as the source of truth.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
     Client --> API[FastAPI API]
-    API --> DB[(PostgreSQL)]
-    DB --> Outbox[(Outbox table)]
+    API --> DB[(MongoDB)]
+    DB --> Outbox[(Outbox collection)]
     Outbox --> Publisher[Outbox worker]
     Publisher --> RabbitMQ[RabbitMQ]
     RabbitMQ --> Consumers[Idempotent consumers]
@@ -32,7 +32,8 @@ flowchart LR
 ```
 
 The application is a modular monolith with background workers. A business
-transaction and its outgoing event are written together. The outbox worker
+transaction and its outgoing event can be written together when MongoDB transactions
+are enabled. The outbox worker
 then publishes committed events to RabbitMQ, where consumers update downstream
 workflows and the Meilisearch read model.
 
@@ -46,13 +47,13 @@ workflows and the Meilisearch read model.
 - RabbitMQ consumers for asynchronous workflows
 - Redis-backed idempotency, OTP storage, and rate limiting
 - Meilisearch full-text search with filtering and typo tolerance
-- Alembic migrations and database integrity constraints
+- MongoDB collections, references, and application-managed indexes
 - Analytics queries for sales, borrowing, users, and authors
 
 ## Technology
 
 - Python 3.11 and FastAPI
-- PostgreSQL 16, SQLAlchemy 2, and Alembic
+- MongoDB 8 and the official asynchronous PyMongo client
 - Redis 7
 - RabbitMQ and `aio-pika`
 - Meilisearch
@@ -89,7 +90,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-The stack starts the API, PostgreSQL, Redis, RabbitMQ, Meilisearch, the outbox
+The stack starts the API, MongoDB, Redis, RabbitMQ, Meilisearch, the outbox
 publisher, event consumers, and scheduled jobs.
 
 Useful endpoints:
@@ -108,7 +109,7 @@ secret before using the application outside a local environment.
 
 ## Run locally
 
-Use Python 3.11 and provide reachable PostgreSQL, Redis, RabbitMQ, and
+Use Python 3.11 and provide reachable MongoDB, Redis, RabbitMQ, and
 Meilisearch instances in `.env`.
 
 ```powershell
@@ -116,7 +117,6 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-alembic upgrade head
 python -m uvicorn app.main:app --reload
 ```
 
@@ -145,8 +145,9 @@ planned next step.
 
 ### Transactional outbox
 
-Business changes and outgoing events are persisted in the same PostgreSQL
-transaction. This avoids losing an event after committing domain state.
+Business changes and outgoing events can be persisted in the same MongoDB
+transaction when `MONGO_TRANSACTIONS=true` is configured on a replica set. The
+outbox worker otherwise provides at-least-once publication.
 
 ### Idempotency
 
@@ -156,13 +157,12 @@ another request's lock.
 
 ### Database invariants
 
-Database constraints protect non-negative wallet balances and inventory.
-Service-level checks provide useful domain errors, while database constraints
-remain the final safety boundary.
+Atomic update predicates and service-level checks protect wallet balances and
+inventory. MongoDB references are application-managed rather than SQL foreign keys.
 
 ### Search as a read model
 
-PostgreSQL remains the source of truth. Meilisearch is updated asynchronously
+MongoDB remains the source of truth. Meilisearch is updated asynchronously
 and can be rebuilt from domain data when required.
 
 ## Current limitations
@@ -174,7 +174,7 @@ environment.
 
 ## Roadmap
 
-- PostgreSQL, Redis, and RabbitMQ integration tests
+- MongoDB, Redis, and RabbitMQ integration tests
 - Concurrency tests for inventory and wallet updates
 - OpenTelemetry tracing and Prometheus metrics
 - Production container configuration
@@ -191,7 +191,7 @@ environment.
 ## Author
 
 **Alireza Moradkhani** — Backend developer focused on Python, FastAPI,
-PostgreSQL, asynchronous systems, and reliability engineering.
+MongoDB, asynchronous systems, and reliability engineering.
 
 GitHub: <https://github.com/alirezamoradkhani>
 

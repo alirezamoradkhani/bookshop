@@ -8,10 +8,13 @@ from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import logging
 from app.dependency_injection.container import Container
+from app.core.database import client, init_mongo
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -32,7 +35,18 @@ container.wire(
     ]
 )
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        await init_mongo()
+    except Exception as exc:
+        logger.warning("MongoDB is unavailable during startup: %s", exc)
+    yield
+    await client.close()
+
+
 app = FastAPI(
+    lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json"

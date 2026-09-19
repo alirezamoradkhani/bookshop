@@ -1,12 +1,1 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.user.models import model
-
-
-class AdminRepository:
-    def __init__(self, db: AsyncSession):
-        self.db = db
-    
-    async def create(self, id:int):
-        new_user = model.Admin(id=id)
-        self.db.add(new_user)
-        return new_user
+from app.mongo.repositories import AdminRepository

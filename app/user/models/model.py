@@ -1,56 +1,31 @@
-from sqlalchemy import ForeignKey, Integer, String, Boolean,DateTime
-from sqlalchemy.orm import Mapped, mapped_column
-from app.core.database import Base
-import app.user.models.enums as enum
-from sqlalchemy.types import Enum as sqlEnum
+from dataclasses import dataclass
 from datetime import datetime
 
+from app.user.models.enums import Role, UserPlan
 
 
-class BaseUser(Base):
-    __tablename__ = "base_users"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String)
-    email: Mapped[str] = mapped_column(String, unique=True)
-    password: Mapped[str] = mapped_column(String)
-
-    role: Mapped[enum.Role] = mapped_column(sqlEnum(enum.Role),nullable= False)
-    wallet_amount: Mapped[int] = mapped_column(Integer, default=0)
-
-    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-    __mapper_args__ = {
-        "polymorphic_on": role,
-        "polymorphic_identity": "base_user",
-    }
+@dataclass
+class BaseUser:
+    id: int | None = None
+    username: str = ""
+    email: str = ""
+    password: str = ""
+    role: Role = Role.USER
+    wallet_amount: int = 0
+    is_deleted: bool = False
 
 
+@dataclass
 class User(BaseUser):
-    __tablename__ = "users"
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
-    plan: Mapped[enum.UserPlan] = mapped_column(
-        sqlEnum(enum.UserPlan, name="plan_enum"),
-        default=enum.UserPlan.BRONZE,
-        nullable=False
-    )
-    plan_expire : Mapped[datetime] = mapped_column(DateTime(timezone=True),nullable=True)
-    __mapper_args__ = {
-        "polymorphic_identity": enum.Role.USER,
-    }
-    
+    plan: UserPlan = UserPlan.BRONZE
+    plan_expire: datetime | None = None
 
 
+@dataclass
 class Author(BaseUser):
-    __tablename__ = "authors"
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
-    __mapper_args__ = {
-        "polymorphic_identity": enum.Role.AUTHOR,
-    }
+    role: Role = Role.AUTHOR
 
 
+@dataclass
 class Admin(BaseUser):
-    __tablename__ = "admins"
-    id: Mapped[int] = mapped_column(ForeignKey("base_users.id"), primary_key=True)
-    __mapper_args__ = {
-        "polymorphic_identity": enum.Role.ADMIN,
-    }
+    role: Role = Role.ADMIN

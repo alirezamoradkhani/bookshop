@@ -1,30 +1,26 @@
-from sqlalchemy import ForeignKey, Integer, String, Boolean, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
-from app.core.database import Base
+from dataclasses import dataclass, field
 
-class Book(Base):
-    __tablename__ = "books"
-    __table_args__ = (
-        UniqueConstraint(
-            "external_provider",
-            "external_id"
-        ),
-    )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String)
-    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-    external_provider: Mapped[str] = mapped_column(String, nullable=True)
-    external_id: Mapped[str] = mapped_column(String, nullable=True)
+@dataclass
+class Book:
+    id: int | None = None
+    title: str = ""
+    is_deleted: bool = False
+    external_provider: str | None = None
+    external_id: str | None = None
+    author_ids: list[int] = field(default_factory=list)
+    categories: list[str] = field(default_factory=list)
 
-class BookAuthor(Base):
-    __tablename__ = "book_authors"
 
-    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), primary_key=True)
-    author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), primary_key=True)
+@dataclass
+class BookAuthor:
+    id: int | None = None
+    book_id: int = 0
+    author_id: int = 0
 
-class BookCategory(Base):
-    __tablename__ = "book_categorys"
-    
-    book_id : Mapped[int] = mapped_column(Integer,ForeignKey("books.id"),primary_key=True)
-    category : Mapped[str] = mapped_column(String,primary_key=True) 
+
+@dataclass
+class BookCategory:
+    id: int | None = None
+    book_id: int = 0
+    category: str = ""

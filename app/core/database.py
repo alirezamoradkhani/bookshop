@@ -1,19 +1,27 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import declarative_base
+from pymongo import AsyncMongoClient
+
 from app.core.setting import settings
-POSTGRES_DATABASE_URL = settings.database_url
-engine = create_async_engine(
-    POSTGRES_DATABASE_URL,
-    pool_pre_ping=True,
-    pool_recycle=1800,
-)
 
-SessionLocal = async_sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-    expire_on_commit= False
-)
+client = AsyncMongoClient(settings.mongo_url)
+database = client[settings.mongo_database]
 
 
-Base = declarative_base()
+async def init_mongo() -> None:
+    await database.command("ping")
+    await database.users.create_index("email", unique=True)
+    await database.users.create_index([("username", 1), ("is_deleted", 1)])
+    await database.books.create_index("title")
+    await database.books.create_index("author_ids")
+    await database.books.create_index("categories")
+    await database.book_authors.create_index([("book_id", 1), ("author_id", 1)], unique=True)
+    await database.book_categories.create_index([("book_id", 1), ("category", 1)], unique=True)
+    await database.edition_languages.create_index([("edition_id", 1), ("language", 1)], unique=True)
+    await database.editions.create_index("book_id")
+    await database.orders.create_index("user_id")
+    await database.orders.create_index("state")
+    await database.order_editions.create_index("order_id")
+    await database.order_editions.create_index("edition_id")
+    await database.borrows.create_index([("user_id", 1), ("edition_id", 1), ("status", 1)])
+    await database.waitlist.create_index([("user_id", 1), ("edition_id", 1)], unique=True)
+    await database.transactions.create_index([("user_id", 1), ("date", -1)])
+    await database.outbox_events.create_index([("processed", 1), ("id", 1)])
