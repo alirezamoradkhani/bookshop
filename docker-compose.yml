@@ -40,6 +40,13 @@ services:
       - "15672:15672"
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+      start_interval: 5s
 
   meilisearch:
     # Keep infrastructure logs available via docker compose logs, outside the app console.
@@ -67,7 +74,7 @@ services:
       redis:
         condition: service_started
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       meilisearch:
         condition: service_started
     env_file:
@@ -88,7 +95,7 @@ services:
       mongo:
         condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       redis:
         condition: service_started
     env_file:
@@ -109,7 +116,7 @@ services:
       mongo:
         condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       redis:
         condition: service_started
     env_file:

@@ -29,6 +29,10 @@ class RabbitMQBroker(BaseBroker):
 
             self.connection = await aio_pika.connect_robust(
                 self.url,
+                # A process start does not guarantee the broker is ready yet.
+                # RobustConnection retries the first connection as well as reconnects.
+                fail_fast=False,
+                reconnect_interval=5,
             )
 
             self.channel = await self.connection.channel()
