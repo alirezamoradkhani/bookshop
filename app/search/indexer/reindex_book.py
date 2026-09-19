@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 from app.dependency_injection.container import Container
 
 async def reindex_books():
@@ -24,7 +28,7 @@ async def reindex_books():
 
     index.add_documents(docs)
 
-    print(f"reindexed {len(docs)} books")
+    logger.debug("Reindexed %s books", len(docs))
 
 if __name__ == "__main__":
     import asyncio

@@ -117,7 +117,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload --log-level error --no-access-log
 ```
 
 Start workers in separate terminals when their backing services are available:

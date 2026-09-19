@@ -7,6 +7,7 @@ class Settings(BaseSettings):
 
     app_name: str = "bookshop"
     debug: bool = False
+    log_level: str = "ERROR"
     mongo_url: str = "mongodb://localhost:27017"
     mongo_database: str = "bookshop"
     mongo_transactions: bool = False

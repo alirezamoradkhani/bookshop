@@ -15,8 +15,12 @@ from fastapi.responses import JSONResponse
 import logging
 from app.dependency_injection.container import Container
 from app.core.database import client, init_mongo
+from app.core.setting import settings
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+logging.basicConfig(
+    level=getattr(logging, settings.log_level.upper(), logging.ERROR),
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 logger = logging.getLogger(__name__)
 
 container = Container()
@@ -40,7 +44,7 @@ async def lifespan(app: FastAPI):
     try:
         await init_mongo()
     except Exception as exc:
-        logger.warning("MongoDB is unavailable during startup: %s", exc)
+        logger.error("MongoDB is unavailable during startup: %s", exc)
     yield
     await client.close()
 

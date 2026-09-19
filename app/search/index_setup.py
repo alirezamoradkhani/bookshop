@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 from app.dependency_injection.container import Container
 
 container = Container()
@@ -7,10 +11,10 @@ def setup_book_indexes():
     # --- create index (idempotent) ---
     try:
         client.get_index("books")
-        print("books index already exists")
+        logger.debug("Books index already exists")
     except Exception:
         client.create_index("books", {"primaryKey": "id"})
-        print("books index created")
+        logger.debug("Books index created")
 
     index = client.index("books")
 
@@ -30,7 +34,7 @@ def setup_book_indexes():
         "id"
     ])
 
-    print("books index configured")
+    logger.debug("Books index configured")
 
 
 def setup_edition_indexes():
@@ -39,10 +43,10 @@ def setup_edition_indexes():
     # --- create index (idempotent) ---
     try:
         client.get_index("editions")
-        print("editions index already exists")
+        logger.debug("Editions index already exists")
     except Exception:
         client.create_index("editions", {"primaryKey": "id"})
-        print("editions index created")
+        logger.debug("Editions index created")
 
     index = client.index("editions")
 
@@ -76,7 +80,7 @@ def setup_edition_indexes():
         "amount",
     ])
 
-    print("editions index configured")
+    logger.debug("Editions index configured")
 
 
 if __name__ == "__main__":

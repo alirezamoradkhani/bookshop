@@ -3,20 +3,24 @@ services:
     image: mongo:8
     container_name: bookshop-mongo
     restart: always
+    command: ["mongod", "--config", "/etc/mongod.conf"]
     ports:
       - "27018:27017"
     volumes:
       - mongo_data:/data/db
+      - ./mongo.conf:/etc/mongod.conf:ro
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 })"]
-      interval: 5s
+      interval: 30m
       timeout: 5s
       retries: 10
+      start_period: 5s
 
   redis:
     image: redis:7
     container_name: bookshop-redis
     restart: always
+    command: ["redis-server", "--loglevel", "warning"]
     ports:
       - "6380:6379"
 
@@ -27,6 +31,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
 
   meilisearch:
     image: getmeili/meilisearch
@@ -36,6 +42,7 @@ services:
       - "7700:7700"
     environment:
       MEILI_MASTER_KEY: masterKey
+      MEILI_LOG_LEVEL: ERROR
     volumes:
       - meili_data:/meili_data
 
@@ -61,7 +68,7 @@ services:
       MONGO_DATABASE: bookshop
     volumes:
       - .:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level error --no-access-log
 
   consumer-worker:
     build: .
