@@ -35,10 +35,6 @@ class FakeUnitOfWork:
         else:
             self.committed = True
 
-    async def flush(self):
-        return None
-
-
 class FakeBaseUsers:
     def __init__(self, users):
         self.users = {user.id: user for user in users}
@@ -78,6 +74,10 @@ class FakeEditions:
     async def update_amount(self, edition, new_amount):
         edition.amount = new_amount
         self.updated.append((edition.id, new_amount))
+
+    async def change_amount(self, edition, change):
+        edition.amount += change
+        self.updated.append((edition.id, edition.amount))
 
 
 class FakeOrders:

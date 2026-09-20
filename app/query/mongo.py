@@ -10,7 +10,7 @@ class MongoRow(dict):
 
 
 async def aggregate(db, collection: str, pipeline: list[dict[str, Any]]) -> list[MongoRow]:
-    cursor = db.collection(collection).aggregate(pipeline, **db.options())
+    cursor = db[collection].aggregate(pipeline)
     return [MongoRow(document) async for document in cursor]
 
 
@@ -100,7 +100,7 @@ async def best_author_in_income(db):
 
 
 async def count_of_owerdue(db, user):
-    return await db.collection("borrows").count_documents({"user_id": user.id, "is_overdue": True}, **db.options())
+    return await db["borrows"].count_documents({"user_id": user.id, "is_overdue": True})
 
 
 async def user_with_over_due(db):

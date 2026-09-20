@@ -42,13 +42,10 @@ async def create_edition(uow:UnitOfWork,edition:EditionCreate,token_data:dict):
             ,description = edition.description
             )
         await uow.edition.create_edition(new_edition)
-        await uow.flush()
         edition_languages = [
             model.EditionLanguage(edition_id=new_edition.id,language=language.lower()) for language in edition.language
         ]
         await uow.editionlanguage.create_many(edition_languages)
-
-        await uow.flush()
         event = EditionCreatedEvent(edition_id=new_edition.id)
         outbox_event = OutboxEvent(
             event_type=event.event_type,

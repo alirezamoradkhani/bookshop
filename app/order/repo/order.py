@@ -15,14 +15,14 @@ class OrderRepository(MongoRepository):
         return await self._find_one({"_id": order_id})
 
     async def update_order_state(self, order: Order, new_state: OrderState):
-        order.state = new_state
+        return await self._set_fields(order, state=new_state)
 
     async def update_final_price(self, order: Order, change: int):
-        order.final_price -= change
+        return await self._increment_fields(order, final_price=-change)
 
     async def many_update_state(self, order_ids: list[int], new_state):
-        await self.db.collection(self.collection).update_many(
-            {"_id": {"$in": order_ids}}, {"$set": {"state": serialize(new_state)}}, **self.db.options()
+        await self._collection().update_many(
+            {"_id": {"$in": order_ids}}, {"$set": {"state": serialize(new_state)}}, **self._options()
         )
 
     async def get_by_state(self, state: OrderState):

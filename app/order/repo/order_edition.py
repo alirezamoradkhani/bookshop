@@ -17,14 +17,17 @@ class OrderEditionRepository(MongoRepository):
             await self._insert(item)
 
     async def update_state(self, new_state: OrderItemState, orderedition: OrderEdition):
-        orderedition.state = new_state
-        orderedition.last_modify = datetime.utcnow()
+        return await self._set_fields(
+            orderedition,
+            state=new_state,
+            last_modify=datetime.utcnow(),
+        )
 
     async def many_update_state(self, order_edition_ids: list[int], new_state: OrderItemState):
-        await self.db.collection(self.collection).update_many(
+        await self._collection().update_many(
             {"_id": {"$in": order_edition_ids}},
             {"$set": {"state": serialize(new_state), "last_modify": datetime.utcnow()}},
-            **self.db.options(),
+            **self._options(),
         )
 
     async def get_by_order_id(self, order_id: int):

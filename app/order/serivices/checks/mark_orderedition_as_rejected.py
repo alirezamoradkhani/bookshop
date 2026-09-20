@@ -24,7 +24,7 @@ async def mark_orderedition_as_rejected(uow_factory):
             )
             await uow.order.update_final_price(order=order, change=order_edition.price)
             await uow.baseusers.increase_wallet_amount(user=customer, change=order_edition.price)
-            await uow.edition.update_amount(edition=edition, new_amount=edition.amount + 1)
+            await uow.edition.change_amount(edition=edition, change=1)
             event = OrderItemRejectedEvent(order_item_id=order_edition.order_edition_id)
             await uow.outbox.add(OutboxEvent(
                 event_type=event.event_type,

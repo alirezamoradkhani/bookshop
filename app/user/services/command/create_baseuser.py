@@ -46,7 +46,6 @@ async def create_user(uow:UnitOfWork,user: inputs.UserCreate,otp: str):
         else:
             raise InvalidRegistrationRole
         await uow.baseusers.create(new_user)
-        await uow.flush()
         event = UserCreatedEvent(user_id=new_user.id)
         await uow.outbox.add(OutboxEvent(
             event_type=event.event_type,

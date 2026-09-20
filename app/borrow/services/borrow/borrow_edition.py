@@ -30,7 +30,7 @@ async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
             now = datetime.now(current_user.plan_expire.tzinfo or timezone.utc)
             if current_user.plan_expire <= now:
                 raise PlanPermissionDenied
-        edition = await uow.edition.get_by_id(edition_id=edition_id, for_update=True)
+        edition = await uow.edition.get_by_id(edition_id=edition_id)
         if edition is None:
             raise EditionNotFound
         if await uow.borrow.get_active_by_user_and_edition(current_user.id, edition.id):
@@ -50,9 +50,7 @@ async def borrow_edition(uow:UnitOfWork,token_data:dict,edition_id:int):
         due_at = now + timedelta(days=day)
         new_borrow = model.Borrow(user_id=current_user.id,edition_id=edition.id,borrowed_at=now,due_at=due_at)
         await uow.borrow.create(new_borrow=new_borrow)
-        await uow.flush()
-        amount = edition.amount
-        await uow.edition.update_amount(edition=edition,new_amount=amount-1)
+        await uow.edition.change_amount(edition=edition, change=-1)
         event = BorrowCreatedEvent(
             borrow_id=new_borrow.id,
             edition_id=edition.id,

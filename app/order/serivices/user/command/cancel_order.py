@@ -20,7 +20,6 @@ async def cancel_order(uow:UnitOfWork,order_id: int, token_data: dict):
 
         if current_user.role == Role.AUTHOR:
              raise OnlyUserHavePrimition
-        await uow.flush()
         order_editions = await uow.orderedition.get_by_order_id(order.id)
         if current_user.role == Role.USER:
             if order.user_id != current_user.id:
@@ -34,7 +33,7 @@ async def cancel_order(uow:UnitOfWork,order_id: int, token_data: dict):
                 if order_edition.state == enums.OrderItemState.WAITING:
                     edition = await uow.edition.get_by_id(order_edition.edition_id)
                     if edition is not None:
-                        await uow.edition.update_amount(edition, edition.amount + 1)
+                        await uow.edition.change_amount(edition, 1)
             await uow.order.update_order_state(order=order,new_state=enums.OrderState.CANCELED)
             await uow.orderedition.many_update_state(
                 order_edition_ids=[oe.order_edition_id for oe in order_editions],

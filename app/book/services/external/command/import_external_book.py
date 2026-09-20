@@ -107,8 +107,6 @@ async def import_book(
 
         await uow.book.create_book(book)
 
-        await uow.flush()
-
         book_authors = [
             model.BookAuthor(
                 book_id=book.id,

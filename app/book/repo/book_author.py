@@ -12,8 +12,8 @@ class BookAuthorRepository(MongoRepository):
     async def create_many(self, items: list[BookAuthor]):
         for item in items:
             await self._insert(item)
-            await self.db.collection("books").update_one(
-                {"_id": item.book_id}, {"$addToSet": {"author_ids": item.author_id}}, **self.db.options()
+            await self._collection("books").update_one(
+                {"_id": item.book_id}, {"$addToSet": {"author_ids": item.author_id}}, **self._options()
             )
 
     async def get_by_authorid_and_bookid(self, book_id: int, author_id: int):

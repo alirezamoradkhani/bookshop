@@ -19,12 +19,12 @@ class BaseUserRepository(MongoRepository):
         if cls is User:
             plan = payload.get("plan", UserPlan.BRONZE)
             payload["plan"] = plan if isinstance(plan, UserPlan) else UserPlan(plan)
-        return self.db.track(cls(**payload), self.collection)
+        return cls(**payload)
 
-    async def get_by_id(self, user_id: int, for_update: bool = False):
+    async def get_by_id(self, user_id: int):
         return await self._find_one({"_id": user_id, "is_deleted": False})
 
-    async def get_by_ids(self, user_ids: list[int], for_update: bool = False):
+    async def get_by_ids(self, user_ids: list[int]):
         return await self._find({"_id": {"$in": user_ids}, "is_deleted": False})
 
     async def get_by_username(self, user_name: str):
@@ -37,20 +37,19 @@ class BaseUserRepository(MongoRepository):
         return await self._insert(new_user)
 
     async def soft_delete(self, user: BaseUser):
-        user.is_deleted = True
-        return user
+        return await self._set_fields(user, is_deleted=True)
 
     async def update_wallet_amount(self, user: BaseUser, new_amount: int):
-        user.wallet_amount = new_amount
+        return await self._set_fields(user, wallet_amount=new_amount)
 
     async def increase_wallet_amount(self, user: BaseUser, change: int):
-        user.wallet_amount += change
+        return await self._increment_fields(user, wallet_amount=change)
 
     async def many_increase_wallet(self, wallet_updates: list[tuple[int, int]]):
         for user_id, change in wallet_updates:
-            await self.db.collection(self.collection).update_one(
-                {"_id": user_id}, {"$inc": {"wallet_amount": change}}, **self.db.options()
+            await self._collection().update_one(
+                {"_id": user_id}, {"$inc": {"wallet_amount": change}}, **self._options()
             )
 
     async def decrease_wallet_amount(self, user: BaseUser, change: int):
-        user.wallet_amount -= change
+        return await self._increment_fields(user, wallet_amount=-change)

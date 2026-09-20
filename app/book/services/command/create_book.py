@@ -17,7 +17,6 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
             raise OnlyAuthorPrimition
         book = model.Book(title=new_book.title)
         await uow.book.create_book(book)
-        await uow.flush()
         authors = await uow.author.get_by_ids(new_book.authors_id)
         found_ids = {a.id for a in authors}
         missing = set(new_book.authors_id) - found_ids
@@ -32,7 +31,6 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
             model.BookCategory(book_id=book.id, category=category.lower()) for category in new_book.categorys
         ]
         await uow.bookcategory.create_many(book_categorys)
-        await uow.flush()
         event = BookCreatedEvent(book_id=book.id)
         outbox_event = OutboxEvent(
             event_type=event.event_type,

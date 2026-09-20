@@ -12,19 +12,19 @@ class BookCategoryRepository(MongoRepository):
     async def create_many(self, items: list[BookCategory]):
         for item in items:
             await self._insert(item)
-            await self.db.collection("books").update_one(
-                {"_id": item.book_id}, {"$addToSet": {"categories": item.category}}, **self.db.options()
+            await self._collection("books").update_one(
+                {"_id": item.book_id}, {"$addToSet": {"categories": item.category}}, **self._options()
             )
 
     async def delete(self, book_category: BookCategory):
         await self._delete(book_category)
-        await self.db.collection("books").update_one(
-            {"_id": book_category.book_id}, {"$pull": {"categories": book_category.category}}, **self.db.options()
+        await self._collection("books").update_one(
+            {"_id": book_category.book_id}, {"$pull": {"categories": book_category.category}}, **self._options()
         )
 
     async def get_by_book_id(self, book_id: int):
         return await self._find({"book_id": book_id})
 
     async def delete_by_book_id(self, book_id: int):
-        await self.db.collection(self.collection).delete_many({"book_id": book_id}, **self.db.options())
-        await self.db.collection("books").update_one({"_id": book_id}, {"$set": {"categories": []}}, **self.db.options())
+        await self._collection().delete_many({"book_id": book_id}, **self._options())
+        await self._collection("books").update_one({"_id": book_id}, {"$set": {"categories": []}}, **self._options())

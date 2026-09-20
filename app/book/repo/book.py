@@ -16,10 +16,10 @@ class BookRepository(MongoRepository):
         return await self._find_one({"external_provider": external_provider, "external_id": external_id})
 
     async def update_book_title(self, book: Book, title: str):
-        book.title = title
+        return await self._set_fields(book, title=title)
 
     async def delete_book(self, book: Book):
-        book.is_deleted = True
+        return await self._set_fields(book, is_deleted=True)
 
     async def search_books(self, title=None, category=None, author_id=None):
         query: dict[str, Any] = {"is_deleted": False}

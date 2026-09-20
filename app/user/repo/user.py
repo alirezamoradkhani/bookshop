@@ -15,16 +15,15 @@ class UserRepository(BaseUserRepository):
     async def update_plan(self, new_plan: UserPlan, id: int, ex: datetime):
         user = await self.get_by_id(id)
         if user is not None:
-            user.plan, user.plan_expire = new_plan, ex
+            await self._set_fields(user, plan=new_plan, plan_expire=ex)
         return user
 
     async def change_user_plan(self, user: User, new_plan: UserPlan):
-        user.plan = new_plan
-        return user
+        return await self._set_fields(user, plan=new_plan)
 
     async def many_update_plan(self, user_ids: list[int], new_plan: UserPlan):
-        await self.db.collection(self.collection).update_many(
-            {"_id": {"$in": user_ids}}, {"$set": {"plan": serialize(new_plan)}}, **self.db.options()
+        await self._collection().update_many(
+            {"_id": {"$in": user_ids}}, {"$set": {"plan": serialize(new_plan)}}, **self._options()
         )
 
     async def get_plan_by_id(self, user_id: int):

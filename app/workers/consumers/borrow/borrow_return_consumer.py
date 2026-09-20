@@ -58,7 +58,7 @@ class BorrowReturnedConsumer(BaseConsumer):
         )
 
         await uow.borrow.create(new_borrow=borrow)
-        await uow.edition.update_amount(edition, edition.amount - 1)
+        await uow.edition.change_amount(edition, -1)
 
         await uow.waitlist.delete(waitlist)
 

@@ -15,7 +15,10 @@ class Waitlistpository(MongoRepository):
 
     async def get_by_edition_id_and_user_plan(self, edition_id: int, user_plan: UserPlan):
         for item in await self.get_by_edition_id(edition_id):
-            user = await self.db.collection("users").find_one({"_id": item.user_id, "plan": serialize(user_plan)}, **self.db.options())
+            user = await self._collection("users").find_one(
+                {"_id": item.user_id, "plan": serialize(user_plan)},
+                **self._options(),
+            )
             if user:
                 return item
         return None

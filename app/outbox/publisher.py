@@ -18,13 +18,11 @@ async def publish_outbox_events(uow:UnitOfWork, broker:RedisBroker | RabbitMQBro
                 message=event.payload
             )
 
-            event.processed = True
+            await uow.outbox.mark_processed(event)
             processed_count += 1
 
         except Exception:
             logger.exception("Failed to publish outbox event %s", event.id)
             continue
-
-    await uow.commit()
 
     return processed_count

@@ -17,7 +17,7 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
         if current_user.role != Role.USER:
             raise OnlyUserHavePrimition
         
-        borrow = await uow.borrow.get_by_id(borrow_id=borrow_id, for_update=True)
+        borrow = await uow.borrow.get_by_id(borrow_id=borrow_id)
         if borrow is None:
             raise BorrowNotFound
         if borrow.user_id != current_user.id:
@@ -30,7 +30,7 @@ async def return_borrow(uow:UnitOfWork,token_data:dict,borrow_id:int):
         edition = await uow.edition.get_by_id(edition_id=borrow.edition_id)
     
         if edition is not None:
-            await uow.edition.update_amount(edition=edition,new_amount=edition.amount+1)
+            await uow.edition.change_amount(edition=edition, change=1)
         event = BorrowReturnedEvent(
             edition_id=borrow.edition_id,
             returned_by=current_user.id

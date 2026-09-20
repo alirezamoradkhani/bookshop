@@ -33,7 +33,6 @@ async def create_order(
 
         current_user = await uow.baseusers.get_by_id(
             user_id=token_data["user_id"],
-            for_update=True,
         )
 
         if current_user is None:
@@ -42,7 +41,7 @@ async def create_order(
         if current_user.role != Role.USER:
             raise OnlyUserHavePrimition
 
-        editions = await uow.edition.get_by_ids(edition_ids, for_update=True)
+        editions = await uow.edition.get_by_ids(edition_ids)
 
         edition_map = {e.id: e for e in editions}
 
@@ -60,10 +59,11 @@ async def create_order(
 
             final_price += edition.price
 
-            edition.amount -= 1
-
         if current_user.wallet_amount < final_price:
             raise InsufficientFunds
+
+        for edition in editions:
+            await uow.edition.change_amount(edition, -1)
 
         await uow.baseusers.decrease_wallet_amount(
             user=current_user,
@@ -79,8 +79,6 @@ async def create_order(
         )
 
         await uow.order.create_order(new_order)
-
-        await uow.flush()
 
         order_editions = [
             model.OrderEdition(

@@ -1,29 +1,38 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from collections.abc import Callable
 from enum import Enum
 from typing import Any
 
 from pymongo import ReturnDocument
+from pymongo.asynchronous.database import AsyncDatabase
 
-from app.mongo.database import MongoContext
 from app.mongo.serialization import serialize
+
 
 class MongoRepository:
     collection: str
     model: type
     enum_fields: dict[str, type[Enum]] = {}
 
-    def __init__(self, db: MongoContext):
-        self.db = db
+    def __init__(self, database: AsyncDatabase, session_provider: Callable[[], Any]):
+        self.database = database
+        self._session_provider = session_provider
+
+    def _collection(self, name: str | None = None):
+        return self.database[name or self.collection]
+
+    def _options(self) -> dict[str, Any]:
+        session = self._session_provider()
+        return {"session": session} if session is not None else {}
 
     async def _next_id(self) -> int:
-        result = await self.db.collection("counters").find_one_and_update(
+        result = await self._collection("counters").find_one_and_update(
             {"_id": self.collection},
             {"$inc": {"value": 1}},
             upsert=True,
             return_document=ReturnDocument.AFTER,
-            **self.db.options(),
+            **self._options(),
         )
         return int(result["value"])
 
@@ -36,7 +45,7 @@ class MongoRepository:
             value = payload.get(field)
             if value is not None and not isinstance(value, enum_type):
                 payload[field] = enum_type(value)
-        return self.db.track(self.model(**payload), self.collection)
+        return self.model(**payload)
 
     async def _insert(self, obj: Any):
         object_id = getattr(obj, "id", None)
@@ -47,24 +56,38 @@ class MongoRepository:
             else:
                 obj.id = object_id
         document = {"_id": object_id, **serialize(obj)}
-        await self.db.collection(self.collection).insert_one(document, **self.db.options())
-        self.db.track(obj, self.collection)
+        await self._collection().insert_one(document, **self._options())
         return obj
 
     async def _find_one(self, query: dict[str, Any]):
-        document = await self.db.collection(self.collection).find_one(query, **self.db.options())
+        document = await self._collection().find_one(query, **self._options())
         return self._make(document)
 
     async def _find(self, query: dict[str, Any] | None = None, sort: tuple[str, int] | None = None):
-        cursor = self.db.collection(self.collection).find(query or {}, **self.db.options())
+        cursor = self._collection().find(query or {}, **self._options())
         if sort:
             cursor = cursor.sort(*sort)
         return [self._make(document) async for document in cursor]
 
-    async def _replace(self, obj: Any):
-        await self.db.collection(self.collection).replace_one(
-            {"_id": obj.id}, {"_id": obj.id, **serialize(obj)}, upsert=True, **self.db.options()
+    async def _set_fields(self, obj: Any, **changes: Any):
+        await self._collection().update_one(
+            {"_id": obj.id},
+            {"$set": serialize(changes)},
+            **self._options(),
         )
+        for field, value in changes.items():
+            setattr(obj, field, value)
+        return obj
+
+    async def _increment_fields(self, obj: Any, **changes: int):
+        await self._collection().update_one(
+            {"_id": obj.id},
+            {"$inc": changes},
+            **self._options(),
+        )
+        for field, change in changes.items():
+            setattr(obj, field, getattr(obj, field) + change)
+        return obj
 
     async def _delete(self, obj: Any):
-        await self.db.collection(self.collection).delete_one({"_id": obj.id}, **self.db.options())
+        await self._collection().delete_one({"_id": obj.id}, **self._options())

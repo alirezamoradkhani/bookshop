@@ -157,7 +157,7 @@ another request's lock.
 
 ### Database invariants
 
-Atomic update predicates and service-level checks protect wallet balances and
+Atomic field updates and service-level checks protect wallet balances and
 inventory. MongoDB references are application-managed rather than SQL foreign keys.
 
 ### Search as a read model

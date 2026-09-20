@@ -1,4 +1,9 @@
-from app.mongo.database import MongoContext
+from typing import Any
+
+from pymongo import AsyncMongoClient
+from pymongo.asynchronous.database import AsyncDatabase
+
+from app.core.setting import settings
 from app.user.repo.baseuser import BaseUserRepository
 from app.user.repo.user import UserRepository
 from app.user.repo.author import AuthorRepository
@@ -17,39 +22,48 @@ from app.outbox.repo import OutboxRepository
 
 
 class UnitOfWork:
-    def __init__(self, db: MongoContext):
-        self.db = db
-        self.baseusers = BaseUserRepository(db)
-        self.user = UserRepository(db)
-        self.author = AuthorRepository(db)
-        self.book = BookRepository(db)
-        self.bookauthor = BookAuthorRepository(db)
-        self.bookcategory = BookCategoryRepository(db)
-        self.edition = EditionRepository(db)
-        self.editionlanguage = EditionLanguageRepository(db)
-        self.order = OrderRepository(db)
-        self.orderedition = OrderEditionRepository(db)
-        self.admin = AdminRepository(db)
-        self.transaction = TransactionRepository(db)
-        self.borrow = Borrowpository(db)
-        self.waitlist = Waitlistpository(db)
-        self.outbox = OutboxRepository(db)
+    def __init__(self, database: AsyncDatabase, client: AsyncMongoClient):
+        self.db = database
+        self.client = client
+        self.session: Any = None
+        session_provider = lambda: self.session
+        self.baseusers = BaseUserRepository(database, session_provider)
+        self.user = UserRepository(database, session_provider)
+        self.author = AuthorRepository(database, session_provider)
+        self.book = BookRepository(database, session_provider)
+        self.bookauthor = BookAuthorRepository(database, session_provider)
+        self.bookcategory = BookCategoryRepository(database, session_provider)
+        self.edition = EditionRepository(database, session_provider)
+        self.editionlanguage = EditionLanguageRepository(database, session_provider)
+        self.order = OrderRepository(database, session_provider)
+        self.orderedition = OrderEditionRepository(database, session_provider)
+        self.admin = AdminRepository(database, session_provider)
+        self.transaction = TransactionRepository(database, session_provider)
+        self.borrow = Borrowpository(database, session_provider)
+        self.waitlist = Waitlistpository(database, session_provider)
+        self.outbox = OutboxRepository(database, session_provider)
 
     async def __aenter__(self):
-        await self.db.__aenter__()
+        if settings.mongo_transactions:
+            self.session = await self.client.start_session()
+            self.session.start_transaction()
         return self
 
     async def __aexit__(self, exc_type, exc, tb):
-        return await self.db.__aexit__(exc_type, exc, tb)
+        try:
+            if exc_type is None:
+                await self.commit()
+            else:
+                await self.rollback()
+        finally:
+            if self.session is not None:
+                await self.session.end_session()
+                self.session = None
 
     async def commit(self):
-        await self.db.commit()
+        if self.session is not None and self.session.in_transaction:
+            await self.session.commit_transaction()
 
     async def rollback(self):
-        await self.db.rollback()
-
-    async def refresh(self, obj):
-        return obj
-
-    async def flush(self):
-        await self.db.flush()
+        if self.session is not None and self.session.in_transaction:
+            await self.session.abort_transaction()

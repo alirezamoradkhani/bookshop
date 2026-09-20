@@ -13,3 +13,6 @@ class OutboxRepository(MongoRepository):
 
     async def get_unprocessed(self, limit: int):
         return (await self._find({"processed": False}, ("id", 1)))[:limit]
+
+    async def mark_processed(self, event: OutboxEvent):
+        return await self._set_fields(event, processed=True)

@@ -13,7 +13,7 @@ async def transfer(uow:UnitOfWork,amount:int,token_data: dict,reciver_id :int):
         raise InvalidAmount
     async with uow:
         user_ids = sorted({token_data["user_id"], reciver_id})
-        users = await uow.baseusers.get_by_ids(user_ids, for_update=True)
+        users = await uow.baseusers.get_by_ids(user_ids)
         users_by_id = {user.id: user for user in users}
         current_user = users_by_id.get(token_data["user_id"])
         if current_user is None:
@@ -25,7 +25,6 @@ async def transfer(uow:UnitOfWork,amount:int,token_data: dict,reciver_id :int):
             raise InsufficientFunds
         send_transaction = Transaction(user_id=current_user.id,amount=amount,date=datetime.utcnow(),type=TransactionType.SEND)
         await uow.transaction.create(send_transaction)
-        await uow.flush()
         recive_transaction = Transaction(user_id=reciver.id,amount=amount,date=datetime.utcnow(),type=TransactionType.RECEIVE)
         await uow.transaction.create(recive_transaction)
 

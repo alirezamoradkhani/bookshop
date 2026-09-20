@@ -34,7 +34,6 @@ async def add_to_wait_list(uow:UnitOfWork,token_data:dict,edition_id):
         now = datetime.utcnow()
         new_waitlist = Waitlist(user_id=current_user.id,edition_id=edition_id,created_at=now)
         await uow.waitlist.create(waitlist=new_waitlist)
-        await uow.flush()
         event = WaitlistCreateEvent(edition_id=edition.id, user_id=current_user.id)
         await uow.outbox.add(OutboxEvent(
             event_type=event.event_type,
