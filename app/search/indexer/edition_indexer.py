@@ -10,9 +10,11 @@ class EditionIndexer:
         edition = await self.uow.edition.get_by_id(edition_id)
         if not edition:
             return
+        assert edition.id is not None
         book = await self.uow.book.get_by_id(edition.book_id)
         if not book:
             return
+        assert book.id is not None
         doc = {
             "id": edition.id,
             "edition_title": edition.specefic_edition_title,

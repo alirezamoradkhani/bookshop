@@ -17,6 +17,8 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
             raise OnlyAuthorPrimition
         book = model.Book(title=new_book.title)
         await uow.book.create_book(book)
+        assert book.id is not None
+        book_id: int = book.id
         authors = await uow.author.get_by_ids(new_book.authors_id)
         found_ids = {a.id for a in authors}
         missing = set(new_book.authors_id) - found_ids
@@ -24,14 +26,14 @@ async def create_book(uow:UnitOfWork,new_book:inputs.BookCreate,token_data:dict)
         if missing:
             raise AuthorNotFound
         book_authors = [
-            model.BookAuthor(book_id=book.id,
+            model.BookAuthor(book_id=book_id,
                             author_id=author.id)for author in authors]
         await uow.bookauthor.create_many(book_authors)
         book_categorys = [
-            model.BookCategory(book_id=book.id, category=category.lower()) for category in new_book.categorys
+            model.BookCategory(book_id=book_id, category=category.lower()) for category in new_book.categorys
         ]
         await uow.bookcategory.create_many(book_categorys)
-        event = BookCreatedEvent(book_id=book.id)
+        event = BookCreatedEvent(book_id=book_id)
         outbox_event = OutboxEvent(
             event_type=event.event_type,
             payload=event_to_payload(event=event)

@@ -19,7 +19,9 @@ async def update_book(uow:UnitOfWork, token_data:dict,book_id:int,book_update:in
         book = await uow.book.get_by_id(book_id)
         if book is None:
             raise BookNotFound
-        elif current_user.role == Role.AUTHOR:
+        assert book.id is not None
+        book_id_value: int = book.id
+        if current_user.role == Role.AUTHOR:
             if await uow.bookauthor.get_by_authorid_and_bookid(book_id=book_id,author_id=current_user.id) == None:
                 raise UserPermissionDenied
     
@@ -28,7 +30,7 @@ async def update_book(uow:UnitOfWork, token_data:dict,book_id:int,book_update:in
 
             if book_update.categorys is not None:
                await uow.bookcategory.delete_by_book_id(book_id=book_id)
-               book_categorys = [model.BookCategory(book_id=book.id,category=category) for category in book_update.categorys]
+               book_categorys = [model.BookCategory(book_id=book_id_value,category=category) for category in book_update.categorys]
                await uow.bookcategory.create_many(items=book_categorys)
         elif current_user.role == Role.ADMIN:
             if book_update.title is not None:
@@ -36,10 +38,10 @@ async def update_book(uow:UnitOfWork, token_data:dict,book_id:int,book_update:in
 
             if book_update.categorys is not None:
                 await uow.bookcategory.delete_by_book_id(book_id=book_id)
-                book_categorys = [model.BookCategory(book_id=book.id,category=category) for category in book_update.categorys]
+                book_categorys = [model.BookCategory(book_id=book_id_value,category=category) for category in book_update.categorys]
                 await uow.bookcategory.create_many(items=book_categorys)
 
-        event = BookUpdatedEvent(book_id=book.id)
+        event = BookUpdatedEvent(book_id=book_id_value)
         outbox_event = OutboxEvent(
             event_type=event.event_type,
             payload=event_to_payload(event=event)

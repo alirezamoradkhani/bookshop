@@ -106,10 +106,12 @@ async def import_book(
         )
 
         await uow.book.create_book(book)
+        assert book.id is not None
+        book_id: int = book.id
 
         book_authors = [
             model.BookAuthor(
-                book_id=book.id,
+                book_id=book_id,
                 author_id=author.id
             )
             for author in authors
@@ -119,7 +121,7 @@ async def import_book(
 
         book_categories = [
             model.BookCategory(
-                book_id=book.id,
+                book_id=book_id,
                 category=category
             )
             for category in categories

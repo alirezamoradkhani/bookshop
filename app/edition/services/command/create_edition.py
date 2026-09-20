@@ -42,6 +42,7 @@ async def create_edition(uow:UnitOfWork,edition:EditionCreate,token_data:dict):
             ,description = edition.description
             )
         await uow.edition.create_edition(new_edition)
+        assert new_edition.id is not None
         edition_languages = [
             model.EditionLanguage(edition_id=new_edition.id,language=language.lower()) for language in edition.language
         ]

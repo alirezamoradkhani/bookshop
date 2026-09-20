@@ -10,6 +10,7 @@ class BookIndexer:
         book = await self.uow.book.get_by_id(book_id)
         if not book:
             return
+        assert book.id is not None
         doc = {
             "id": book.id,
             "title": book.title,
