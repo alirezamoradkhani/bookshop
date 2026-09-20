@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     mongo_url: str = "mongodb://localhost:27017"
     mongo_database: str = "bookshop"
     mongo_transactions: bool = False
-    database_url: str = ""
     redis_url: str = "redis://localhost:6379/0"
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
     jwt_secret: str = Field(default="development-secret-key-change-me", min_length=12)
